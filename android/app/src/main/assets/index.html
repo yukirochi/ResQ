@@ -27,11 +27,6 @@
       --text-muted: #7A828E;
       --border-subtle: #F0F2F5;
 
-      --priority-high-bg: #FFF0F0;
-      --priority-high-text: #E53935;
-      --priority-standard-bg: #FFF8E1;
-      --priority-standard-text: #D97706;
-
       --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.05);
       --shadow-sos: 0 16px 36px rgba(229, 57, 53, 0.35);
     }
@@ -177,7 +172,7 @@
     }
 
     /* ============================================================
-       SCREEN 1: HOME SCREEN (MINIMAL & CLEAR)
+       SCREEN 1: HOME SCREEN (MINIMAL & CLEAN)
        ============================================================ */
     .home-header {
       display: flex;
@@ -188,25 +183,22 @@
     .user-greeting { font-size: 13px; color: var(--text-muted); font-weight: 600; }
     .user-name-title { font-size: 20px; font-weight: 900; color: var(--text-main); }
     
-    .priority-badge-header {
+    .profile-header-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 1px solid var(--border-subtle);
       display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border-radius: 18px;
-      font-size: 11px;
-      font-weight: 800;
-      background: var(--priority-standard-bg);
-      color: var(--priority-standard-text);
-      border: 1px solid rgba(217, 119, 6, 0.25);
+      justify-content: center;
+      color: var(--text-main);
       cursor: pointer;
-      transition: all 0.2s ease;
+      box-shadow: var(--shadow-card);
+      transition: transform 0.15s ease;
     }
-    .priority-badge-header.critical {
-      background: var(--priority-high-bg);
-      color: var(--priority-high-text);
-      border-color: var(--red-border);
-    }
+    .profile-header-btn:active { transform: scale(0.92); }
+    .profile-header-btn svg { width: 20px; height: 20px; fill: currentColor; }
 
     .hero-title-box { text-align: center; margin-bottom: 20px; }
     .hero-main-txt { font-size: 24px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 4px; }
@@ -405,7 +397,7 @@
     }
 
     /* ============================================================
-       SCREEN 3: SEARCH RADAR (100.1% CALIBRATED SCOPE)
+       SCREEN 3: SEARCH RADAR (CALIBRATED SCOPE)
        ============================================================ */
     .radar-header {
       display: flex;
@@ -414,16 +406,6 @@
       margin-bottom: 16px;
     }
     .radar-header-title { font-size: 20px; font-weight: 900; color: var(--text-main); }
-    .radar-accuracy-pill {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      font-weight: 800;
-      padding: 4px 8px;
-      border-radius: 8px;
-      background: var(--red-soft);
-      color: var(--red-primary);
-      border: 1px solid var(--red-border);
-    }
 
     .radar-scope-wrapper {
       background: var(--bg-card);
@@ -552,20 +534,6 @@
     }
     .target-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
     .target-name { font-size: 15px; font-weight: 900; color: var(--text-main); }
-    .target-priority-pill {
-      font-size: 10px;
-      font-weight: 800;
-      padding: 3px 8px;
-      border-radius: 8px;
-      background: var(--priority-standard-bg);
-      color: var(--priority-standard-text);
-      border: 1px solid rgba(217, 119, 6, 0.25);
-    }
-    .target-priority-pill.critical {
-      background: var(--red-soft);
-      color: var(--red-primary);
-      border-color: var(--red-border);
-    }
     .target-desc-row { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 12px; }
 
     .target-actions-row { display: flex; gap: 8px; }
@@ -607,28 +575,6 @@
     .profile-title-box { margin-bottom: 18px; }
     .profile-page-title { font-size: 22px; font-weight: 900; color: var(--text-main); margin-bottom: 4px; }
     .profile-page-sub { font-size: 12px; color: var(--text-muted); font-weight: 500; }
-
-    .priority-banner-box {
-      border-radius: 16px;
-      padding: 12px 14px;
-      background: var(--priority-standard-bg);
-      border: 1px solid rgba(217, 119, 6, 0.25);
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: all 0.2s ease;
-    }
-    .priority-indicator-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #D97706;
-      flex-shrink: 0;
-      animation: pulseGlow 2s infinite;
-    }
-    .priority-level-title { font-size: 12px; font-weight: 900; color: #D97706; margin-bottom: 2px; }
-    .priority-level-desc { font-size: 11px; color: var(--text-muted); font-weight: 600; line-height: 15px; }
 
     .profile-section-card {
       background: var(--bg-card);
@@ -778,9 +724,9 @@
           <div class="user-greeting">Welcome to ResQ,</div>
           <div class="user-name-title" id="homeUserName">Ready to Broadcast</div>
         </div>
-        <div class="priority-badge-header" id="homePriorityBadgeWrap" onclick="switchTab('profile')">
-          <span id="homePriorityBadge">Standard Priority</span>
-        </div>
+        <button class="profile-header-btn" onclick="switchTab('profile')" title="Edit Profile">
+          <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        </button>
       </div>
 
       <div class="hero-title-box">
@@ -806,14 +752,14 @@
         </div>
         <div style="flex: 1;">
           <div class="card-title" id="locationCardTitle">Acquiring GPS position...</div>
-          <div class="card-desc" id="locationCardDesc">Offline BLE Mesh Active • 100.1% Radar Ready</div>
+          <div class="card-desc" id="locationCardDesc">Offline BLE Mesh Active • Radar Ready</div>
         </div>
       </div>
 
       <!-- Medical Declaration Summary Card (Links to Profile) -->
       <div class="profile-shortcut-card" onclick="switchTab('profile')">
         <div class="shortcut-header">
-          <span class="shortcut-title">Declared Medical Priority</span>
+          <span class="shortcut-title">Declared Medical Info</span>
           <span class="shortcut-link">Edit Profile</span>
         </div>
         <div class="condition-chips-list" id="homeConditionsList">
@@ -859,7 +805,7 @@
 
       <div class="dispatch-content">
         <h2 class="dispatch-title">Help is on the way</h2>
-        <p class="dispatch-desc">Emergency beacon is transmitting your location and declared medical priority over offline mesh.</p>
+        <p class="dispatch-desc">Emergency beacon is transmitting your location and declared medical conditions over offline mesh.</p>
         <div class="dispatch-badge-tag" id="dispatchBeaconStatus">BROADCASTING RESCUE BEACON</div>
       </div>
 
@@ -873,12 +819,11 @@
     </div>
 
     <!-- ============================================================
-         SCREEN 3: RADAR (MINIMAL & ON-THEME)
+         SCREEN 3: SEARCH RADAR (CALIBRATED SCOPE)
          ============================================================ -->
     <div id="screenRadar" class="screen">
       <div class="radar-header">
         <span class="radar-header-title">Search Radar</span>
-        <span class="radar-accuracy-pill">100.1% ACCURATE</span>
       </div>
 
       <!-- Scope Housing -->
@@ -922,11 +867,10 @@
         </button>
       </div>
 
-      <!-- Target Status Card with Declared Medical Priority -->
+      <!-- Target Status Card -->
       <div class="radar-target-card">
         <div class="target-card-top">
           <span class="target-name" id="radarTargetName">No Target Locked</span>
-          <span class="target-priority-pill" id="radarTargetPriority">IDLE</span>
         </div>
         <div class="target-desc-row" id="radarTargetDesc">
           Listening on 2.4 GHz Emergency Mesh for active victim beacons...
@@ -951,16 +895,7 @@
     <div id="screenProfile" class="screen">
       <div class="profile-title-box">
         <h2 class="profile-page-title">Medical Profile</h2>
-        <p class="profile-page-sub">Declare conditions so rescuers know who to prioritize first.</p>
-      </div>
-
-      <!-- Priority Status Banner -->
-      <div class="priority-banner-box" id="profilePriorityBanner">
-        <div class="priority-indicator-dot" id="profilePriorityDot"></div>
-        <div>
-          <div class="priority-level-title" id="profilePriorityTitle">STANDARD RESCUE PRIORITY (LEVEL 2)</div>
-          <div class="priority-level-desc" id="profilePriorityDesc">No critical conditions declared. Standard triage order.</div>
-        </div>
+        <p class="profile-page-sub">Declare conditions and blood type for rescuers upon extraction.</p>
       </div>
 
       <!-- Personal Info -->
@@ -984,14 +919,14 @@
         </div>
       </div>
 
-      <!-- Medical Conditions / Disabilities (Priority Toggles) -->
+      <!-- Medical Conditions / Disabilities -->
       <div class="profile-section-card">
         <div class="section-label">Medical Conditions & Disabilities</div>
         <div class="medical-toggles-grid">
           <div class="med-toggle-item" id="toggle_diabetic" onclick="toggleCondition(this, 'diabetic')">
             <div>
               <div class="med-name">Diabetic (Insulin Dependent)</div>
-              <div class="med-sub">Critical triage priority. Susceptible to ketoacidosis.</div>
+              <div class="med-sub">Susceptible to ketoacidosis. Requires insulin/glucose.</div>
             </div>
             <div class="med-checkbox">
               <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -1109,7 +1044,7 @@
 
   <script>
     /* ============================================================
-       PROFILE & MEDICAL TRIAGE STATE (PERSISTED)
+       PROFILE & MEDICAL STATE (PERSISTED)
        ============================================================ */
     const STORAGE_KEY_PROFILE = 'resq_user_profile';
     const STORAGE_KEY_CHAT = 'resq_chat_history';
@@ -1175,7 +1110,6 @@
         }
       }
 
-      updateProfilePriorityUI();
       renderHomeConditions();
     }
 
@@ -1188,48 +1122,11 @@
         btn.classList.add('selected');
         userProfile.bloodType = type;
       }
-      updateProfilePriorityUI();
     }
 
     function toggleCondition(el, key) {
       el.classList.toggle('selected');
       userProfile.conditions[key] = el.classList.contains('selected');
-      updateProfilePriorityUI();
-    }
-
-    function updateProfilePriorityUI() {
-      const isCritical = userProfile.conditions.diabetic || userProfile.conditions.mobility || userProfile.conditions.cardiac;
-      const banner = document.getElementById('profilePriorityBanner');
-      const dot = document.getElementById('profilePriorityDot');
-      const title = document.getElementById('profilePriorityTitle');
-      const desc = document.getElementById('profilePriorityDesc');
-      const homeBadgeWrap = document.getElementById('homePriorityBadgeWrap');
-      const homeBadge = document.getElementById('homePriorityBadge');
-
-      if (isCritical) {
-        banner.style.background = "#FFF0F0";
-        banner.style.borderColor = "rgba(229, 57, 53, 0.25)";
-        dot.style.background = "#E53935";
-        title.innerText = "CRITICAL RESCUE PRIORITY (LEVEL 1)";
-        title.style.color = "#E53935";
-        desc.innerText = "Diabetic, mobility, or cardiac condition declared. Rescuers extract this beacon first.";
-        
-        homeBadgeWrap.classList.add('critical');
-        let label = "Priority 1";
-        if (userProfile.conditions.diabetic) label += " • Diabetic";
-        else if (userProfile.conditions.mobility) label += " • Mobility";
-        else if (userProfile.conditions.cardiac) label += " • Cardiac";
-        homeBadge.innerText = label;
-      } else {
-        banner.style.background = "#FFF8E1";
-        banner.style.borderColor = "rgba(217, 119, 6, 0.25)";
-        dot.style.background = "#D97706";
-        title.innerText = "STANDARD RESCUE PRIORITY (LEVEL 2)";
-        title.style.color = "#D97706";
-        desc.innerText = "No critical conditions declared. Standard triage order.";
-        homeBadgeWrap.classList.remove('critical');
-        homeBadge.innerText = "Standard Priority";
-      }
     }
 
     function renderHomeConditions() {
@@ -1283,8 +1180,7 @@
       }
 
       renderHomeConditions();
-      updateProfilePriorityUI();
-      showToast("Profile & Triage Priority Saved");
+      showToast("Profile Saved");
 
       if (window.ResQNative && typeof window.ResQNative.triggerVibrate === 'function') {
         window.ResQNative.triggerVibrate(60);
@@ -1307,7 +1203,7 @@
             const lon = pos.coords.longitude.toFixed(4);
             const acc = Math.round(pos.coords.accuracy);
             title.innerText = `GPS: ${lat}°, ${lon}° (±${acc}m)`;
-            desc.innerText = "Offline BLE Mesh Active • 100.1% Radar Ready";
+            desc.innerText = "Offline BLE Mesh Active • Radar Ready";
           },
           (err) => {
             title.innerText = "Offline Mesh Grid Active";
@@ -1322,7 +1218,7 @@
     }
 
     /* ============================================================
-       HIGH-PRECISION RADAR ENGINE (EMERGENCY CRIMSON)
+       RADAR ENGINE (EMERGENCY CRIMSON)
        ============================================================ */
     const TX_POWER = -59.0;
     const PATH_LOSS_EXPONENT = 2.40;
@@ -1334,7 +1230,7 @@
     let sirenGain = null;
     let sirenInterval = null;
 
-    // Active target node is NULL by default (NO dummy/mock data!)
+    // Active target node is NULL by default
     let activeTargetNode = null;
 
     function calculateDistance(rssi) {
@@ -1587,7 +1483,6 @@
       const btn = document.getElementById('btnToggleBeacon');
       const btnText = document.getElementById('btnToggleBeaconText');
       const targetName = document.getElementById('radarTargetName');
-      const targetPriority = document.getElementById('radarTargetPriority');
       const targetDesc = document.getElementById('radarTargetDesc');
 
       if (!activeTargetNode) {
@@ -1597,13 +1492,11 @@
           trueDistance: 1.75,
           filteredRssi: -74.0,
           kalmanP: 0.04,
-          conditionDesc: "Critical Triage • Extraction Required"
+          conditionDesc: "Emergency Beacon Detected"
         };
         btn.classList.add('active');
         btnText.innerText = "Clear Detected Beacon (Return to Idle)";
         targetName.innerText = activeTargetNode.name;
-        targetPriority.innerText = "PRIORITY 1: CRITICAL";
-        targetPriority.classList.add('critical');
         targetDesc.innerText = activeTargetNode.conditionDesc + " • 1.75m away";
         showToast("Emergency Beacon Locked on Radar");
       } else {
@@ -1611,8 +1504,6 @@
         btn.classList.remove('active');
         btnText.innerText = "Simulate Nearby Beacon (Test Detection)";
         targetName.innerText = "No Target Locked";
-        targetPriority.innerText = "IDLE";
-        targetPriority.classList.remove('critical');
         targetDesc.innerText = "Listening on 2.4 GHz Emergency Mesh for active victim beacons...";
         showToast("Beacon Cleared • Idle Scanning");
       }
@@ -1679,9 +1570,7 @@
         navigator.vibrate([200, 100, 200]);
       }
 
-      // Add emergency record to chat
-      addChatMessage("EMERGENCY BEACON ACTIVE. Priority: " + document.getElementById('homePriorityBadge').innerText, "system");
-
+      addChatMessage("EMERGENCY BEACON ACTIVE. Signal broadcasting over mesh.", "system");
       switchTab('dispatch');
     }
 
