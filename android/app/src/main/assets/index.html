@@ -3,17 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ResQ - Emergency Rescue & 100.1% Radar Scope</title>
+  <title>ResQ - Emergency Rescue & Radar</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=JetBrains+Mono:wght@600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* Emergency Crimson & Coral Design System */
-      --primary-red: #E53935;
-      --primary-red-hover: #D32F2F;
-      --primary-red-dark: #B71C1C;
-      --primary-gradient: linear-gradient(180deg, #E53935 0%, #D32F2F 100%);
+      /* Emergency Crimson & Crisp Minimal Palette */
+      --red-primary: #E53935;
+      --red-dark: #C62828;
+      --red-soft: #FFF0F0;
+      --red-border: rgba(229, 57, 53, 0.25);
+      --red-gradient: linear-gradient(180deg, #E53935 0%, #D32F2F 100%);
       --dispatch-gradient: linear-gradient(180deg, #DE352B 0%, #E63946 50%, #FF5A5F 100%);
       
       --ripple-1: rgba(229, 57, 53, 0.08);
@@ -22,34 +23,25 @@
 
       --bg-page: #FBFBFC;
       --bg-card: #FFFFFF;
-      --text-title: #191C21;
-      --text-sub: #7A828E;
-      --text-muted: #9EABB8;
-      --border-light: #F0F2F5;
-      --border-card: #EAECEF;
+      --text-main: #191C21;
+      --text-muted: #7A828E;
+      --border-subtle: #F0F2F5;
 
-      --status-amber: #D97706;
-      --status-red: #E53935;
-      
-      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.03);
-      --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.06);
-      --shadow-lg: 0 18px 40px rgba(0, 0, 0, 0.08);
-      --shadow-sos: 0 16px 36px rgba(229, 57, 53, 0.38);
+      --priority-high-bg: #FFF0F0;
+      --priority-high-text: #E53935;
+      --priority-standard-bg: #FFF8E1;
+      --priority-standard-text: #D97706;
 
-      /* Radar Emergency Scope Tokens */
-      --radar-bg: #150508;
-      --radar-surface: #1E070B;
-      --radar-crimson: #E53935;
-      --radar-crimson-bright: #FF1744;
-      --radar-glow: rgba(229, 57, 53, 0.35);
+      --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.05);
+      --shadow-sos: 0 16px 36px rgba(229, 57, 53, 0.35);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     
     body {
       background-color: #E9ECEF;
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      color: var(--text-title);
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      color: var(--text-main);
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -81,7 +73,34 @@
       }
     }
 
-    /* Floating Bottom Dock */
+    /* Screens Base */
+    .screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 50px 20px 120px 20px;
+      transition: opacity 0.2s ease;
+    }
+
+    .screen.active {
+      display: flex;
+      animation: fadeIn 0.25s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.99); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* ============================================================
+       FLOATING BOTTOM DOCK
+       ============================================================ */
     .bottom-dock {
       position: absolute;
       bottom: 22px;
@@ -90,8 +109,8 @@
       height: 64px;
       background: #FFFFFF;
       border-radius: 36px;
-      box-shadow: var(--shadow-lg), 0 2px 8px rgba(0,0,0,0.04);
-      border: 1px solid var(--border-light);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+      border: 1px solid var(--border-subtle);
       display: flex;
       align-items: center;
       justify-content: space-around;
@@ -109,114 +128,62 @@
     .dock-tab {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       padding: 10px 16px;
-      border-radius: 26px;
+      border-radius: 24px;
       font-size: 13px;
       font-weight: 700;
-      color: var(--text-sub);
+      color: var(--text-muted);
       cursor: pointer;
-      transition: all 0.25s ease;
       background: transparent;
       border: none;
       outline: none;
+      transition: all 0.2s ease;
     }
 
-    .dock-tab svg { width: 20px; height: 20px; fill: currentColor; }
+    .dock-tab svg { width: 18px; height: 18px; fill: currentColor; }
 
     .dock-tab.active {
-      background: var(--primary-red);
+      background: var(--red-primary);
       color: #FFFFFF;
-      box-shadow: 0 4px 14px rgba(229, 57, 53, 0.35);
-    }
-
-    .dock-tab:hover:not(.active) {
-      color: var(--text-title);
-      background: #F4F6F8;
-    }
-
-    /* Screens Base */
-    .screen {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      display: none;
-      flex-direction: column;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding: 50px 20px 125px 20px;
-      transition: opacity 0.25s ease, transform 0.25s ease;
-    }
-
-    .screen.active {
-      display: flex;
-      animation: fadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.985); }
-      to { opacity: 1; transform: scale(1); }
+      box-shadow: 0 4px 12px rgba(229, 57, 53, 0.35);
     }
 
     /* ============================================================
-       SCREEN 2: MAIN SOS HOME SCREEN
+       SCREEN 1: HOME SCREEN (MINIMAL & CLEAR)
        ============================================================ */
-    #screenHome { background: var(--bg-page); }
-
     .home-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-top: 10px;
       margin-bottom: 24px;
     }
-
-    .home-user-info .user-greeting { font-size: 13px; color: var(--text-sub); font-weight: 500; }
-    .home-user-info .user-name { font-size: 18px; font-weight: 800; color: var(--text-title); letter-spacing: -0.3px; }
+    .user-greeting { font-size: 13px; color: var(--text-muted); font-weight: 600; }
+    .user-name-title { font-size: 20px; font-weight: 900; color: var(--text-main); }
     
-    /* Clean Tactical Badge Icon (No Dude Photo) */
-    .home-avatar-wrap { position: relative; cursor: pointer; }
-    .badge-shield-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: #FFF0F0;
-      border: 2px solid #FFFFFF;
-      box-shadow: var(--shadow-sm);
+    .priority-badge-header {
       display: flex;
       align-items: center;
-      justify-content: center;
-      color: var(--primary-red);
-    }
-    .badge-shield-icon svg { width: 22px; height: 22px; fill: currentColor; }
-
-    .avatar-badge {
-      position: absolute;
-      top: -2px;
-      right: -2px;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: var(--primary-red);
-      color: #FFFFFF;
-      font-size: 10px;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 18px;
+      font-size: 11px;
       font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid #FFFFFF;
+      background: var(--priority-high-bg);
+      color: var(--priority-high-text);
+      border: 1px solid var(--red-border);
+      cursor: pointer;
     }
 
-    .hero-title-wrap { text-align: center; margin-bottom: 24px; }
-    .hero-title { font-size: 26px; font-weight: 900; color: var(--text-title); letter-spacing: -0.5px; margin-bottom: 6px; }
-    .hero-sub { font-size: 13px; color: var(--text-sub); font-weight: 500; line-height: 19px; max-width: 250px; margin: 0 auto; }
+    .hero-title-box { text-align: center; margin-bottom: 20px; }
+    .hero-main-txt { font-size: 24px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 4px; }
+    .hero-sub-txt { font-size: 13px; color: var(--text-muted); font-weight: 500; }
 
+    /* Concentric SOS Ripples */
     .sos-ripple-stage {
       position: relative;
-      width: 280px;
-      height: 280px;
+      width: 270px;
+      height: 270px;
       margin: 0 auto 24px auto;
       display: flex;
       align-items: center;
@@ -224,9 +191,9 @@
     }
 
     .ripple-ring { position: absolute; border-radius: 50%; pointer-events: none; }
-    .ring-3 { width: 275px; height: 275px; background: var(--ripple-1); animation: pulseGlow 3.5s ease-in-out infinite; }
-    .ring-2 { width: 210px; height: 210px; background: var(--ripple-2); animation: pulseGlow 3.5s ease-in-out infinite 0.6s; }
-    .ring-1 { width: 155px; height: 155px; background: var(--ripple-3); animation: pulseGlow 3.5s ease-in-out infinite 1.2s; }
+    .ring-3 { width: 265px; height: 265px; background: var(--ripple-1); animation: pulseGlow 3.5s ease-in-out infinite; }
+    .ring-2 { width: 200px; height: 200px; background: var(--ripple-2); animation: pulseGlow 3.5s ease-in-out infinite 0.6s; }
+    .ring-1 { width: 145px; height: 145px; background: var(--ripple-3); animation: pulseGlow 3.5s ease-in-out infinite 1.2s; }
 
     @keyframes pulseGlow {
       0%, 100% { transform: scale(1); opacity: 0.85; }
@@ -235,10 +202,10 @@
 
     .sos-core-btn {
       position: relative;
-      width: 120px;
-      height: 120px;
+      width: 116px;
+      height: 116px;
       border-radius: 50%;
-      background: var(--primary-gradient);
+      background: var(--red-gradient);
       box-shadow: var(--shadow-sos);
       display: flex;
       flex-direction: column;
@@ -248,67 +215,65 @@
       cursor: pointer;
       border: none;
       outline: none;
-      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+      transition: transform 0.15s ease;
       z-index: 10;
     }
+    .sos-core-btn:active { transform: scale(0.92); }
+    .sos-btn-text { font-size: 32px; font-weight: 900; line-height: 1; }
+    .sos-btn-sub { font-size: 9px; font-weight: 800; letter-spacing: 1px; margin-top: 4px; }
 
-    .sos-core-btn:active { transform: scale(0.92); box-shadow: 0 8px 20px rgba(229, 57, 53, 0.4); }
-    .sos-btn-text { font-size: 32px; font-weight: 900; letter-spacing: 0.5px; line-height: 1; }
-    .sos-btn-sub { font-size: 9px; font-weight: 800; letter-spacing: 1px; opacity: 0.9; margin-top: 4px; }
-
-    .address-card {
+    /* Minimal Address & Mesh Card */
+    .minimal-card {
       background: var(--bg-card);
-      border-radius: 20px;
+      border-radius: 18px;
       padding: 14px 16px;
-      box-shadow: var(--shadow-md);
-      border: 1px solid var(--border-light);
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
-      gap: 14px;
-      margin-bottom: 16px;
+      gap: 12px;
     }
-
-    .address-icon-wrap {
-      width: 42px;
-      height: 42px;
+    .card-icon-pill {
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      background: #FFF0F0;
-      border: 1px solid rgba(229, 57, 53, 0.15);
+      background: var(--red-soft);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--primary-red);
+      color: var(--red-primary);
       flex-shrink: 0;
     }
-    .address-info { flex: 1; }
-    .address-label { font-size: 13px; font-weight: 800; color: var(--text-title); margin-bottom: 2px; }
-    .address-text { font-size: 11px; color: var(--text-sub); line-height: 15px; }
-    .mesh-status-row { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 10px; font-weight: 700; color: var(--primary-red); }
-    .mesh-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary-red); box-shadow: 0 0 6px var(--primary-red); }
+    .card-icon-pill svg { width: 20px; height: 20px; fill: currentColor; }
+    .card-title { font-size: 13px; font-weight: 800; color: var(--text-main); margin-bottom: 2px; }
+    .card-desc { font-size: 11px; color: var(--text-muted); font-weight: 500; line-height: 15px; }
 
-    .chips-section-title { font-size: 11px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-    .chips-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 8px; }
-    
-    /* Clean Triage Chips (No Emojis) */
-    .triage-chip {
+    /* Profile Shortcut / Condition Card */
+    .profile-shortcut-card {
       background: var(--bg-card);
-      border: 1.5px solid var(--border-light);
-      border-radius: 14px;
-      padding: 8px 14px;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-title);
-      white-space: nowrap;
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-subtle);
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.2s ease;
     }
-    .triage-chip.selected { border-color: var(--primary-red); background: #FFF5F5; color: var(--primary-red); }
+    .shortcut-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .shortcut-title { font-size: 12px; font-weight: 800; color: var(--text-main); }
+    .shortcut-link { font-size: 11px; font-weight: 700; color: var(--red-primary); text-decoration: none; }
+    .condition-chips-list { display: flex; gap: 6px; flex-wrap: wrap; }
+    .condition-chip {
+      background: var(--red-soft);
+      color: var(--red-primary);
+      border: 1px solid var(--red-border);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 12px;
+    }
 
     /* ============================================================
-       SCREEN 1: DISPATCH VIEW (AMBULANCE)
+       SCREEN 2: DISPATCH SCREEN (AMBULANCE)
        ============================================================ */
     #screenDispatch {
       background: var(--dispatch-gradient);
@@ -319,7 +284,7 @@
       justify-content: space-between;
     }
     #screenDispatch.active { display: flex; }
-    .dispatch-top-nav { display: flex; align-items: center; margin-top: 8px; }
+    .dispatch-top-nav { display: flex; align-items: center; }
     .dispatch-back-btn {
       width: 40px;
       height: 40px;
@@ -350,7 +315,6 @@
       background: rgba(255, 255, 255, 0.22);
       border-radius: 40px;
       backdrop-filter: blur(10px);
-      box-shadow: inset 0 2px 10px rgba(255,255,255,0.4);
     }
     .ambulance-svg {
       position: relative;
@@ -360,277 +324,153 @@
       animation: vehicleDrive 1.8s ease-in-out infinite alternate;
     }
     @keyframes vehicleDrive {
-      from { transform: translateX(-4px) translateY(0); }
-      to { transform: translateX(4px) translateY(-3px); }
+      from { transform: translateX(-4px); }
+      to { transform: translateX(4px); }
     }
-    .dispatch-content { margin-top: 10px; margin-bottom: 24px; }
-    .dispatch-title { font-size: 26px; font-weight: 900; line-height: 32px; letter-spacing: -0.5px; margin-bottom: 12px; color: #FFFFFF; }
-    .dispatch-desc { font-size: 13px; line-height: 20px; color: rgba(255, 255, 255, 0.9); font-weight: 500; }
-    .dispatch-actions { display: flex; flex-direction: column; gap: 14px; align-items: center; }
+    .dispatch-content { text-align: center; margin-bottom: 24px; }
+    .dispatch-title { font-size: 24px; font-weight: 900; line-height: 30px; margin-bottom: 8px; color: #FFFFFF; }
+    .dispatch-desc { font-size: 13px; line-height: 19px; color: rgba(255, 255, 255, 0.9); font-weight: 500; }
+    .dispatch-actions { display: flex; flex-direction: column; gap: 12px; align-items: center; }
     .btn-see-radar {
       width: 100%;
-      height: 54px;
+      height: 52px;
       background: #FFFFFF;
-      color: var(--primary-red);
-      border-radius: 28px;
+      color: var(--red-primary);
+      border-radius: 26px;
       font-size: 15px;
       font-weight: 800;
       border: none;
       cursor: pointer;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-      transition: transform 0.2s ease;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
     }
-    .btn-see-radar:active { transform: scale(0.97); }
-    .btn-cancel-req { background: transparent; border: none; color: #FFFFFF; font-size: 14px; font-weight: 700; cursor: pointer; opacity: 0.9; padding: 8px 16px; }
+    .btn-cancel-req { background: transparent; border: none; color: #FFFFFF; font-size: 14px; font-weight: 700; cursor: pointer; opacity: 0.9; padding: 6px; }
 
     /* ============================================================
-       SCREEN 3: RESPONDERS RADAR SCREEN (ON-THEME EMERGENCY RADAR)
+       SCREEN 3: RADAR SCREEN (MINIMAL & ON-THEME)
        ============================================================ */
-    #screenRadar { background: var(--bg-page); padding: 50px 18px 125px 18px; }
-    .radar-nav-bar { display: flex; align-items: center; gap: 12px; margin-top: 4px; margin-bottom: 12px; }
-    .radar-back-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: #FFFFFF;
-      border: 1px solid var(--border-light);
+    .radar-header {
       display: flex;
       align-items: center;
-      justify-content: center;
-      color: var(--text-title);
-      cursor: pointer;
-      box-shadow: var(--shadow-sm);
-      flex-shrink: 0;
+      justify-content: space-between;
+      margin-bottom: 14px;
     }
-    .radar-header-info { flex: 1; }
-    .radar-main-title { font-size: 18px; font-weight: 900; color: var(--text-title); line-height: 22px; letter-spacing: -0.3px; }
-    .radar-main-sub { font-size: 11px; color: var(--text-sub); line-height: 16px; margin-top: 2px; }
-    .link-instruction { color: var(--primary-red); font-size: 11px; font-weight: 700; text-decoration: none; display: inline-block; cursor: pointer; margin-top: 2px; }
+    .radar-header-title { font-size: 18px; font-weight: 900; color: var(--text-main); }
+    .radar-accuracy-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--red-primary);
+      background: var(--red-soft);
+      padding: 4px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--red-border);
+    }
 
-    /* Tactical Emergency Scope Container (Red/Crimson Theme) */
     .radar-scope-wrapper {
       position: relative;
       width: 100%;
       background: #FFFFFF;
       border-radius: 24px;
       padding: 12px;
-      box-shadow: var(--shadow-md);
-      border: 1px solid var(--border-light);
-      margin-bottom: 14px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 12px;
     }
 
-    .scope-top-bar {
+    .radar-scale-bar {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       margin-bottom: 8px;
-      padding: 0 4px;
-    }
-
-    .radar-accuracy-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      font-weight: 800;
-      color: var(--primary-red);
-      background: #FFF0F0;
-      padding: 3px 8px;
-      border-radius: 6px;
-      border: 1px solid rgba(229, 57, 53, 0.25);
-    }
-    .radar-live-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--primary-red);
-      box-shadow: 0 0 6px var(--primary-red);
-      animation: pulseGlow 1.2s infinite;
-    }
-
-    .scale-selector {
-      display: flex;
-      background: #F1F4F8;
-      border-radius: 8px;
-      padding: 2px;
-      gap: 2px;
+      gap: 4px;
     }
     .scale-btn {
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
       font-weight: 800;
-      color: var(--text-sub);
-      background: transparent;
+      color: var(--text-muted);
+      background: #F1F4F8;
       border: none;
-      padding: 3px 8px;
-      border-radius: 6px;
+      padding: 4px 10px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: all 0.2s ease;
     }
     .scale-btn.active {
-      background: var(--primary-red);
+      background: var(--red-primary);
       color: #FFFFFF;
-      box-shadow: 0 2px 6px rgba(229, 57, 53, 0.3);
     }
 
     .radar-canvas-housing {
       position: relative;
       width: 100%;
       aspect-ratio: 1 / 1;
-      max-width: 340px;
+      max-width: 320px;
       margin: 0 auto;
       border-radius: 50%;
       background: radial-gradient(circle at center, #1E070B 0%, #150508 70%, #0C0305 100%);
-      box-shadow: inset 0 0 35px rgba(229, 57, 53, 0.25), 0 4px 16px rgba(0, 0, 0, 0.15), 0 0 0 2px rgba(229, 57, 53, 0.3);
+      box-shadow: inset 0 0 35px rgba(229, 57, 53, 0.25), 0 4px 16px rgba(0, 0, 0, 0.12), 0 0 0 2px rgba(229, 57, 53, 0.3);
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    #radarCanvas {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      display: block;
-    }
+    #radarCanvas { width: 100%; height: 100%; border-radius: 50%; display: block; }
 
-    /* Sub-meter Telemetry Banner */
-    .radar-telemetry-banner {
-      background: #F8FAFC;
-      border: 1px solid var(--border-light);
-      border-radius: 16px;
-      padding: 10px 14px;
-      margin-top: 10px;
-    }
-
-    .telemetry-primary-row {
+    /* Minimal Distance & Zone Strip */
+    .radar-distance-strip {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       justify-content: space-between;
-      margin-bottom: 6px;
+      padding: 10px 6px 2px 6px;
     }
-
-    .telemetry-big-dist {
+    .big-dist-value {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 900;
-      color: var(--text-title);
-      letter-spacing: -0.5px;
+      color: var(--text-main);
     }
-    .telemetry-unit {
-      font-size: 13px;
+    .dist-unit-label { font-size: 14px; font-weight: 800; color: var(--red-primary); margin-left: 2px; }
+    .zone-indicator-badge {
+      font-size: 11px;
       font-weight: 800;
-      color: var(--primary-red);
-      margin-left: 4px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      background: var(--red-soft);
+      color: var(--red-primary);
+      border: 1px solid var(--red-border);
     }
 
-    .proximity-pill {
+    /* Minimal Target Card */
+    .radar-target-card {
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 12px;
+    }
+    .target-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .target-name { font-size: 15px; font-weight: 900; color: var(--text-main); }
+    .target-priority-pill {
       font-size: 10px;
       font-weight: 800;
       padding: 3px 8px;
       border-radius: 8px;
-      background: #FFF0F0;
-      color: var(--primary-red);
-      border: 1px solid rgba(229, 57, 53, 0.3);
-      display: flex;
-      align-items: center;
-      letter-spacing: 0.3px;
+      background: var(--red-soft);
+      color: var(--red-primary);
+      border: 1px solid var(--red-border);
     }
+    .target-desc-row { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 12px; }
 
-    .telemetry-metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      background: #FFFFFF;
-      border: 1px solid var(--border-light);
-      border-radius: 10px;
-      padding: 6px 8px;
-    }
-
-    .metric-cell-label {
-      font-size: 8px;
-      font-weight: 800;
-      color: var(--text-sub);
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-    }
-    .metric-cell-val {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--text-title);
-      margin-top: 1px;
-    }
-    .metric-cell-val.crimson { color: var(--primary-red); }
-
-    /* Tactical Quick Calibration Buttons (No Emojis) */
-    .quick-calib-row {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    .btn-calib {
-      flex: 1;
-      height: 38px;
-      background: #FFFFFF;
-      border: 1px solid var(--border-light);
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 800;
-      color: var(--text-title);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.15s ease;
-    }
-    .btn-calib svg { width: 14px; height: 14px; fill: var(--primary-red); }
-    .btn-calib:active { background: #F1F4F8; transform: scale(0.97); }
-
-    /* Tactical Responder Card (No Dudes, Emergency Crimson Theme) */
-    .responder-card {
-      background: var(--bg-card);
-      border-radius: 22px;
-      padding: 16px;
-      box-shadow: var(--shadow-lg);
-      border: 1px solid var(--border-light);
-      margin-bottom: 12px;
-    }
-    .responder-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-    
-    .responder-tactical-icon {
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-      background: #FFF0F0;
-      border: 2px solid #FFFFFF;
-      box-shadow: var(--shadow-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--primary-red);
-      flex-shrink: 0;
-    }
-    .responder-tactical-icon svg { width: 22px; height: 22px; fill: currentColor; }
-
-    .responder-meta { flex: 1; }
-    .responder-name { font-size: 14px; font-weight: 800; color: var(--text-title); }
-    .responder-role { font-size: 11px; color: var(--text-sub); font-weight: 600; margin-top: 1px; }
-    .responder-badge-proximity { background: #FFF0F0; color: var(--primary-red); font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px; }
-    
-    .responder-actions { display: flex; gap: 10px; }
-    .btn-resp-call {
+    .target-actions-row { display: flex; gap: 8px; }
+    .btn-alert-siren {
       flex: 1;
       height: 42px;
-      background: var(--primary-red);
+      background: var(--red-primary);
       color: #FFFFFF;
       border: none;
       border-radius: 21px;
@@ -641,15 +481,13 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      box-shadow: 0 4px 12px rgba(229, 57, 53, 0.3);
-      transition: all 0.2s ease;
     }
-    .btn-resp-call.active { background: #B71C1C; animation: pulseGlow 0.8s infinite; }
-    .btn-resp-msg {
+    .btn-alert-siren.active { background: var(--red-dark); animation: pulseGlow 0.8s infinite; }
+    .btn-open-chat {
       flex: 1;
       height: 42px;
       background: #F0F2F5;
-      color: #555E68;
+      color: var(--text-main);
       border: none;
       border-radius: 21px;
       font-size: 13px;
@@ -659,54 +497,172 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      transition: background 0.2s ease;
     }
-    .btn-resp-msg:active { background: #E2E6EA; }
 
-    /* ============================================================
-       SCREEN 4: OFFLINE P2P MESH CHAT
-       ============================================================ */
-    #screenChat { background: var(--bg-page); padding: 50px 18px 125px 18px; display: none; flex-direction: column; }
-    #screenChat.active { display: flex; }
-    .chat-header { display: flex; align-items: center; gap: 12px; margin-top: 4px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-light); }
-    .chat-stream-box { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; padding-right: 2px; }
-    .chat-bubble { max-width: 82%; padding: 10px 14px; font-size: 13px; line-height: 18px; border-radius: 18px; }
-    .bubble-in { align-self: flex-start; background: #F0F2F5; color: var(--text-title); border-bottom-left-radius: 4px; }
-    .bubble-out { align-self: flex-end; background: var(--primary-red); color: #FFFFFF; border-bottom-right-radius: 4px; box-shadow: 0 4px 12px rgba(229, 57, 53, 0.25); }
-    .bubble-sub { font-size: 9px; opacity: 0.8; margin-top: 4px; text-align: right; }
-    .chat-input-bar { display: flex; gap: 8px; background: #FFFFFF; border: 1px solid var(--border-light); border-radius: 28px; padding: 4px 6px 4px 16px; box-shadow: var(--shadow-sm); }
-    .chat-input-field { flex: 1; border: none; outline: none; background: transparent; font-size: 13px; font-family: inherit; }
-    .chat-send-icon-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--primary-red); color: #FFFFFF; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-
-    /* ============================================================
-       TACTICAL TELEMETRY DRAWER
-       ============================================================ */
-    .deck-drawer {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
+    /* Minimal Quick Proximity Buttons */
+    .quick-calib-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    .btn-calib {
+      flex: 1;
+      height: 36px;
       background: #FFFFFF;
-      border-radius: 28px 28px 0 0;
-      box-shadow: 0 -10px 40px rgba(0,0,0,0.18);
-      border: 1px solid var(--border-light);
-      padding: 20px;
-      z-index: 200;
-      transform: translateY(105%);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      max-height: 80vh;
-      overflow-y: auto;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
     }
-    .deck-drawer.open { transform: translateY(0); }
-    .deck-handle-bar { width: 40px; height: 4px; border-radius: 2px; background: #D1D5DB; margin: 0 auto 16px auto; }
-    .deck-heading { font-size: 16px; font-weight: 800; color: var(--text-title); margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; }
-    .deck-sub-text { font-size: 11px; color: var(--text-sub); line-height: 16px; margin-bottom: 16px; }
-    .deck-card { background: #F8F9FA; border-radius: 16px; padding: 12px 14px; margin-bottom: 12px; border: 1px solid var(--border-light); }
-    .deck-row-label { font-size: 11px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin-bottom: 8px; }
-    .deck-btn-group { display: flex; gap: 6px; }
-    .deck-btn-action { flex: 1; padding: 10px; border-radius: 12px; border: 1px solid var(--border-light); background: #FFFFFF; font-size: 12px; font-weight: 700; color: var(--text-title); cursor: pointer; box-shadow: var(--shadow-sm); }
-    .deck-btn-action:active { background: #F0F2F5; }
-    .telemetry-code { font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 18px; color: #374151; }
+    .btn-calib svg { width: 12px; height: 12px; fill: var(--red-primary); }
+
+    /* ============================================================
+       SCREEN 4: PROFILE & MEDICAL DECLARATION SCREEN
+       ============================================================ */
+    .profile-title-box { margin-bottom: 18px; }
+    .profile-page-title { font-size: 22px; font-weight: 900; color: var(--text-main); margin-bottom: 4px; }
+    .profile-page-sub { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+    .profile-section-card {
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 14px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .profile-input-field {
+      width: 100%;
+      height: 44px;
+      border: 1.5px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 0 14px;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: inherit;
+      color: var(--text-main);
+      background: #F8FAFC;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+    .profile-input-field:focus { border-color: var(--red-primary); background: #FFFFFF; }
+
+    .blood-selector-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .blood-chip {
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border-subtle);
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-main);
+      background: #FFFFFF;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .blood-chip.selected {
+      border-color: var(--red-primary);
+      background: var(--red-soft);
+      color: var(--red-primary);
+    }
+
+    /* Medical Condition Toggles */
+    .medical-toggles-grid { display: flex; flex-direction: column; gap: 8px; }
+    .med-toggle-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1.5px solid var(--border-subtle);
+      background: #FFFFFF;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .med-toggle-item.selected {
+      border-color: var(--red-primary);
+      background: #FFFBFB;
+    }
+    .med-name { font-size: 13px; font-weight: 800; color: var(--text-main); }
+    .med-sub { font-size: 10px; color: var(--text-muted); font-weight: 600; margin-top: 1px; }
+    .med-checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+    }
+    .med-toggle-item.selected .med-checkbox {
+      background: var(--red-primary);
+      border-color: var(--red-primary);
+      color: #FFFFFF;
+    }
+    .med-toggle-item.selected .med-checkbox svg { display: block; }
+    .med-checkbox svg { display: none; width: 14px; height: 14px; stroke: #FFFFFF; stroke-width: 3; }
+
+    /* Live Rescuer Priority Banner */
+    .priority-banner-box {
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      border: 1.5px solid var(--red-border);
+      background: var(--priority-high-bg);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .priority-indicator-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--red-primary);
+      box-shadow: 0 0 8px var(--red-primary);
+    }
+    .priority-level-title { font-size: 13px; font-weight: 900; color: var(--red-primary); }
+    .priority-level-desc { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+
+    .btn-save-profile {
+      width: 100%;
+      height: 48px;
+      background: var(--red-primary);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(229, 57, 53, 0.3);
+      transition: transform 0.15s ease;
+    }
+    .btn-save-profile:active { transform: scale(0.97); }
+
+    /* ============================================================
+       SCREEN 5: CHAT SCREEN
+       ============================================================ */
+    .chat-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-subtle); }
+    .chat-stream-box { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+    .chat-bubble { max-width: 82%; padding: 10px 14px; font-size: 13px; line-height: 18px; border-radius: 18px; }
+    .bubble-in { align-self: flex-start; background: #F0F2F5; color: var(--text-main); border-bottom-left-radius: 4px; }
+    .bubble-out { align-self: flex-end; background: var(--red-primary); color: #FFFFFF; border-bottom-right-radius: 4px; box-shadow: 0 4px 12px rgba(229, 57, 53, 0.25); }
+    .bubble-sub { font-size: 9px; opacity: 0.8; margin-top: 4px; text-align: right; }
+    .chat-input-bar { display: flex; gap: 8px; background: #FFFFFF; border: 1px solid var(--border-subtle); border-radius: 28px; padding: 4px 6px 4px 16px; box-shadow: var(--shadow-card); }
+    .chat-input-field { flex: 1; border: none; outline: none; background: transparent; font-size: 13px; font-family: inherit; }
+    .chat-send-icon-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--red-primary); color: #FFFFFF; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -714,66 +670,62 @@
   <div class="app-viewport">
 
     <!-- ============================================================
-         SCREEN 2: MAIN SOS SCREEN (HOME)
+         SCREEN 1: HOME (CLEAN & MINIMAL)
          ============================================================ -->
     <div id="screenHome" class="screen active">
       <div class="home-header">
-        <div class="home-user-info">
+        <div>
           <div class="user-greeting">Welcome back,</div>
-          <div class="user-name">Rescue Unit Lead</div>
+          <div class="user-name-title" id="homeUserName">Jenifer Pilman</div>
         </div>
-        <!-- Tactical Badge Icon (No Dude Face) -->
-        <div class="home-avatar-wrap" onclick="toggleDeck()">
-          <div class="badge-shield-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 6h2v4h4v2h-4v4h-2v-4H7v-2h4V7z"/></svg>
-          </div>
-          <div class="avatar-badge">3</div>
+        <div class="priority-badge-header" onclick="switchTab('profile')">
+          <span id="homePriorityBadge">Priority 1 • Diabetic</span>
         </div>
       </div>
 
-      <div class="hero-title-wrap">
-        <h1 class="hero-title">Are you in emergency?</h1>
-        <p class="hero-sub">Press the button below help will reach you soon.</p>
+      <div class="hero-title-box">
+        <h1 class="hero-main-txt">Are you in emergency?</h1>
+        <p class="hero-sub-txt">Press the button below. Rescuers will lock onto your beacon.</p>
       </div>
 
-      <!-- Concentric Ripple Stage with SOS Button -->
+      <!-- Concentric Ripple SOS -->
       <div class="sos-ripple-stage">
         <div class="ripple-ring ring-3"></div>
         <div class="ripple-ring ring-2"></div>
         <div class="ripple-ring ring-1"></div>
-        <button id="btnSosCore" class="sos-core-btn" onclick="triggerSosEmergency()">
+        <button class="sos-core-btn" onclick="triggerSosEmergency()">
           <span class="sos-btn-text">SOS</span>
           <span class="sos-btn-sub">PRESS</span>
         </button>
       </div>
 
-      <!-- Current Address Card -->
-      <div class="address-card">
-        <div class="address-icon-wrap">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+      <!-- Location Card -->
+      <div class="minimal-card">
+        <div class="card-icon-pill">
+          <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
         </div>
-        <div class="address-info">
-          <div class="address-label">Your current address</div>
-          <div class="address-text">151-171 Montclair Ave Newark, NJ 07104, USA</div>
-          <div class="mesh-status-row">
-            <span class="mesh-dot"></span>
-            <span>BLE Mesh Online • 100.1% Radar Ready</span>
-          </div>
+        <div style="flex: 1;">
+          <div class="card-title">151-171 Montclair Ave, Newark, NJ</div>
+          <div class="card-desc">Offline BLE Mesh Active • 100.1% Radar Ready</div>
         </div>
       </div>
 
-      <!-- Condition / Triage Selection (No Emojis) -->
-      <div class="chips-section-title">Emergency Condition (Encoded in BLE Beacon)</div>
-      <div class="chips-row">
-        <div class="triage-chip selected" onclick="selectChip(this)">Conscious</div>
-        <div class="triage-chip" onclick="selectChip(this)">Trapped Under Debris</div>
-        <div class="triage-chip" onclick="selectChip(this)">Severe Bleeding</div>
-        <div class="triage-chip" onclick="selectChip(this)">Cannot Move Legs</div>
+      <!-- Medical Declaration Summary Card (Links to Profile) -->
+      <div class="profile-shortcut-card" onclick="switchTab('profile')">
+        <div class="shortcut-header">
+          <span class="shortcut-title">Declared Medical Priority</span>
+          <span class="shortcut-link">Edit Profile</span>
+        </div>
+        <div class="condition-chips-list" id="homeConditionsList">
+          <span class="condition-chip">Diabetic (Insulin)</span>
+          <span class="condition-chip">Mobility Impaired</span>
+          <span class="condition-chip">Blood: O+</span>
+        </div>
       </div>
     </div>
 
     <!-- ============================================================
-         SCREEN 1: DISPATCH VIEW (AMBULANCE)
+         SCREEN 2: DISPATCH (AMBULANCE)
          ============================================================ -->
     <div id="screenDispatch" class="screen">
       <div class="dispatch-top-nav">
@@ -808,81 +760,52 @@
       </div>
 
       <div class="dispatch-content">
-        <h2 class="dispatch-title">Ambulance and responders are on a way</h2>
-        <p class="dispatch-desc">Speak calmly to the person until the first aider arrives. First responders are on the way and the Rescue service is alarmed.</p>
+        <h2 class="dispatch-title">Help is on the way</h2>
+        <p class="dispatch-desc">First responders are locking onto your offline mesh signal.</p>
       </div>
 
       <div class="dispatch-actions">
         <button class="btn-see-radar" onclick="switchTab('radar')">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6" stroke="currentColor" stroke-width="2"/><line x1="12" y1="18" x2="12" y2="22" stroke="currentColor" stroke-width="2"/></svg>
-          <span>See responders on radar</span>
+          <span>Open Search Radar</span>
         </button>
         <button class="btn-cancel-req" onclick="cancelEmergency()">Cancel request</button>
       </div>
     </div>
 
     <!-- ============================================================
-         SCREEN 3: RESPONDERS RADAR SCREEN (ON-THEME RADAR SCOPE)
+         SCREEN 3: RADAR (MINIMAL & ON-THEME)
          ============================================================ -->
     <div id="screenRadar" class="screen">
-      <div class="radar-nav-bar">
-        <button class="radar-back-btn" onclick="switchTab('home')">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-        </button>
-        <div class="radar-header-info">
-          <h2 class="radar-main-title">Ambulance and responders are on a way</h2>
-          <p class="radar-main-sub">Speak calmly to the person until the first aider arrives. Radar locked on mesh beacon.</p>
-          <a class="link-instruction" onclick="toggleDeck()">Open full telemetry & instruction</a>
-        </div>
+      <div class="radar-header">
+        <span class="radar-header-title">Search Radar</span>
+        <span class="radar-accuracy-pill">100.1% ACCURATE</span>
       </div>
 
-      <!-- RADAR SCOPE CARD (Crimson & Coral Emergency Palette) -->
+      <!-- Scope Housing -->
       <div class="radar-scope-wrapper">
-        <div class="scope-top-bar">
-          <div class="radar-accuracy-badge">
-            <span class="radar-live-dot"></span>
-            <span id="calibratedAccuracyTxt">100.1% ACCURATE</span>
-          </div>
-          <div class="scale-selector">
-            <button class="scale-btn active" onclick="setScale(5, this)">5M</button>
-            <button class="scale-btn" onclick="setScale(15, this)">15M</button>
-            <button class="scale-btn" onclick="setScale(30, this)">30M</button>
-          </div>
+        <div class="radar-scale-bar">
+          <button class="scale-btn active" onclick="setScale(5, this)">5M</button>
+          <button class="scale-btn" onclick="setScale(15, this)">15M</button>
+          <button class="scale-btn" onclick="setScale(30, this)">30M</button>
         </div>
 
         <div class="radar-canvas-housing">
           <canvas id="radarCanvas"></canvas>
         </div>
 
-        <!-- Telemetry Strip -->
-        <div class="radar-telemetry-banner">
-          <div class="telemetry-primary-row">
-            <div>
-              <span id="scopeMainDistance" class="telemetry-big-dist">1.62</span>
-              <span class="telemetry-unit">METERS</span>
-            </div>
-            <div id="scopeProximityPill" class="proximity-pill">
-              IMMEDIATE (&lt; 2M)
-            </div>
+        <div class="radar-distance-strip">
+          <div>
+            <span id="scopeMainDistance" class="big-dist-value">1.62</span>
+            <span class="dist-unit-label">M</span>
           </div>
-          <div class="telemetry-metrics-grid">
-            <div>
-              <div class="metric-cell-label">Filtered RSSI</div>
-              <div id="scopeFilteredRssi" class="metric-cell-val crimson">-73.2 dBm</div>
-            </div>
-            <div>
-              <div class="metric-cell-label">Raw RF RSSI</div>
-              <div id="scopeRawRssi" class="metric-cell-val">-71.7 dBm</div>
-            </div>
-            <div>
-              <div class="metric-cell-label">Trend Velocity</div>
-              <div id="scopeVelocity" class="metric-cell-val">-0.47 dB/s</div>
-            </div>
+          <div id="scopeProximityPill" class="zone-indicator-badge">
+            IMMEDIATE ZONE (&lt; 2M)
           </div>
         </div>
       </div>
 
-      <!-- Quick Distance Calibration (No Emojis) -->
+      <!-- Quick Proximity Adjustment -->
       <div class="quick-calib-row">
         <button class="btn-calib" onclick="adjustDistance(-0.6)">
           <svg viewBox="0 0 24 24"><path d="M12 4l-8 8h6v8h4v-8h6z"/></svg>
@@ -894,25 +817,22 @@
         </button>
       </div>
 
-      <!-- Responder Tactical Card (Clean tactical icon, no dude face, emergency theme) -->
-      <div class="responder-card">
-        <div class="responder-card-top">
-          <div class="responder-tactical-icon">
-            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h2v2h-2v-2zm0-10h2v8h-2V6z"/></svg>
-          </div>
-          <div class="responder-meta">
-            <div class="responder-name" id="respCardTargetName">Sarah M. (Trapped Under Debris)</div>
-            <div class="responder-role">Target Beacon • <span id="respDistTxt">1.62m away</span></div>
-          </div>
-          <div class="responder-badge-proximity" id="respZoneBadge">IMMEDIATE</div>
+      <!-- Target Status Card with Declared Medical Priority -->
+      <div class="radar-target-card">
+        <div class="target-card-top">
+          <span class="target-name" id="radarTargetName">Sarah M.</span>
+          <span class="target-priority-pill" id="radarTargetPriority">PRIORITY 1: DIABETIC</span>
+        </div>
+        <div class="target-desc-row" id="radarTargetDesc">
+          Mobility Impaired • Trapped under rubble • 1.62m away
         </div>
 
-        <div class="responder-actions">
-          <button id="btnCallSiren" class="btn-resp-call" onclick="toggleAudioSiren()">
+        <div class="target-actions-row">
+          <button id="btnCallSiren" class="btn-alert-siren" onclick="toggleAudioSiren()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-            <span id="callBtnText">Call / Siren</span>
+            <span id="callBtnText">Sound Siren</span>
           </button>
-          <button class="btn-resp-msg" onclick="switchTab('chat')">
+          <button class="btn-open-chat" onclick="switchTab('chat')">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
             <span>Message</span>
           </button>
@@ -921,32 +841,142 @@
     </div>
 
     <!-- ============================================================
-         SCREEN 4: OFFLINE P2P CHAT
+         SCREEN 4: PROFILE & MEDICAL DECLARATION SCREEN
+         ============================================================ -->
+    <div id="screenProfile" class="screen">
+      <div class="profile-title-box">
+        <h2 class="profile-page-title">Medical Profile</h2>
+        <p class="profile-page-sub">Declare conditions so rescuers know who to prioritize first.</p>
+      </div>
+
+      <!-- Priority Status Banner -->
+      <div class="priority-banner-box" id="profilePriorityBanner">
+        <div class="priority-indicator-dot"></div>
+        <div>
+          <div class="priority-level-title" id="profilePriorityTitle">HIGH RESCUE PRIORITY (LEVEL 1)</div>
+          <div class="priority-level-desc" id="profilePriorityDesc">Diabetic or disability declared. Rescuers extract this beacon first.</div>
+        </div>
+      </div>
+
+      <!-- Personal Info -->
+      <div class="profile-section-card">
+        <div class="section-label">Your Name</div>
+        <input type="text" id="inputProfileName" class="profile-input-field" value="Jenifer Pilman" placeholder="Enter your full name">
+      </div>
+
+      <!-- Blood Type -->
+      <div class="profile-section-card">
+        <div class="section-label">Blood Type</div>
+        <div class="blood-selector-row">
+          <button class="blood-chip selected" onclick="selectBlood(this, 'O+')">O+</button>
+          <button class="blood-chip" onclick="selectBlood(this, 'A+')">A+</button>
+          <button class="blood-chip" onclick="selectBlood(this, 'B+')">B+</button>
+          <button class="blood-chip" onclick="selectBlood(this, 'AB+')">AB+</button>
+          <button class="blood-chip" onclick="selectBlood(this, 'O-')">O-</button>
+          <button class="blood-chip" onclick="selectBlood(this, 'A-')">A-</button>
+          <button class="blood-chip" onclick="selectBlood(this, 'B-')">B-</button>
+          <button class="blood-chip" onclick="selectBlood(this, 'AB-')">AB-</button>
+        </div>
+      </div>
+
+      <!-- Medical Conditions / Disabilities (Priority Toggles) -->
+      <div class="profile-section-card">
+        <div class="section-label">Medical Conditions & Disabilities</div>
+        <div class="medical-toggles-grid">
+          <div class="med-toggle-item selected" onclick="toggleCondition(this, 'diabetic')">
+            <div>
+              <div class="med-name">Diabetic (Insulin Dependent)</div>
+              <div class="med-sub">Critical triage priority. Susceptible to ketoacidosis.</div>
+            </div>
+            <div class="med-checkbox">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+          </div>
+
+          <div class="med-toggle-item selected" onclick="toggleCondition(this, 'mobility')">
+            <div>
+              <div class="med-name">Physical Disability / Mobility Impaired</div>
+              <div class="med-sub">Requires stretcher or extraction assistance.</div>
+            </div>
+            <div class="med-checkbox">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+          </div>
+
+          <div class="med-toggle-item" onclick="toggleCondition(this, 'asthma')">
+            <div>
+              <div class="med-name">Asthma / Respiratory Distress</div>
+              <div class="med-sub">Vulnerable to dust and smoke inhalation under rubble.</div>
+            </div>
+            <div class="med-checkbox">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+          </div>
+
+          <div class="med-toggle-item" onclick="toggleCondition(this, 'cardiac')">
+            <div>
+              <div class="med-name">Cardiac Condition</div>
+              <div class="med-sub">Requires rapid medical monitoring.</div>
+            </div>
+            <div class="med-checkbox">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+          </div>
+
+          <div class="med-toggle-item" onclick="toggleCondition(this, 'hearing')">
+            <div>
+              <div class="med-name">Hearing / Speech Impaired</div>
+              <div class="med-sub">Cannot hear verbal callouts. Rely on radar & haptics.</div>
+            </div>
+            <div class="med-checkbox">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+          </div>
+
+          <div class="med-toggle-item" onclick="toggleCondition(this, 'allergy')">
+            <div>
+              <div class="med-name">Severe Drug Allergies</div>
+              <div class="med-sub">Penicillin / Antibiotic allergy.</div>
+            </div>
+            <div class="med-checkbox">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-save-profile" onclick="saveProfileAndBroadcast()">
+        Save & Broadcast to Mesh Beacon
+      </button>
+    </div>
+
+    <!-- ============================================================
+         SCREEN 5: OFFLINE P2P CHAT
          ============================================================ -->
     <div id="screenChat" class="screen">
       <div class="chat-header">
-        <button class="radar-back-btn" onclick="switchTab('radar')">
+        <button class="dispatch-back-btn" style="background:#F0F2F5; color:var(--text-main);" onclick="switchTab('radar')">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </button>
         <div style="flex: 1;">
-          <div style="font-size: 15px; font-weight: 800; color: var(--text-title);" id="chatTargetName">Sarah M. (Search Target)</div>
-          <div style="font-size: 11px; color: var(--primary-red); font-weight: 700;">Offline BLE Mesh Connected (1.62m)</div>
+          <div style="font-size: 15px; font-weight: 800; color: var(--text-main);">Sarah M. (Search Target)</div>
+          <div style="font-size: 11px; color: var(--red-primary); font-weight: 700;">Offline BLE Mesh Connected (1.62m)</div>
         </div>
       </div>
 
       <div class="chat-stream-box" id="chatStreamBox">
         <div class="chat-bubble bubble-in">
-          Can you hear us? We have locked onto your BLE beacon via radar at 1.6 meters.
+          Search Alpha locked onto your beacon. Rescuers notified of your Diabetic condition!
           <div class="bubble-sub">15:42 • DELIVERED</div>
         </div>
         <div class="chat-bubble bubble-out">
-          Yes! I am trapped under a concrete beam. I hear the radar siren!
+          Thank you! Concrete beam is on my legs. I have my insulin kit with me.
           <div class="bubble-sub">15:43 • DELIVERED</div>
         </div>
       </div>
 
       <div class="chat-input-bar">
-        <input type="text" id="chatInput" class="chat-input-field" placeholder="Type offline mesh message..." onkeydown="if(event.key==='Enter') sendChatMessage()">
+        <input type="text" id="chatInput" class="chat-input-field" placeholder="Type offline message..." onkeydown="if(event.key==='Enter') sendChatMessage()">
         <button class="chat-send-icon-btn" onclick="sendChatMessage()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         </button>
@@ -954,7 +984,7 @@
     </div>
 
     <!-- ============================================================
-         BOTTOM FLOATING DOCK
+         BOTTOM DOCK (HOME, RADAR, CHAT, PROFILE)
          ============================================================ -->
     <div class="bottom-dock" id="bottomDock">
       <button class="dock-tab active" id="tabHome" onclick="switchTab('home')">
@@ -969,48 +999,9 @@
         <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
         <span>Chat</span>
       </button>
-      <button class="dock-tab" id="tabDeck" onclick="toggleDeck()">
-        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-        <span>Telemetry</span>
-      </button>
-    </div>
-
-    <!-- ============================================================
-         TACTICAL TELEMETRY DRAWER
-         ============================================================ -->
-    <div id="deckDrawer" class="deck-drawer">
-      <div class="deck-handle-bar" onclick="toggleDeck()"></div>
-      <div class="deck-heading">
-        <span>High-Precision Radar Telemetry</span>
-        <span style="font-size: 11px; color: var(--primary-red); font-family: 'JetBrains Mono', monospace;">100.1% CONFIDENCE</span>
-      </div>
-      <div class="deck-sub-text">
-        Real-time log-distance path loss inversion with adaptive 1D Kalman state smoothing ($TX_{1m} = -59.0\text{ dBm}$, $n = 2.40$).
-      </div>
-
-      <div class="deck-card">
-        <div class="deck-row-label">Target Node Selection</div>
-        <div class="deck-btn-group">
-          <button class="deck-btn-action" style="background: #FFF0F0; color: var(--primary-red); font-weight: 800;" onclick="selectNode(0)">Sarah M. (1.62m)</button>
-          <button class="deck-btn-action" onclick="selectNode(1)">Alex R. (3.45m)</button>
-          <button class="deck-btn-action" onclick="selectNode(2)">K9 Beacon (8.90m)</button>
-        </div>
-      </div>
-
-      <div class="deck-card">
-        <div class="deck-row-label">Active State Vector</div>
-        <div class="telemetry-code">
-          <div>&gt; Model: 1D Discrete Adaptive Kalman</div>
-          <div>&gt; Process Noise Q: 0.040 | Measurement Noise R: 1.800</div>
-          <div>&gt; Prior Variance P_k: <span id="deckPk">0.038</span></div>
-          <div>&gt; Kalman Gain K: <span id="deckGain">0.021</span></div>
-          <div>&gt; Log-Dist Path Loss: d = 10^((-59 - RSSI) / (10 * 2.4))</div>
-          <div>&gt; Sub-Meter Confidence: <span style="color: var(--primary-red); font-weight: bold;">100.1%</span></div>
-        </div>
-      </div>
-
-      <button class="btn-resp-call" style="width: 100%; height: 46px; margin-top: 4px;" onclick="toggleDeck()">
-        Close Telemetry Inspector
+      <button class="dock-tab" id="tabProfile" onclick="switchTab('profile')">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <span>Profile</span>
       </button>
     </div>
 
@@ -1018,91 +1009,123 @@
 
   <script>
     /* ============================================================
-       HIGH-PRECISION RADAR MATHEMATICS & STATE
+       PROFILE & MEDICAL TRIAGE STATE
+       ============================================================ */
+    const userProfile = {
+      name: "Jenifer Pilman",
+      bloodType: "O+",
+      conditions: {
+        diabetic: true,
+        mobility: true,
+        asthma: false,
+        cardiac: false,
+        hearing: false,
+        allergy: false
+      }
+    };
+
+    function selectBlood(btn, type) {
+      document.querySelectorAll('.blood-chip').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      userProfile.bloodType = type;
+      updateProfilePriorityUI();
+    }
+
+    function toggleCondition(el, key) {
+      el.classList.toggle('selected');
+      userProfile.conditions[key] = el.classList.contains('selected');
+      updateProfilePriorityUI();
+    }
+
+    function updateProfilePriorityUI() {
+      const isCritical = userProfile.conditions.diabetic || userProfile.conditions.mobility || userProfile.conditions.cardiac;
+      const banner = document.getElementById('profilePriorityBanner');
+      const title = document.getElementById('profilePriorityTitle');
+      const desc = document.getElementById('profilePriorityDesc');
+      const homeBadge = document.getElementById('homePriorityBadge');
+      const radarTargetPriority = document.getElementById('radarTargetPriority');
+
+      if (isCritical) {
+        banner.style.background = "#FFF0F0";
+        banner.style.borderColor = "rgba(229, 57, 53, 0.25)";
+        title.innerText = "CRITICAL RESCUE PRIORITY (LEVEL 1)";
+        title.style.color = "#E53935";
+        desc.innerText = "Diabetic or disability declared. Rescuers extract this beacon first.";
+        
+        let label = "Priority 1";
+        if (userProfile.conditions.diabetic) label += " • Diabetic";
+        else if (userProfile.conditions.mobility) label += " • Mobility";
+        homeBadge.innerText = label;
+        radarTargetPriority.innerText = "PRIORITY 1: DIABETIC • MOBILITY";
+      } else {
+        banner.style.background = "#FFF8E1";
+        banner.style.borderColor = "rgba(217, 119, 6, 0.25)";
+        title.innerText = "STANDARD RESCUE PRIORITY (LEVEL 2)";
+        title.style.color = "#D97706";
+        desc.innerText = "No critical conditions declared. Standard triage order.";
+        homeBadge.innerText = "Priority 2 • Standard";
+        radarTargetPriority.innerText = "PRIORITY 2: STANDARD";
+      }
+    }
+
+    function saveProfileAndBroadcast() {
+      const nameInput = document.getElementById('inputProfileName').value.trim();
+      if (nameInput) {
+        userProfile.name = nameInput;
+        document.getElementById('homeUserName').innerText = nameInput;
+      }
+
+      // Update Home chips
+      const chipsBox = document.getElementById('homeConditionsList');
+      chipsBox.innerHTML = '';
+      if (userProfile.conditions.diabetic) chipsBox.innerHTML += '<span class="condition-chip">Diabetic (Insulin)</span>';
+      if (userProfile.conditions.mobility) chipsBox.innerHTML += '<span class="condition-chip">Mobility Impaired</span>';
+      if (userProfile.conditions.asthma) chipsBox.innerHTML += '<span class="condition-chip">Asthma</span>';
+      if (userProfile.conditions.cardiac) chipsBox.innerHTML += '<span class="condition-chip">Cardiac</span>';
+      chipsBox.innerHTML += '<span class="condition-chip">Blood: ' + userProfile.bloodType + '</span>';
+
+      updateProfilePriorityUI();
+      switchTab('home');
+    }
+
+    /* ============================================================
+       HIGH-PRECISION RADAR ENGINE (EMERGENCY CRIMSON)
        ============================================================ */
     const TX_POWER = -59.0;
     const PATH_LOSS_EXPONENT = 2.40;
 
     let currentScaleMeters = 5.0;
-    let selectedNodeIndex = 0;
     let isSirenActive = false;
     let audioCtx = null;
     let sirenOsc = null;
     let sirenGain = null;
     let sirenInterval = null;
 
-    // Node colors aligned with emergency theme (Crimson, Warm Amber, Coral)
-    const nodes = [
-      {
-        id: "NODE-SARAH-01",
-        name: "Sarah M.",
-        condition: "TRAPPED UNDER DEBRIS",
-        role: "Target Beacon",
-        angleDeg: 18,
-        trueDistance: 1.62,
-        baseRssi: -73.2,
-        filteredRssi: -73.2,
-        kalmanP: 0.04,
-        history: [-73.2, -73.3, -73.1, -73.2],
-        color: "#FF1744",
-        highlight: true
-      },
-      {
-        id: "NODE-ALEX-02",
-        name: "Alex R.",
-        condition: "CONSCIOUS & MOVING",
-        role: "Mesh Node",
-        angleDeg: 68,
-        trueDistance: 3.45,
-        baseRssi: -82.1,
-        filteredRssi: -82.1,
-        kalmanP: 0.05,
-        history: [-82.1, -82.0, -82.3],
-        color: "#FF9800",
-        highlight: false
-      },
-      {
-        id: "NODE-K9-03",
-        name: "K9 Search Beacon #4",
-        condition: "TACTICAL DOG SENSOR",
-        role: "Perimeter Beacon",
-        angleDeg: 205,
-        trueDistance: 8.90,
-        baseRssi: -90.8,
-        filteredRssi: -90.8,
-        kalmanP: 0.07,
-        history: [-90.8, -90.9, -90.7],
-        color: "#E53935",
-        highlight: false
-      }
-    ];
+    const targetNode = {
+      name: "Sarah M.",
+      angleDeg: 18,
+      trueDistance: 1.62,
+      filteredRssi: -73.2,
+      kalmanP: 0.04
+    };
 
     function calculateDistance(rssi) {
-      const exponent = (TX_POWER - rssi) / (10 * PATH_LOSS_EXPONENT);
-      return Math.pow(10, exponent);
+      return Math.pow(10, (TX_POWER - rssi) / (10 * PATH_LOSS_EXPONENT));
     }
 
     function calculateRssi(dist) {
       return TX_POWER - (10 * PATH_LOSS_EXPONENT * Math.log10(Math.max(0.1, dist)));
     }
 
-    function updateKalman(node, rawSample) {
+    function updateKalman(rawSample) {
       const Q = 0.04;
       const R = 1.80;
-      let pPrior = node.kalmanP + Q;
+      let pPrior = targetNode.kalmanP + Q;
       let gain = pPrior / (pPrior + R);
-      node.filteredRssi = node.filteredRssi + gain * (rawSample - node.filteredRssi);
-      node.kalmanP = (1 - gain) * pPrior;
-
-      node.history.push(node.filteredRssi);
-      if (node.history.length > 8) node.history.shift();
-
-      return { pPrior, gain };
+      targetNode.filteredRssi = targetNode.filteredRssi + gain * (rawSample - targetNode.filteredRssi);
+      targetNode.kalmanP = (1 - gain) * pPrior;
     }
 
-    /* ============================================================
-       CANVAS RADAR RENDERING ENGINE (EMERGENCY THEME PALETTE)
-       ============================================================ */
     const canvas = document.getElementById('radarCanvas');
     const ctx = canvas.getContext('2d');
     let sweepAngle = 0;
@@ -1132,7 +1155,7 @@
 
       ctx.clearRect(0, 0, size, size);
 
-      // Deep emergency midnight obsidian backdrop with subtle warm center
+      // Deep emergency midnight obsidian
       const bgGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxRadius);
       bgGrad.addColorStop(0, '#1E070B');
       bgGrad.addColorStop(0.7, '#140407');
@@ -1142,7 +1165,7 @@
       ctx.arc(cx, cy, maxRadius, 0, Math.PI * 2);
       ctx.fill();
 
-      // Cardinal and 30-degree divider lines (Emergency Crimson Alpha)
+      // Divider Lines
       ctx.save();
       ctx.strokeStyle = 'rgba(229, 57, 53, 0.16)';
       ctx.lineWidth = 1;
@@ -1159,10 +1182,10 @@
       let ringSteps = [];
       if (currentScaleMeters === 5.0) {
         ringSteps = [
-          { dist: 1.0, label: "1.0m", dash: false },
-          { dist: 2.0, label: "2.0m [IMM]", dash: true, immediate: true },
+          { dist: 1.0, label: "1m", dash: false },
+          { dist: 2.0, label: "2m [IMM]", dash: true, immediate: true },
           { dist: 3.5, label: "3.5m", dash: false },
-          { dist: 5.0, label: "5.0m", dash: false }
+          { dist: 5.0, label: "5m", dash: false }
         ];
       } else if (currentScaleMeters === 15.0) {
         ringSteps = [
@@ -1202,14 +1225,13 @@
         ctx.arc(cx, cy, r, 0, Math.PI * 2);
         ctx.stroke();
 
-        // Ring distance label
         ctx.fillStyle = ring.immediate ? '#FF5252' : 'rgba(255, 120, 120, 0.75)';
         ctx.font = '8px "JetBrains Mono", monospace';
         ctx.fillText(ring.label, cx + 3, cy - r + 9);
         ctx.restore();
       });
 
-      // Cardinal Labels (N, E, S, W) in Emergency Red
+      // Cardinal Labels in Emergency Red
       ctx.fillStyle = 'rgba(255, 82, 82, 0.9)';
       ctx.font = 'bold 9px "Plus Jakarta Sans", sans-serif';
       ctx.textAlign = 'center';
@@ -1237,7 +1259,7 @@
       ctx.closePath();
       ctx.fill();
 
-      // Leading beam vector (Bright Crimson)
+      // Leading beam vector
       ctx.strokeStyle = '#FF1744';
       ctx.lineWidth = 1.8;
       ctx.shadowColor = '#FF1744';
@@ -1248,7 +1270,7 @@
       ctx.stroke();
       ctx.restore();
 
-      // Center user anchor dot
+      // Center anchor dot
       ctx.save();
       ctx.fillStyle = '#FF1744';
       ctx.shadowColor = '#FF1744';
@@ -1258,97 +1280,67 @@
       ctx.fill();
       ctx.restore();
 
-      // Plot BLE Nodes on Polar Scope
-      nodes.forEach((node, idx) => {
-        const estDist = calculateDistance(node.filteredRssi);
-        const normR = Math.min(1.0, estDist / currentScaleMeters) * maxRadius;
-        const rad = ((node.angleDeg - 90) * Math.PI) / 180;
-        const bx = cx + Math.cos(rad) * normR;
-        const by = cy + Math.sin(rad) * normR;
+      // Plot Target Node
+      const estDist = calculateDistance(targetNode.filteredRssi);
+      const normR = Math.min(1.0, estDist / currentScaleMeters) * maxRadius;
+      const rad = ((targetNode.angleDeg - 90) * Math.PI) / 180;
+      const bx = cx + Math.cos(rad) * normR;
+      const by = cy + Math.sin(rad) * normR;
 
-        // Sweep collision detection
-        const nodeAngleMod = ((node.angleDeg % 360) + 360) % 360;
-        const diff = Math.abs(sweepAngle - nodeAngleMod);
-        const isSwept = diff < 12 || diff > 348;
+      const diff = Math.abs(sweepAngle - targetNode.angleDeg);
+      const isSwept = diff < 12 || diff > 348;
 
-        ctx.save();
-        ctx.fillStyle = node.color;
-        ctx.shadowColor = node.color;
-        ctx.shadowBlur = isSwept ? 18 : 6;
+      ctx.save();
+      ctx.fillStyle = '#FF1744';
+      ctx.shadowColor = '#FF1744';
+      ctx.shadowBlur = isSwept ? 18 : 6;
+      ctx.beginPath();
+      ctx.arc(bx, by, isSwept ? 5.5 : 4, 0, Math.PI * 2);
+      ctx.fill();
 
-        ctx.beginPath();
-        ctx.arc(bx, by, isSwept ? 5.5 : 4, 0, Math.PI * 2);
-        ctx.fill();
+      // Target lock pulse ring
+      ctx.strokeStyle = '#FF1744';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(bx, by, isSwept ? 10 : 8, 0, Math.PI * 2);
+      ctx.stroke();
 
-        // Selected Node Outer Pulse Ring
-        if (idx === selectedNodeIndex) {
-          ctx.strokeStyle = node.color;
-          ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.arc(bx, by, isSwept ? 10 : 8, 0, Math.PI * 2);
-          ctx.stroke();
-        }
-
-        // Node Label
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 8px "Plus Jakarta Sans", sans-serif';
-        ctx.shadowBlur = 4;
-        ctx.fillText(node.name + " " + estDist.toFixed(1) + "m", bx + 6, by - 4);
-        ctx.restore();
-      });
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 8px "Plus Jakarta Sans", sans-serif';
+      ctx.shadowBlur = 4;
+      ctx.fillText(targetNode.name + " " + estDist.toFixed(1) + "m", bx + 6, by - 4);
+      ctx.restore();
 
       requestAnimationFrame(drawRadarScope);
     }
     requestAnimationFrame(drawRadarScope);
 
-    /* ============================================================
-       REAL-TIME TELEMETRY REFRESH LOOP
-       ============================================================ */
+    /* Background Kalman update */
     setInterval(() => {
-      nodes.forEach((node, idx) => {
-        const jitter = (Math.random() - 0.49) * 1.2;
-        const rawSample = calculateRssi(node.trueDistance) + jitter;
-        const { pPrior, gain } = updateKalman(node, rawSample);
+      const jitter = (Math.random() - 0.49) * 1.2;
+      const rawSample = calculateRssi(targetNode.trueDistance) + jitter;
+      updateKalman(rawSample);
 
-        if (idx === selectedNodeIndex) {
-          const estDist = calculateDistance(node.filteredRssi);
-          const vel = (node.history[node.history.length - 1] - node.history[0]) / Math.max(1, node.history.length - 1);
+      const estDist = calculateDistance(targetNode.filteredRssi);
+      document.getElementById('scopeMainDistance').innerText = estDist.toFixed(2);
+      document.getElementById('radarTargetDesc').innerText = "Mobility Impaired • Trapped under rubble • " + estDist.toFixed(2) + "m away";
 
-          document.getElementById('scopeMainDistance').innerText = estDist.toFixed(2);
-          document.getElementById('scopeFilteredRssi').innerText = node.filteredRssi.toFixed(1) + " dBm";
-          document.getElementById('scopeRawRssi').innerText = rawSample.toFixed(1) + " dBm";
-          document.getElementById('scopeVelocity').innerText = (vel >= 0 ? "+" : "") + vel.toFixed(2) + " dB/s";
-          document.getElementById('respDistTxt').innerText = estDist.toFixed(2) + "m away";
-          document.getElementById('calibratedAccuracyTxt').innerText = "100.1% ACCURATE";
-          document.getElementById('deckPk').innerText = node.kalmanP.toFixed(4);
-          document.getElementById('deckGain').innerText = gain.toFixed(4);
-
-          const isImmediate = estDist <= 2.0;
-          const zonePill = document.getElementById('scopeProximityPill');
-          const zoneBadge = document.getElementById('respZoneBadge');
-          if (isImmediate) {
-            zonePill.innerHTML = "IMMEDIATE (&lt; 2M)";
-            zonePill.style.background = "#FFF0F0";
-            zonePill.style.color = "#E53935";
-            zonePill.style.borderColor = "rgba(229, 57, 53, 0.3)";
-            zoneBadge.innerText = "IMMEDIATE";
-            zoneBadge.style.background = "#FFF0F0";
-            zoneBadge.style.color = "#E53935";
-          } else {
-            zonePill.innerHTML = "SEARCHING (&gt; 2M)";
-            zonePill.style.background = "#FFF8E1";
-            zonePill.style.color = "#D97706";
-            zonePill.style.borderColor = "rgba(217, 119, 6, 0.3)";
-            zoneBadge.innerText = "APPROACHING";
-            zoneBadge.style.background = "#FFF8E1";
-            zoneBadge.style.color = "#D97706";
-          }
-        }
-      });
+      const zonePill = document.getElementById('scopeProximityPill');
+      if (estDist <= 2.0) {
+        zonePill.innerText = "IMMEDIATE ZONE (< 2M)";
+        zonePill.style.background = "#FFF0F0";
+        zonePill.style.color = "#E53935";
+        zonePill.style.borderColor = "rgba(229, 57, 53, 0.3)";
+      } else {
+        zonePill.innerText = "SEARCHING (> 2M)";
+        zonePill.style.background = "#FFF8E1";
+        zonePill.style.color = "#D97706";
+        zonePill.style.borderColor = "rgba(217, 119, 6, 0.3)";
+      }
     }, 400);
 
     /* ============================================================
-       INTERACTIVE ACTIONS & CONTROLS
+       NAVIGATION & ACTIONS
        ============================================================ */
     function setScale(meters, btn) {
       currentScaleMeters = meters;
@@ -1356,16 +1348,8 @@
       btn.classList.add('active');
     }
 
-    function selectNode(idx) {
-      selectedNodeIndex = idx;
-      const target = nodes[idx];
-      document.getElementById('respCardTargetName').innerText = target.name + " (" + target.condition + ")";
-      document.getElementById('chatTargetName').innerText = target.name + " (" + target.role + ")";
-    }
-
     function adjustDistance(delta) {
-      const node = nodes[selectedNodeIndex];
-      node.trueDistance = Math.max(0.4, node.trueDistance + delta);
+      targetNode.trueDistance = Math.max(0.4, targetNode.trueDistance + delta);
     }
 
     function switchTab(screenId) {
@@ -1373,56 +1357,46 @@
       document.querySelectorAll('.dock-tab').forEach(t => t.classList.remove('active'));
       const dock = document.getElementById('bottomDock');
 
+      let targetScreen = null;
       if (screenId === 'home') {
-        document.getElementById('screenHome').classList.add('active');
+        targetScreen = document.getElementById('screenHome');
         document.getElementById('tabHome').classList.add('active');
         dock.classList.remove('dock-hidden');
       } else if (screenId === 'dispatch') {
-        document.getElementById('screenDispatch').classList.add('active');
+        targetScreen = document.getElementById('screenDispatch');
         dock.classList.add('dock-hidden');
       } else if (screenId === 'radar') {
-        document.getElementById('screenRadar').classList.add('active');
+        targetScreen = document.getElementById('screenRadar');
         document.getElementById('tabRadar').classList.add('active');
         dock.classList.remove('dock-hidden');
         setTimeout(resizeCanvas, 30);
       } else if (screenId === 'chat') {
-        document.getElementById('screenChat').classList.add('active');
+        targetScreen = document.getElementById('screenChat');
         document.getElementById('tabChat').classList.add('active');
         dock.classList.remove('dock-hidden');
+      } else if (screenId === 'profile') {
+        targetScreen = document.getElementById('screenProfile');
+        document.getElementById('tabProfile').classList.add('active');
+        dock.classList.remove('dock-hidden');
+      }
+
+      if (targetScreen) {
+        targetScreen.classList.add('active');
+        targetScreen.scrollTop = 0;
       }
     }
 
-    function triggerSosEmergency() {
-      // Transition to Ambulance Dispatch Screen
-      switchTab('dispatch');
-    }
+    function triggerSosEmergency() { switchTab('dispatch'); }
+    function cancelEmergency() { switchTab('home'); }
 
-    function cancelEmergency() {
-      switchTab('home');
-    }
-
-    function toggleDeck() {
-      document.getElementById('deckDrawer').classList.toggle('open');
-    }
-
-    function selectChip(el) {
-      document.querySelectorAll('.triage-chip').forEach(c => c.classList.remove('selected'));
-      el.classList.add('selected');
-    }
-
-    /* Web Audio API Synthesized Siren */
     function toggleAudioSiren() {
       const btn = document.getElementById('btnCallSiren');
       const txt = document.getElementById('callBtnText');
 
       if (!isSirenActive) {
         try {
-          if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-          }
-          if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-          }
+          if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          if (audioCtx.state === 'suspended') audioCtx.resume();
 
           sirenOsc = audioCtx.createOscillator();
           sirenGain = audioCtx.createGain();
@@ -1446,7 +1420,7 @@
           btn.classList.add('active');
           txt.innerText = 'Siren Active (Mute)';
         } catch (e) {
-          console.warn("Audio Context init blocked:", e);
+          console.warn("Audio blocked:", e);
         }
       } else {
         if (sirenOsc) {
@@ -1459,7 +1433,7 @@
         }
         isSirenActive = false;
         btn.classList.remove('active');
-        txt.innerText = 'Call / Siren';
+        txt.innerText = 'Sound Siren';
       }
     }
 
