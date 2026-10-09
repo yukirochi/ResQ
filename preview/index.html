@@ -126,8 +126,8 @@
     .bottom-dock {
       position: absolute;
       bottom: 22px;
-      left: 20px;
-      right: 20px;
+      left: 14px;
+      right: 14px;
       height: 64px;
       background: #FFFFFF;
       border-radius: 36px;
@@ -136,7 +136,7 @@
       display: flex;
       align-items: center;
       justify-content: space-around;
-      padding: 0 8px;
+      padding: 0 4px;
       z-index: 100;
       transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
     }
@@ -150,10 +150,10 @@
     .dock-tab {
       display: flex;
       align-items: center;
-      gap: 6px;
-      padding: 10px 16px;
-      border-radius: 24px;
-      font-size: 13px;
+      gap: 4px;
+      padding: 8px 10px;
+      border-radius: 20px;
+      font-size: 11px;
       font-weight: 700;
       color: var(--text-muted);
       cursor: pointer;
@@ -163,7 +163,7 @@
       transition: all 0.2s ease;
     }
 
-    .dock-tab svg { width: 18px; height: 18px; fill: currentColor; }
+    .dock-tab svg { width: 17px; height: 17px; fill: currentColor; }
 
     .dock-tab.active {
       background: var(--red-primary);
@@ -1080,6 +1080,617 @@
       padding: 20px;
       line-height: 18px;
     }
+
+    /* ============================================================
+       SCREEN 6: OFFLINE DISASTER SURVIVAL & AI ASSISTANT
+       ============================================================ */
+    .survival-header-wrap { margin-bottom: 14px; }
+    .survival-title-row { display: flex; align-items: center; justify-content: space-between; }
+    .survival-page-title { font-size: 20px; font-weight: 900; color: var(--text-main); letter-spacing: -0.4px; }
+    .survival-page-sub { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+    
+    .survival-offline-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: #E8F5E9;
+      color: #2E7D32;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 800;
+      border: 1px solid rgba(46, 125, 50, 0.2);
+    }
+    .survival-pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #2E7D32;
+      box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.25);
+    }
+
+    .survival-ai-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 14px;
+    }
+    .survival-ai-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .survival-ai-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .survival-ai-model-tag {
+      font-size: 9px;
+      font-weight: 800;
+      color: var(--red-primary);
+      background: var(--red-soft);
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid var(--red-border);
+    }
+    .survival-ai-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 15px;
+      margin-bottom: 10px;
+    }
+
+    .survival-input-bar {
+      display: flex;
+      gap: 8px;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 14px;
+      padding: 4px 6px 4px 12px;
+      align-items: center;
+    }
+    .survival-input-field {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 12px;
+      font-family: inherit;
+      color: var(--text-main);
+    }
+    .survival-ask-btn {
+      background: var(--red-primary);
+      color: #FFFFFF;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: transform 0.15s ease;
+    }
+    .survival-ask-btn:active { transform: scale(0.96); }
+
+    .survival-chips-scroll {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 8px 0 2px 0;
+      scrollbar-width: none;
+    }
+    .survival-chips-scroll::-webkit-scrollbar { display: none; }
+    .survival-preset-chip {
+      white-space: nowrap;
+      background: #F0F2F5;
+      color: var(--text-main);
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 4px 10px;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .survival-preset-chip:active { background: #E2E8F0; }
+
+    .survival-ai-response-box {
+      margin-top: 10px;
+      background: #F8FAFC;
+      border-left: 3px solid var(--red-primary);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: none;
+    }
+    .survival-ai-response-box.active { display: block; animation: fadeIn 0.2s ease; }
+    .survival-ai-res-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .survival-ai-res-badge {
+      font-size: 10px;
+      font-weight: 800;
+      color: #1E88E5;
+    }
+    .survival-ai-res-dismiss {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .survival-ai-res-text {
+      font-size: 12px;
+      line-height: 18px;
+      color: var(--text-main);
+      white-space: pre-line;
+    }
+
+    .survival-filter-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .survival-filter-row::-webkit-scrollbar { display: none; }
+    .survival-filter-btn {
+      white-space: nowrap;
+      flex: 1;
+      min-width: 70px;
+      padding: 7px 10px;
+      background: #FFFFFF;
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+    .survival-filter-btn.active {
+      background: var(--red-primary);
+      color: #FFFFFF;
+      border-color: var(--red-primary);
+      box-shadow: 0 4px 10px rgba(229, 57, 53, 0.2);
+    }
+
+    .survival-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: border-color 0.2s ease;
+    }
+    .survival-card:hover { border-color: rgba(229, 57, 53, 0.3); }
+    .survival-card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .survival-card-title {
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+    .survival-card-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .survival-badge {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 6px;
+      text-transform: uppercase;
+    }
+    .badge-critical { background: #FFEBEE; color: #D32F2F; border: 1px solid rgba(211, 47, 47, 0.25); }
+    .badge-high { background: #FFF8E1; color: #F57C00; border: 1px solid rgba(245, 124, 0, 0.25); }
+    .badge-info { background: #E3F2FD; color: #1976D2; border: 1px solid rgba(25, 118, 210, 0.25); }
+
+    .survival-steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .survival-step-row {
+      display: flex;
+      gap: 6px;
+      font-size: 12px;
+      line-height: 16px;
+      color: #374151;
+    }
+    .survival-step-num {
+      font-weight: 800;
+      color: var(--red-primary);
+      min-width: 16px;
+    }
+    .survival-warning-box {
+      margin-top: 8px;
+      background: #FFF0F0;
+      border: 1px solid rgba(229, 57, 53, 0.2);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #C62828;
+      display: none;
+    }
+    .survival-warning-box.show { display: block; }
+    .survival-expand-hint {
+      text-align: center;
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--red-primary);
+      margin-top: 8px;
+    }
+
+    .survival-quick-tags-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .survival-mini-pill {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-main);
+      background: #F0F2F5;
+      padding: 3px 8px;
+      border-radius: 8px;
+      border: 1px solid #E2E8F0;
+    }
+
+    /* ============================================================
+       FLOATING AI CHAT HEAD & INTERACTIVE AI CHAT MODAL
+       ============================================================ */
+    .ai-floating-head {
+      position: absolute;
+      bottom: 96px;
+      right: 18px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FF3D3D 0%, #D32F2F 100%);
+      box-shadow: 0 10px 28px rgba(229, 57, 53, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 999;
+      border: 2.5px solid #FFFFFF;
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .ai-floating-head:hover { transform: scale(1.08); }
+    .ai-floating-head:active { transform: scale(0.92); }
+    .ai-floating-head.hidden { transform: scale(0); opacity: 0; pointer-events: none; }
+    
+    .ai-head-pulse-ring {
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 2.5px solid rgba(229, 57, 53, 0.5);
+      animation: aiHeadPulse 2.4s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      pointer-events: none;
+    }
+    @keyframes aiHeadPulse {
+      0% { transform: scale(0.95); opacity: 0.9; }
+      70% { transform: scale(1.35); opacity: 0; }
+      100% { transform: scale(1.35); opacity: 0; }
+    }
+    .ai-head-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      background: #191C21;
+      color: #00E676;
+      font-size: 8px;
+      font-weight: 900;
+      padding: 1px 5px;
+      border-radius: 999px;
+      border: 1.5px solid #FFFFFF;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      letter-spacing: 0.5px;
+    }
+    .ai-head-icon {
+      width: 28px;
+      height: 28px;
+      fill: #FFFFFF;
+    }
+
+    /* Modal Overlay & Sheet */
+    .ai-chat-modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+    .ai-chat-modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+    .ai-chat-modal-sheet {
+      width: 100%;
+      background: #FFFFFF;
+      border-radius: 28px 28px 0 0;
+      padding: 14px 18px 20px 18px;
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
+      height: 82vh;
+      max-height: 720px;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(100%);
+      transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .ai-chat-modal-overlay.active .ai-chat-modal-sheet {
+      transform: translateY(0);
+    }
+
+    .ai-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 10px;
+    }
+    .ai-modal-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .ai-modal-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #FF3D3D 0%, #D32F2F 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .ai-modal-avatar svg { width: 18px; height: 18px; fill: #FFFFFF; }
+    .ai-avatar-online-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #00E676;
+      border: 2px solid #FFFFFF;
+      position: absolute;
+      bottom: -1px;
+      right: -1px;
+    }
+    .ai-modal-name {
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--text-main);
+    }
+    .ai-modal-status {
+      font-size: 11px;
+      color: #2E7D32;
+      font-weight: 700;
+    }
+    .ai-modal-close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #F1F5F9;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: background 0.15s ease;
+    }
+    .ai-modal-close-btn:hover { background: #E2E8F0; }
+
+    /* Stream */
+    .ai-modal-stream-box {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 4px 2px 10px 2px;
+    }
+    .ai-msg-bubble {
+      max-width: 86%;
+      padding: 10px 14px;
+      font-size: 12px;
+      line-height: 18px;
+      border-radius: 18px;
+      word-break: break-word;
+    }
+    .ai-msg-user {
+      align-self: flex-end;
+      background: var(--red-primary);
+      color: #FFFFFF;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 4px 12px rgba(229, 57, 53, 0.25);
+    }
+    .ai-msg-bot {
+      align-self: flex-start;
+      background: #F8FAFC;
+      color: var(--text-main);
+      border: 1px solid #E2E8F0;
+      border-bottom-left-radius: 4px;
+    }
+    .ai-bubble-sender {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--red-primary);
+      margin-bottom: 4px;
+    }
+    .ai-bubble-content {
+      font-size: 12px;
+      line-height: 17px;
+      color: inherit;
+      white-space: pre-line;
+    }
+    .ai-bubble-time {
+      font-size: 9px;
+      opacity: 0.7;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+    .ai-msg-user .ai-bubble-time { text-align: right; color: rgba(255,255,255,0.85); }
+    .ai-msg-bot .ai-bubble-time { color: var(--text-muted); }
+
+    /* Typing row */
+    .ai-typing-row {
+      display: flex;
+      align-items: center;
+      padding: 2px 4px 6px 4px;
+    }
+    .ai-typing-pill {
+      background: #F1F5F9;
+      border: 1px solid #E2E8F0;
+      border-radius: 14px;
+      padding: 6px 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .typing-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--red-primary);
+      animation: typingBounce 1.4s infinite ease-in-out both;
+    }
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes typingBounce {
+      0%, 80%, 100% { transform: scale(0); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Quick chips */
+    .ai-chat-quick-chips {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 6px 0 8px 0;
+      scrollbar-width: none;
+    }
+    .ai-chat-quick-chips::-webkit-scrollbar { display: none; }
+    .ai-chip-btn {
+      white-space: nowrap;
+      background: #F1F5F9;
+      color: var(--text-main);
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+    .ai-chip-btn:active { background: #E2E8F0; }
+
+    /* Input Bar */
+    .ai-modal-input-bar {
+      display: flex;
+      gap: 8px;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 28px;
+      padding: 4px 6px 4px 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .ai-modal-input-field {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text-main);
+    }
+    .ai-modal-send-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--red-primary);
+      color: #FFFFFF;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    .ai-modal-send-btn:active { transform: scale(0.95); }
+
+    /* Channel switcher in ScreenChat */
+    .chat-channel-switcher {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      background: #F0F2F5;
+      padding: 4px;
+      border-radius: 14px;
+    }
+    .chat-channel-pill {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: none;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-muted);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .chat-channel-pill.active {
+      background: #FFFFFF;
+      color: var(--text-main);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .chat-channel-live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #00E676;
+    }
   </style>
 </head>
 <body>
@@ -1141,6 +1752,26 @@
         </div>
         <div class="condition-chips-list" id="homeConditionsList">
           <span class="condition-chip-empty">No conditions declared. Tap to add.</span>
+        </div>
+      </div>
+
+      <!-- Offline Survival & App Guide Card (Links to Survival Tab) -->
+      <div class="profile-shortcut-card survival-shortcut-card" onclick="switchTab('survival')" style="cursor:pointer; margin-top: 10px;">
+        <div class="shortcut-header">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#4CAF50;"></span>
+            <span class="shortcut-title">Offline Survival & App AI</span>
+          </div>
+          <span class="shortcut-link">Open Guide →</span>
+        </div>
+        <div style="font-size:12px; color:var(--text-muted); font-weight:600; margin: 4px 0 8px 0; line-height:16px;">
+          Instant emergency triage, first aid steps, and ResQ app instructions. 100% offline.
+        </div>
+        <div class="survival-quick-tags-row">
+          <span class="survival-mini-pill">🩸 Bleeding</span>
+          <span class="survival-mini-pill">🫀 CPR</span>
+          <span class="survival-mini-pill">🏗️ Trapped</span>
+          <span class="survival-mini-pill">📡 Radar Help</span>
         </div>
       </div>
     </div>
@@ -1437,6 +2068,19 @@
         </div>
       </div>
 
+      <!-- Channel Switcher: Mesh vs AI Assistant -->
+      <div class="chat-channel-switcher">
+        <button class="chat-channel-pill active" id="btnChannelMesh" onclick="switchChatChannel('mesh')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+          <span>Mesh #911</span>
+        </button>
+        <button class="chat-channel-pill" id="btnChannelAi" onclick="openAiChatModal()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="var(--red-primary)"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          <span>Talk to resQ</span>
+          <span class="chat-channel-live-dot"></span>
+        </button>
+      </div>
+
       <div class="chat-stream-box" id="chatStreamBox">
         <div class="chat-empty-hint" id="chatEmptyHint">
           Emergency mesh channel ready.<br>Type a message below to broadcast to nearby rescuers and victims.
@@ -1452,7 +2096,160 @@
     </div>
 
     <!-- ============================================================
-         BOTTOM DOCK (HOME, RADAR, CHAT, PROFILE)
+         SCREEN 6: OFFLINE DISASTER SURVIVAL & AI ASSISTANT
+         ============================================================ -->
+    <div id="screenSurvival" class="screen">
+      <div class="survival-header-wrap">
+        <div class="survival-title-row">
+          <div>
+            <h2 class="survival-page-title">Survival & App Guide</h2>
+            <div class="survival-page-sub">Verified Triage & Offline AI Knowledge Base</div>
+          </div>
+          <div class="survival-offline-badge">
+            <span class="survival-pulse-dot"></span>
+            <span>100% OFFLINE</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Local AI Query Box -->
+      <div class="survival-ai-card">
+        <div class="survival-ai-top">
+          <div class="survival-ai-title">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--red-primary)"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            <span>Talk to resQ</span>
+          </div>
+          <span class="survival-ai-model-tag">100% Offline AI</span>
+        </div>
+        <div class="survival-ai-desc">
+          Chat conversationally with resQ for disaster survival triage or app instructions. Zero network needed.
+        </div>
+
+        <div class="survival-input-bar">
+          <input type="text" id="survivalAiInput" class="survival-input-field" placeholder="Talk to resQ (e.g. 'I'm trapped on 3rd floor', 'Bleeding', 'Radar')..." onkeydown="if(event.key==='Enter') querySurvivalAssistant()">
+          <button class="survival-ask-btn" onclick="querySurvivalAssistant()">
+            <span>Ask</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+          </button>
+        </div>
+
+        <!-- Quick Query Preset Chips -->
+        <div class="survival-chips-scroll">
+          <button class="survival-preset-chip" onclick="askSurvivalPreset('Trapped in rubble')">🏗️ Trapped in Rubble</button>
+          <button class="survival-preset-chip" onclick="askSurvivalPreset('Severe bleeding')">🩸 Severe Bleeding</button>
+          <button class="survival-preset-chip" onclick="askSurvivalPreset('CPR adult')">🫀 Adult CPR</button>
+          <button class="survival-preset-chip" onclick="askSurvivalPreset('How radar works')">📡 Radar Guide</button>
+          <button class="survival-preset-chip" onclick="askSurvivalPreset('Siren trigger')">🚨 Siren Guide</button>
+          <button class="survival-preset-chip" onclick="askSurvivalPreset('Earthquake drop cover hold')">🏚️ Earthquake</button>
+        </div>
+
+        <!-- AI Response Container -->
+        <div class="survival-ai-response-box" id="survivalAiResponseBox">
+          <div class="survival-ai-res-header">
+            <span class="survival-ai-res-badge" id="survivalAiResBadge">🛡️ VERIFIED PROTOCOL ENGINE</span>
+            <span class="survival-ai-res-dismiss" onclick="dismissSurvivalAiResponse()">Dismiss ✕</span>
+          </div>
+          <div class="survival-ai-res-text" id="survivalAiResText"></div>
+        </div>
+      </div>
+
+      <!-- Category Filter Tabs -->
+      <div class="survival-filter-row">
+        <button class="survival-filter-btn active" id="survFilter_ALL" onclick="filterSurvivalCategory('ALL')">All</button>
+        <button class="survival-filter-btn" id="survFilter_MEDICAL" onclick="filterSurvivalCategory('MEDICAL')">First Aid</button>
+        <button class="survival-filter-btn" id="survFilter_DISASTER" onclick="filterSurvivalCategory('DISASTER')">Disaster</button>
+        <button class="survival-filter-btn" id="survFilter_APP" onclick="filterSurvivalCategory('APP')">ResQ Manual</button>
+      </div>
+
+      <!-- Protocols Cards Container -->
+      <div id="survivalProtocolsContainer">
+        <!-- Dynamically rendered from survivalProtocolsDB -->
+      </div>
+    </div>
+
+    <!-- FLOATING AI CHAT HEAD (VISIBLE ACROSS APP) -->
+    <div class="ai-floating-head" id="aiFloatingChatHead" onclick="openAiChatModal()" title="Talk to resQ">
+      <div class="ai-head-pulse-ring"></div>
+      <div class="ai-head-badge">resQ</div>
+      <svg class="ai-head-icon" viewBox="0 0 24 24">
+        <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.38-1 1.72V7h2a7 7 0 0 1 7 7v1a2 2 0 0 1-2 2h-1v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-2H4a2 2 0 0 1-2-2v-1a7 7 0 0 1 7-7h2V5.72A2.002 2.002 0 0 1 12 2m-3 8a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-6 5v1h6v-1z"/>
+      </svg>
+    </div>
+
+    <!-- FULL AI CHAT MODAL OVERLAY & CONVERSATION SHEET -->
+    <div class="ai-chat-modal-overlay" id="aiChatModalOverlay" onclick="closeAiChatModal()">
+      <div class="ai-chat-modal-sheet" onclick="event.stopPropagation()">
+        <div class="modal-grab-bar"></div>
+        <div class="ai-modal-header">
+          <div class="ai-modal-header-left">
+            <div class="ai-modal-avatar">
+              <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <div class="ai-avatar-online-dot"></div>
+            </div>
+            <div>
+              <div class="ai-modal-name">resQ</div>
+              <div class="ai-modal-status">Offline Survival Companion & App Guide</div>
+            </div>
+          </div>
+          <button class="ai-modal-close-btn" onclick="closeAiChatModal()" title="Minimize Chat">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+        </div>
+
+        <!-- Conversation Stream -->
+        <div class="ai-modal-stream-box" id="aiModalStreamBox">
+          <div class="ai-msg-bubble ai-msg-bot">
+            <div class="ai-bubble-sender">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <span>resQ</span>
+            </div>
+            <div class="ai-bubble-content">
+              👋 <strong>Hi, I'm resQ!</strong> I'm your offline survival companion and interactive guide for this app.<br><br>
+              I run 100% offline directly on your phone with zero internet, Wi-Fi, or cellular reception. You can talk to me naturally, inform me of your situation (where you're trapped, who is with you, or your injuries), or ask me how to operate any part of this app to survive and find people.<br><br>
+              How can I help you right now?
+            </div>
+            <div class="ai-bubble-time">JUST NOW • 100% OFFLINE</div>
+          </div>
+        </div>
+
+        <!-- Quick prompt chips inside chat -->
+        <div class="ai-chat-quick-chips">
+          <button class="ai-chip-btn" onclick="sendAiChatQuickPrompt('How do I use this app? Walk me through everything')">📖 App Guide</button>
+          <button class="ai-chip-btn" onclick="sendAiChatQuickPrompt('How do I treat severe bleeding?')">🩸 Bleeding</button>
+          <button class="ai-chip-btn" onclick="sendAiChatQuickPrompt('Someone is trapped under rubble, what should I do?')">🏗️ Trapped in Rubble</button>
+          <button class="ai-chip-btn" onclick="sendAiChatQuickPrompt('What is the 15-minute crush injury warning?')">⚠️ Crush Warning</button>
+          <button class="ai-chip-btn" onclick="sendAiChatQuickPrompt('How to perform CPR on an adult?')">🫀 Adult CPR</button>
+          <button class="ai-chip-btn" onclick="sendAiChatQuickPrompt('How do I use the ResQ radar to locate a victim?')">📡 Radar</button>
+          <button class="ai-chip-btn" onclick="sendAiChatQuickPrompt('How does the remote siren work?')">🚨 Siren</button>
+          <button class="ai-chip-btn" onclick="sendAiChatQuickPrompt('What should I do during an earthquake?')">🏚️ Earthquake</button>
+          <button class="ai-chip-btn" onclick="sendAiChatQuickPrompt('How to purify water for drinking during a disaster?')">💧 Clean Water</button>
+          <button class="ai-chip-btn" onclick="sendAiChatQuickPrompt('What should be in an emergency survival go-bag?')">🎒 Go-Bag Kit</button>
+          <button class="ai-chip-btn" onclick="sendAiChatQuickPrompt('How does the emergency beacon protect my privacy?')">🔒 Beacon Privacy</button>
+          <button class="ai-chip-btn" onclick="sendAiChatQuickPrompt('How do I save phone battery during an outage?')">📱 Battery Saver</button>
+        </div>
+
+        <!-- Typing Indicator Bubble -->
+        <div class="ai-typing-row" id="aiTypingRow" style="display: none;">
+          <div class="ai-typing-pill">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <span style="font-size: 10px; font-weight: 700; color: var(--text-muted); margin-left: 4px;">resQ is thinking...</span>
+          </div>
+        </div>
+
+        <!-- Input Bar -->
+        <div class="ai-modal-input-bar">
+          <input type="text" id="aiModalInput" class="ai-modal-input-field" placeholder="Talk to resQ (tell me your situation, ask survival advice or app guide)..." onkeydown="if(event.key==='Enter') sendAiChatMessage()">
+          <button class="ai-modal-send-btn" onclick="sendAiChatMessage()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         BOTTOM DOCK (HOME, RADAR, CHAT, SURVIVAL, PROFILE)
          ============================================================ -->
     <div class="bottom-dock" id="bottomDock">
       <button class="dock-tab active" id="tabHome" onclick="switchTab('home')">
@@ -1466,6 +2263,10 @@
       <button class="dock-tab" id="tabChat" onclick="switchTab('chat')">
         <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
         <span>Chat</span>
+      </button>
+      <button class="dock-tab" id="tabSurvival" onclick="switchTab('survival')">
+        <svg viewBox="0 0 24 24"><path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm-1 6h2v3h3v2h-3v3h-2v-3H8v-2h3V8z"/></svg>
+        <span>Survival</span>
       </button>
       <button class="dock-tab" id="tabProfile" onclick="switchTab('profile')">
         <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
@@ -2361,6 +3162,11 @@
         targetScreen = document.getElementById('screenProfile');
         document.getElementById('tabProfile').classList.add('active');
         dock.classList.remove('dock-hidden');
+      } else if (screenId === 'survival') {
+        targetScreen = document.getElementById('screenSurvival');
+        document.getElementById('tabSurvival').classList.add('active');
+        dock.classList.remove('dock-hidden');
+        renderSurvivalProtocols();
       }
 
       if (targetScreen) {
@@ -2545,12 +3351,935 @@
       input.value = '';
     }
 
+    /* ============================================================
+       OFFLINE DISASTER SURVIVAL & APP MANUAL KNOWLEDGE ENGINE
+       ============================================================ */
+    const survivalProtocolsDB = [
+      {
+        id: 'cpr_cardiac',
+        category: 'MEDICAL',
+        title: 'CPR / Unresponsive Victim',
+        subtitle: 'Adult Cardiac Arrest & Breathing Failure',
+        severity: 'CRITICAL',
+        tags: ['cpr', 'heart', 'cardiac', 'unresponsive', 'unconscious', 'breathing', 'pulse', 'chest compressions'],
+        steps: [
+          'Verify responsiveness: Tap shoulders firmly and shout "Are you okay?". Check chest rise for normal breathing (no more than 10 seconds).',
+          'Position heel of one hand in center of victim\'s chest (lower half of breastbone), interlock other hand on top.',
+          'Deliver 30 hard, fast compressions (5-6 cm deep, 100-120 bpm to the rhythm of "Stayin\' Alive"). Allow chest to fully recoil between compressions.',
+          'Tilt head back gently, lift chin, pinch nose, and deliver 2 rescue breaths (1 sec each, watch chest rise).',
+          'Continue 30:2 ratio uninterrupted until emergency personnel arrive or victim shows signs of life. If unable or untrained for breaths, do continuous hands-only compressions.'
+        ],
+        warning: 'Do not interrupt chest compressions for more than 10 seconds. Continuous high-quality compressions keep oxygenated blood flowing to the brain.'
+      },
+      {
+        id: 'severe_bleeding',
+        category: 'MEDICAL',
+        title: 'Severe Bleeding & Hemorrhage Control',
+        subtitle: 'Heavy Traumatic Arterial or Venous Wounds',
+        severity: 'CRITICAL',
+        tags: ['bleeding', 'blood', 'hemorrhage', 'cut', 'wound', 'tourniquet', 'artery', 'spurting'],
+        steps: [
+          'Apply immediate, continuous direct pressure over the wound using a clean cloth, shirt, or sterile pad with both hands.',
+          'Maintain firm pressure for at least 5-10 minutes without lifting cloth to peek.',
+          'If arterial limb bleeding does not stop (blood spurting or soaking through), apply a tourniquet 2-3 inches above the wound (never over a joint).',
+          'Tighten the windlass until bleeding stops completely and pulse below is absent. Note exact application time on victim\'s forehead or arm (e.g., "TK 21:15").',
+          'Keep victim warm with jackets/blankets to prevent trauma-induced hypothermia and shock.'
+        ],
+        warning: 'Do NOT remove deeply embedded objects (rebar, glass, metal). Pack sterile cloth around the object to stabilize it in place.'
+      },
+      {
+        id: 'choking_airway',
+        category: 'MEDICAL',
+        title: 'Choking & Foreign Body Airway Obstruction',
+        subtitle: 'Heimlich Maneuver & Complete Airway Blockage',
+        severity: 'CRITICAL',
+        tags: ['choking', 'choke', 'heimlich', 'airway', 'cant breathe', 'coughing', 'throat'],
+        steps: [
+          'Ask "Are you choking?". If they can speak, cough forcefully, or breathe, encourage coughing and do NOT hit their back.',
+          'If unable to breathe or speak (universal clutching throat sign): Stand behind victim, wrap arms around waist.',
+          'Make a fist with one hand, place thumb side just above navel (well below ribcage). Grasp fist with other hand.',
+          'Deliver quick, upward and inward abdominal thrusts (Heimlich maneuver) until object is expelled.',
+          'If pregnant or obese: Position hands at the center of the breastbone and deliver inward chest thrusts.',
+          'If victim becomes unconscious: Lower them gently to the floor, call for help, and begin CPR compressions.'
+        ],
+        warning: 'If you are alone and choking: Lean over a sturdy chair back, table edge, or railing and press your upper abdomen against it.'
+      },
+      {
+        id: 'crush_rubble',
+        category: 'MEDICAL',
+        title: 'Crush Injury & Prolonged Entrapment',
+        subtitle: 'Pinned Under Heavy Concrete, Beams, or Masonry',
+        severity: 'HIGH',
+        tags: ['crush', 'trapped', 'rubble', 'concrete', 'pinned', 'debris', 'collapsed', 'heavy', 'syndrome'],
+        steps: [
+          'Determine entrapment duration: Entrapment >15 mins creates extreme risk of lethal Crush Syndrome (toxin flood upon release).',
+          'DO NOT lift heavy weight suddenly after 15 minutes without emergency medical personnel present!',
+          'Notify incoming rescuers via ResQ BLE Chat of exact entrapment duration before attempting to lift heavy loads.',
+          'If victim is conscious and able to swallow, provide small sips of water to protect renal function before extraction.',
+          'Support crushed limbs gently and keep level with heart after weight is removed.',
+          'Watch for rapid pulse, dark red/brown urine, and shock immediately post-release.'
+        ],
+        warning: 'Sudden decompression without medical support causes massive influx of potassium, myoglobin, and acid into circulation, triggering sudden cardiac arrest.'
+      },
+      {
+        id: 'fractures_splint',
+        category: 'MEDICAL',
+        title: 'Bone Fractures & Joint Splinting',
+        subtitle: 'Broken Limbs, Deformities & Immobilization',
+        severity: 'HIGH',
+        tags: ['broken', 'fracture', 'bone', 'splint', 'sprain', 'arm', 'leg', 'ankle'],
+        steps: [
+          'Support injured limb: Do NOT attempt to straighten or force an angulated bone back into place.',
+          'Splint in position found: Use rolled magazines, pieces of wood, cardboard, or umbrella along with strips of cloth.',
+          'Immobilize joints above and below the fracture site to prevent bone movement and nerve damage.',
+          'Check circulation: Ensure fingers or toes are warm and have normal sensation after tying the splint.',
+          'Apply cold pack wrapped in cloth if available to reduce swelling. Elevate limb slightly only if it causes no additional pain.'
+        ],
+        warning: 'For open/compound fractures (bone protruding through skin): Cover with clean moist cloth. Never attempt to push bone back inside.'
+      },
+      {
+        id: 'head_spine_trauma',
+        category: 'MEDICAL',
+        title: 'Head, Neck & Spinal Injuries',
+        subtitle: 'Falls, Falling Debris & Concussions',
+        severity: 'CRITICAL',
+        tags: ['head', 'neck', 'spine', 'spinal', 'concussion', 'paralysis', 'back injury'],
+        steps: [
+          'Assume spinal injury if victim fell, suffered heavy head impact, or was struck by masonry.',
+          'Keep victim completely still: Manually support the head and neck in neutral alignment with your hands.',
+          'Do NOT move victim unless there is immediate, life-threatening danger from fire, smoke, or water.',
+          'If victim vomits and is unresponsive: Perform a gentle log-roll with a helper, keeping head, neck, and torso in a straight line.',
+          'Monitor consciousness, pupil reaction, and breathing continuously until rescuers arrive.'
+        ],
+        warning: 'Moving a victim with an unstable cervical fracture can sever the spinal cord, causing permanent quadriplegia or respiratory arrest.'
+      },
+      {
+        id: 'earthquake_survival',
+        category: 'DISASTER',
+        title: 'Earthquake & Structure Collapse',
+        subtitle: 'Immediate Protection During & Post Tremor',
+        severity: 'CRITICAL',
+        tags: ['earthquake', 'quake', 'collapse', 'building', 'debris', 'aftershock', 'tremor', 'shaking'],
+        steps: [
+          'DROP to your hands and knees. COVER head and neck under sturdy furniture. HOLD ON until shaking ceases.',
+          'If trapped under rubble: Cover your mouth and nose with your shirt to prevent suffocating concrete dust inhalation.',
+          'Avoid continuous screaming (wastes limited oxygen and inhales fine dust); tap metal pipes or walls rhythmically in sets of 3.',
+          'Activate ResQ SOS Beacon: It will broadcast your location and medical profile to search teams within 30 meters.',
+          'Do NOT light matches or lighters due to potential ruptured gas mains. Use phone flashlight sparingly to preserve battery.'
+        ],
+        warning: 'Always anticipate severe aftershocks. Stay clear of cracked masonry, damaged stairwells, and hanging power lines.'
+      },
+      {
+        id: 'rubble_entrapment',
+        category: 'DISASTER',
+        title: 'Trapped Under Rubble & Concrete Debris',
+        subtitle: 'Self-Preservation & Acoustic Signaling',
+        severity: 'CRITICAL',
+        tags: ['rubble', 'trapped', 'buried', 'concrete', 'dust', 'signal', 'tap', 'stuck'],
+        steps: [
+          'Protect airway immediately: Pull shirt over mouth and nose. Inhaling pulverized silica/concrete dust causes acute asphyxiation.',
+          'Protect eyes and face: Keep eyes closed or shielded when debris settles.',
+          'Signal rhythmically: Find a pipe, iron rod, or stone. Tap walls or pipes in sets of 3: TAP—TAP—TAP ... pause ... TAP—TAP—TAP.',
+          'Conserve vocal energy: Shout only when you hear rescuers calling out or pausing machinery to listen.',
+          'Keep ResQ running: Leave your phone powered on with ResQ SOS active. Search radar locks onto your Bluetooth beacon through concrete.'
+        ],
+        warning: 'Do NOT ignite lighters or matches. Ruptured natural gas lines in rubble cause explosive ignition.'
+      },
+      {
+        id: 'flash_flood_hazard',
+        category: 'DISASTER',
+        title: 'Flash Flood & Rising Waters',
+        subtitle: 'Inundation, Swift Water, & Submerged Hazards',
+        severity: 'HIGH',
+        tags: ['flood', 'water', 'rising', 'drowning', 'rain', 'storm', 'typhoon', 'tsunami'],
+        steps: [
+          'Climb to higher ground immediately. Avoid underground basements and ground-floor enclosures.',
+          'Never walk through moving water deeper than 15 cm (6 inches)—swift current easily knocks down adults.',
+          'Never drive into flooded areas. 30 cm (1 foot) of moving water can float most passenger cars.',
+          'If trapped in a structure by rising water, retreat to top floor or roof. Do NOT enter an enclosed attic without a roof exit.',
+          'Disconnect primary electrical breakers if water enters living spaces and switches can be safely accessed.'
+        ],
+        warning: 'Floodwaters carry live electrical currents from downed lines, raw sewage, and dangerous submerged debris.'
+      },
+      {
+        id: 'burns_smoke_hazard',
+        category: 'DISASTER',
+        title: 'Burns & Toxic Smoke Inhalation',
+        subtitle: 'Thermal Trauma & Structural Fire Survival',
+        severity: 'HIGH',
+        tags: ['burn', 'fire', 'smoke', 'inhalation', 'flame', 'heat'],
+        steps: [
+          'Crawl low on hands and knees under smoke layer where air is cooler and oxygen levels are highest (<30 cm off floor).',
+          'Cover nose and mouth with damp cloth to filter soot particulates.',
+          'Test doors with the back of your hand before turning handles; if warm, do not open.',
+          'For thermal burns: Cool immediately under clean, room-temperature water for 10-20 minutes. Never use ice.',
+          'Cover burns loosely with a clean, dry, lint-free cloth. Do not apply butter, oil, or puncture blisters.'
+        ],
+        warning: 'Carbon monoxide and synthetic plastic fumes cause unconsciousness within seconds.'
+      },
+      {
+        id: 'clean_water_purify',
+        category: 'DISASTER',
+        title: 'Clean Drinking Water & Purification',
+        subtitle: 'Emergency Hydration & Decontamination',
+        severity: 'HIGH',
+        tags: ['water', 'drink', 'drinking', 'thirst', 'boil', 'purify', 'purification', 'dehydration'],
+        steps: [
+          'Boil water vigorously: A rolling boil for 1 full minute (3 minutes at high altitude) kills all bacteria, parasites, and viruses.',
+          'Cloth filtration: If water is murky or cloudy, strain through clean cotton cloth or let sediment settle before boiling.',
+          'Emergency indoor water sources: Drain water heater tanks, melted ice cubes, and clean toilet tank reservoirs (not the toilet bowl).',
+          'Solar disinfection (SODIS): Clear PET plastic bottles in direct sunlight for 6 hours can disinfect clear water.',
+          'Ration water intake: Sip slowly. Do not exert yourself unnecessarily in hot climates.'
+        ],
+        warning: 'NEVER drink floodwater, seawater, or radiator coolant. They contain industrial chemicals, pathogens, and accelerate fatal dehydration.'
+      },
+      {
+        id: 'hypothermia_cold',
+        category: 'DISASTER',
+        title: 'Hypothermia & Cold Exposure',
+        subtitle: 'Core Body Temperature Drop in Freezing Wet Conditions',
+        severity: 'HIGH',
+        tags: ['cold', 'hypothermia', 'freezing', 'shivering', 'frostbite', 'winter', 'wet'],
+        steps: [
+          'Insulate from cold ground: Place cardboard, dry blankets, wood, or clothing under the victim to block conductive heat loss.',
+          'Remove wet clothing immediately and replace with dry layers.',
+          'Rewarm core first: Wrap torso, chest, neck, and head in blankets. Share body heat under blankets if possible.',
+          'Provide warm, sweet non-caffeinated drinks if victim is conscious and able to swallow.',
+          'Avoid active rapid rewarming with hot water or direct flame—rewarm passively to prevent peripheral vasodilation shock.'
+        ],
+        warning: 'Severe hypothermia causes irrational behavior (paradoxical undressing) and cardiac dysrhythmias. Handle victim very gently.'
+      },
+      {
+        id: 'heatstroke_exhaustion',
+        category: 'DISASTER',
+        title: 'Heatstroke & Severe Dehydration',
+        subtitle: 'Hyperthermia & Environmental Heat Emergency',
+        severity: 'HIGH',
+        tags: ['heat', 'heatstroke', 'exhaustion', 'sun', 'faint', 'temperature', 'dizzy'],
+        steps: [
+          'Move victim to shade or coolest available spot immediately. Loosen or remove tight outer clothing.',
+          'Cool rapidly: Apply cool, wet towels or mist with water. Place ice packs/wet cloths at neck, armpits, and groin.',
+          'Fan the victim continuously to maximize evaporative cooling.',
+          'If conscious and alert: Give small sips of cool water or oral rehydration solution.',
+          'Monitor mental state: Confusion, slurred speech, hot dry red skin, or seizures signify life-threatening heatstroke.'
+        ],
+        warning: 'Heatstroke is a medical emergency that causes brain damage and organ failure. Cool the victim aggressively before transport.'
+      },
+      {
+        id: 'emergency_gobag',
+        category: 'DISASTER',
+        title: 'Emergency Go-Bag & 72-Hour Kit',
+        subtitle: 'Essential Survival Equipment Checklist',
+        severity: 'INFO',
+        tags: ['gobag', 'kit', 'supplies', 'pack', 'prep', 'survival kit', 'food', 'flashlight'],
+        steps: [
+          'Water: Minimum 3 liters (1 gallon) per person per day for at least 3 days.',
+          'Food: 3-day supply of non-perishable, high-calorie food (energy bars, canned goods, dried fruit).',
+          'Lighting & Power: LED headlamp/flashlight, extra batteries, high-capacity phone power bank.',
+          'Medical: First aid kit, prescription medications (7-day supply), dust masks (N95), sterile gauze, tourniquet.',
+          'Tools & Signalling: Loud emergency whistle, multi-tool, duct tape, permanent marker, waterproof pouch with copies of IDs.'
+        ]
+      },
+      {
+        id: 'app_overview_manual',
+        category: 'APP',
+        title: 'ResQ App Complete Walkthrough',
+        subtitle: '5-Tab Operational Architecture & Workflow',
+        severity: 'INFO',
+        tags: ['guide', 'app', 'how to use', 'manual', 'walkthrough', 'tabs', 'overview'],
+        steps: [
+          'Tab 1 - Home (SOS Beacon): Tap the large red button to broadcast your emergency BLE beacon. Operates with zero internet and screen locked.',
+          'Tab 2 - Radar (Edge AI Search): Live 2.4 GHz proximity tracking. Follow green "Approaching" trend to close distance to victims (<15m, <5m, <2m).',
+          'Tab 3 - Chat (P2P Mesh): Phone-to-phone text messaging without cellular towers or Wi-Fi over raw Bluetooth Low Energy.',
+          'Tab 4 - Survival (AI & Knowledge): Medically verified Red Cross/FEMA protocols + 100% offline resQ conversational AI.',
+          'Tab 5 - Profile (Medical Triage): Pre-declare blood type, allergies, diabetes, and mobility to broadcast with your SOS beacon.'
+        ]
+      },
+      {
+        id: 'app_radar_manual',
+        category: 'APP',
+        title: 'ResQ Search Radar: How to Use',
+        subtitle: 'Edge AI Signal Denoising & Proximity Rings',
+        severity: 'INFO',
+        tags: ['radar', 'search', 'distance', 'rings', 'denoise', 'proximity', 'scanner'],
+        steps: [
+          'Switch to Radar Tab: ResQ automatically initiates 2.4 GHz hardware BLE scanning.',
+          'Radar Ring Distances: Immediate Zone (<2m, inner ring), Near Zone (<5m, middle ring), Far Zone (<15m, outer ring).',
+          'Follow Movement Trend: "Approaching" (green) indicates your step direction is closing distance; "Moving Away" indicates wrong path.',
+          'On-Device AI Denoising: Radio signals bounce off concrete walls and human bodies (±10 dBm jitter). ResQ\'s 1D-CNN temporal filter cleans this in real-time.',
+          'Tap on any locked victim dot to open their triage card, inspect declared illnesses, and review blood group.'
+        ]
+      },
+      {
+        id: 'app_siren_manual',
+        category: 'APP',
+        title: 'ResQ Remote Siren: Acoustic Pinpoint',
+        subtitle: 'Locating Victims Trapped Under Debris',
+        severity: 'INFO',
+        tags: ['siren', 'alarm', 'audio', 'sound', 'buzzer', 'locate', 'pinpoint'],
+        steps: [
+          'When search radar locks onto victim (<2m), tap "Sound Siren" on the radar victim card.',
+          'ResQ transmits a Bluetooth GATT command packet (0x01) directly to victim\'s hardware receiver.',
+          'Victim\'s phone immediately sounds a piercing dual-tone alarm (1400 Hz / 800 Hz) at 100% volume and vibrates continuously, bypassing silent mode.',
+          'Rescuers use directional acoustic listening to locate the exact spot under rubble.',
+          'Victims can mute the siren anytime directly from their own phone screen once found.'
+        ]
+      },
+      {
+        id: 'app_beacon_manual',
+        category: 'APP',
+        title: 'ResQ SOS Beacon & Privacy Architecture',
+        subtitle: 'Zero-Internet P2P Mesh & Anti-Tracking',
+        severity: 'INFO',
+        tags: ['beacon', 'sos', 'broadcast', 'privacy', 'ephemeral', 'mesh', 'internet'],
+        steps: [
+          'Tap large red SOS button on Home Screen to broadcast emergency beacon.',
+          '100% Zero-Internet: Broadcasts over raw Bluetooth Low Energy (BLE) peripheral advertisement packets.',
+          'Anti-Tracking Ephemeral ID: Your Bluetooth identifier automatically rotates every 15 minutes so bad actors cannot track you.',
+          'Medical Disclosure: Rescuers only see medical conditions you explicitly marked in your Profile.',
+          'Runs in Background: ResQ uses an Android foreground service with wake-lock so your phone keeps broadcasting even with screen locked.'
+        ]
+      },
+      {
+        id: 'app_profile_manual',
+        category: 'APP',
+        title: 'Medical Profile & Emergency Triage',
+        subtitle: 'Pre-Declaring Critical Life-Safety Data',
+        severity: 'INFO',
+        tags: ['profile', 'blood', 'medical', 'diabetic', 'asthma', 'allergy', 'mobility'],
+        steps: [
+          'Open Profile Tab: Select your blood type and check relevant medical conditions (Diabetic, Asthma, Cardiac, Mobility, Allergies).',
+          'Save & Broadcast: Tapping save updates your local profile and encodes flags into your BLE emergency beacon payload.',
+          'Rescuer Immediate View: When searchers lock radar on you, your conditions display on their screen before excavation begins.',
+          'Zero Cloud Storage: All profile records are stored strictly encrypted in your phone\'s local storage.',
+          'Alarm Pre-test: Use the profile volume slider to test siren loudness on your device.'
+        ]
+      },
+      {
+        id: 'app_mesh_manual',
+        category: 'APP',
+        title: 'Peer-to-Peer BLE Mesh Chat',
+        subtitle: 'Offline Texting in Infrastructure Blackouts',
+        severity: 'INFO',
+        tags: ['chat', 'mesh', 'p2p', 'message', 'text', 'channel', 'offline'],
+        steps: [
+          'Switch to Chat Tab: Connects automatically to local Bluetooth Low Energy mesh.',
+          'Channel #911: Default emergency broadcast channel shared with all nearby victims and rescue teams.',
+          'Zero Internet / Cell Towers: Packets relay directly between phones without routers, SIM cards, or data plans.',
+          'Multi-Hop Relay: Messages hop across intervening devices to reach responders beyond direct 30-meter radio range.',
+          'Talk to resQ Pill: Tap the "Talk to resQ" button to open the instant conversational AI companion anytime.'
+        ]
+      }
+    ];
+
+    let currentSurvivalFilter = 'ALL';
+    let expandedSurvivalCards = {};
+
+    function filterSurvivalCategory(cat) {
+      currentSurvivalFilter = cat;
+      ['ALL', 'MEDICAL', 'DISASTER', 'APP'].forEach(c => {
+        const btn = document.getElementById('survFilter_' + c);
+        if (btn) btn.classList.toggle('active', c === cat);
+      });
+      renderSurvivalProtocols();
+    }
+
+    function toggleSurvivalCard(id) {
+      expandedSurvivalCards[id] = !expandedSurvivalCards[id];
+      renderSurvivalProtocols();
+    }
+
+    function renderSurvivalProtocols() {
+      const container = document.getElementById('survivalProtocolsContainer');
+      if (!container) return;
+
+      const filtered = survivalProtocolsDB.filter(item => {
+        if (currentSurvivalFilter === 'ALL') return true;
+        return item.category === currentSurvivalFilter;
+      });
+
+      let html = '';
+      filtered.forEach(p => {
+        const isExp = !!expandedSurvivalCards[p.id];
+        const badgeClass = p.severity === 'CRITICAL' ? 'badge-critical' : (p.severity === 'HIGH' ? 'badge-high' : 'badge-info');
+        
+        let stepsHtml = '';
+        const stepsToShow = isExp ? p.steps : p.steps.slice(0, 2);
+        stepsToShow.forEach((step, idx) => {
+          stepsHtml += `
+            <div class="survival-step-row">
+              <span class="survival-step-num">${idx + 1}.</span>
+              <span>${step}</span>
+            </div>
+          `;
+        });
+
+        html += `
+          <div class="survival-card" onclick="toggleSurvivalCard('${p.id}')">
+            <div class="survival-card-top">
+              <div>
+                <div class="survival-card-title">${p.title}</div>
+                <div class="survival-card-sub">${p.subtitle}</div>
+              </div>
+              <span class="survival-badge ${badgeClass}">${p.severity}</span>
+            </div>
+            <div class="survival-steps-list">
+              ${stepsHtml}
+            </div>
+            ${p.warning ? `<div class="survival-warning-box ${isExp ? 'show' : ''}">⚠️ ${p.warning}</div>` : ''}
+            <div class="survival-expand-hint">${isExp ? 'Tap to collapse ▲' : `View all ${p.steps.length} steps ▼`}</div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function askSurvivalPreset(presetText) {
+      const input = document.getElementById('survivalAiInput');
+      if (input) input.value = presetText;
+      querySurvivalAssistant();
+    }
+
+    function dismissSurvivalAiResponse() {
+      const box = document.getElementById('survivalAiResponseBox');
+      if (box) box.classList.remove('active');
+    }
+
+    /* ============================================================
+       RESQ CONVERSATIONAL ENGINE & SURVIVAL INTELLIGENCE
+       ============================================================ */
+    const resQSession = {
+      userName: null,
+      userLocation: null,
+      conditions: new Set(),
+      companions: null,
+      isTrapped: false,
+      hasBleeding: false,
+      batteryLow: false,
+      messageCount: 0
+    };
+
+    function generateResQConversationalReply(userText) {
+      const q = userText.trim().toLowerCase();
+      resQSession.messageCount++;
+
+      // ------------------------------------------------------------
+      // 1. DYNAMIC SITUATIONAL EXTRACTION (Learn from conversation)
+      // ------------------------------------------------------------
+      let newlyInformed = [];
+
+      // Extract Name
+      const nameMatch = userText.match(/(?:my name is|i am|i'm|call me)\s+([A-Za-z]+)\b/i);
+      const ignoredNames = ['trapped', 'bleeding', 'scared', 'hurt', 'okay', 'fine', 'ready', 'safe', 'resq', 'lost', 'hungry', 'thirsty', 'sick', 'cold', 'hot', 'looking', 'trying', 'wondering', 'asking', 'here', 'alone', 'stuck', 'dying', 'good', 'bad'];
+      if (nameMatch && nameMatch[1] && !ignoredNames.includes(nameMatch[1].toLowerCase()) && !resQSession.userName) {
+        resQSession.userName = nameMatch[1].charAt(0).toUpperCase() + nameMatch[1].slice(1);
+        newlyInformed.push(`your name is ${resQSession.userName}`);
+      }
+
+      // Extract Location / Floor
+      const locMatch = userText.match(/\b(?:on the|at the|in the)?\s*(\b(?:\d+(?:st|nd|rd|th)?|ground|top)\s+floor|\bbasement|\broof(?:top)?|\battic|\bstairwell|\bhallway|\bkitchen|\bbathroom|\brubble|\bunder rubble|\bunder concrete|\bcollapsed room)\b/i);
+      if (locMatch && locMatch[1]) {
+        resQSession.userLocation = locMatch[1];
+        newlyInformed.push(`location: ${resQSession.userLocation}`);
+      }
+
+      // Extract Trapped Status
+      if (/\b(trapped|pinned|stuck|buried|under rubble|under concrete|can't get out|cant get out)\b/i.test(q)) {
+        resQSession.isTrapped = true;
+      }
+
+      // Extract Bleeding Status
+      if (/\b(bleed|bleeding|blood|gash|wound|laceration|cut)\b/i.test(q)) {
+        resQSession.hasBleeding = true;
+      }
+
+      // Extract Companions
+      const compMatch = userText.match(/\bwith (?:my )?(\d+ (?:people|others|kids|children|family|friends)|grandma|grandpa|mother|mom|father|dad|brother|sister|baby|toddler|child|kids|elderly|dog|cat)\b/i);
+      if (compMatch && compMatch[1]) {
+        resQSession.companions = compMatch[1];
+        newlyInformed.push(`accompanied by ${resQSession.companions}`);
+      }
+
+      // Extract Medical Conditions
+      if (/\basthma|inhaler|wheezing\b/i.test(q)) {
+        resQSession.conditions.add('Asthma');
+        newlyInformed.push('asthma condition');
+      }
+      if (/\bdiabet(?:ic|es)|insulin|blood sugar\b/i.test(q)) {
+        resQSession.conditions.add('Diabetes');
+        newlyInformed.push('diabetes / insulin need');
+      }
+      if (/\bheart condition|cardiac|pacemaker|angina\b/i.test(q)) {
+        resQSession.conditions.add('Cardiac');
+        newlyInformed.push('cardiac condition');
+      }
+      if (/\bbroken bone|broken leg|broken arm|fracture|sprain\b/i.test(q)) {
+        resQSession.conditions.add('Fracture');
+        newlyInformed.push('broken bone / fracture');
+      }
+      if (/\ballerg(?:y|ic)|penicillin\b/i.test(q)) {
+        resQSession.conditions.add('Allergies');
+        newlyInformed.push('medical allergy');
+      }
+      if (/\bwheelchair|can't walk|cant walk|paralyzed|mobility\b/i.test(q)) {
+        resQSession.conditions.add('Mobility Impairment');
+        newlyInformed.push('mobility impairment');
+      }
+
+      // Battery status
+      if (/\b(?:battery|phone)\s*(?:is\s*)?(?:dying|low|dead|\d+%\b)/i.test(q)) {
+        resQSession.batteryLow = true;
+      }
+
+      // Optional prefix if user informed new critical facts
+      let ackPrefix = '';
+      const userRef = resQSession.userName ? resQSession.userName : 'friend';
+      if (newlyInformed.length > 0 && /inform|letting you know|i have|we are|my name|i am trapped|i'm trapped/i.test(q)) {
+        ackPrefix = `Understood, ${userRef}. I have noted: **${newlyInformed.join(' • ')}**.\n\n`;
+      }
+
+      // ------------------------------------------------------------
+      // 2. CONVERSATIONAL INTENT MATCHING
+      // ------------------------------------------------------------
+      const hasEmergency = /\b(trapped|pinned|stuck|buried|under rubble|under concrete|cant get out|can't get out|bleed|bleeding|blood|gash|wound|artery|broken|fracture|chok|cpr|crush|burn|fire|smoke|asthma|inhaler)\b/i.test(q);
+      const isPureGreeting = (/^(hi|hello|hey|greetings|good\s*(morning|afternoon|evening)|yo|sup)\b/i.test(q) || q === 'hi' || q === 'hello' || q === 'resq') && !hasEmergency && !/\b(how|what|where|why|guide|app|bleeding|trapped|cpr|siren|radar)\b/i.test(q);
+
+      // A. Greetings, Small Talk & Identity
+      if (isPureGreeting) {
+        const greetingName = resQSession.userName ? `, ${resQSession.userName}` : '';
+        return `Hello${greetingName}! I'm **resQ**, your emergency survival companion and app guide.\n\nI run 100% offline directly on your phone with zero Wi-Fi, cell service, or internet. You can talk to me naturally, inform me of your emergency situation (where you are, who is with you, or your injuries), or ask me:\n\n• **Survival advice**: Stopping severe bleeding, CPR, rubble entrapment, or clean water.\n• **App guide**: How to use the SOS beacon, search radar, remote siren, or mesh chat.\n\nWhat is happening around you right now?`;
+      }
+
+      if (/who\s+are\s+you|what\s+is\s+your\s+name|your\s+name|what\s+are\s+you|are\s+you\s+(an\s+)?ai/i.test(q)) {
+        return `I am **resQ**! I'm an on-device conversational AI built specifically for emergency rescue, disaster survival, and peer-to-peer navigation.\n\nHere is how I help you:\n• **Survival Triage**: Immediate, medically verified first-aid (stopping hemorrhage, adult/pediatric CPR, managing crush syndrome, stabilizing fractures).\n• **Disaster Protocols**: Earthquakes, collapsed buildings, flash floods, and fires.\n• **App Walkthrough**: Guiding you through the Home SOS beacon, 2.4 GHz search radar with 1D-CNN denoising, remote acoustic siren, and offline mesh chat.\n• **Zero Internet**: I never send your data to any cloud or external server.\n\nTell me: Are you safe right now, or do you need emergency guidance?`;
+      }
+
+      if (/can\s+(i|we)\s+talk\s+to\s+you|are\s+you\s+there|can\s+you\s+hear\s+me|talk\s+with\s+me|stay\s+with\s+me|keep\s+me\s+company/i.test(q)) {
+        return `Yes, absolutely! I am right here on your phone and I am not going anywhere.\n\nEven if there is a total regional blackout, power failure, or no cell service, my engine stays active on your device. You can talk to me, inform me of your physical condition, ask for step-by-step guides, or just talk through your situation so we stay calm and focused.\n\nTake a slow breath. Tell me where you are and what is around you.`;
+      }
+
+      // B. Distress, Panic & Emotional Grounding
+      if (/help\s*me|i'm\s+scared|im\s+scared|panic|terrified|afraid|emergency|don't\s+know\s+what\s+to\s+do|i'm\s+gonna\s+die|gonna\s+die|freaking\s+out/i.test(q)) {
+        return `Take a slow, deep breath with me right now. Inhale for 4 seconds... hold for 4 seconds... exhale slowly for 6 seconds. You are alive, and we will get through this step by step.\n\nHere is your immediate survival plan:\n1. **Physical Protection**: Move away from shattered glass, cracked masonry, and dangling wires. If debris is falling, get under sturdy furniture.\n2. **Activate ResQ SOS**: Go to the **Home** tab and tap the big red **SOS button**. Your phone will immediately broadcast an emergency beacon. Nearby search teams with radar will detect your signal within 30 meters.\n3. **Call 911**: If cellular towers are still connected in your area, tap 'Call 911' on the Home screen immediately.\n4. **Conserve Your Voice**: Don't scream continuously. Tap on metal pipes or walls in rhythmic sets of 3 (**TAP—TAP—TAP**).\n\nTell me: Are you injured, trapped, or in immediate danger right now?`;
+      }
+
+      // C. User Informing "We are Safe" or "Help Arrived"
+      if (/we\s+are\s+safe|i\s+am\s+safe|im\s+safe|rescuers\s+are\s+here|help\s+arrived|someone\s+found\s+us|they\s+found\s+me|rescued/i.test(q)) {
+        return `That is such tremendous news! I am so relieved you are safe.\n\nHere are 3 critical post-rescue steps to follow:\n1. **Deactivate SOS**: On the ResQ **Home** tab, tap 'I am Safe / Deactivate SOS'. This lets nearby search teams know your distress is cleared so they can prioritize other victims.\n2. **Stay Clear of Damaged Structures**: Do not re-enter cracked buildings or basements due to aftershocks and gas pocket risks.\n3. **Safe Hydration**: Only drink bottled water or rolling-boiled water until municipal supplies are verified clean.\n\nLet me know if anyone in your group needs first aid or medical advice!`;
+      }
+
+      // D. Full App Guide & Operations (User asked: "guide for this app so people can talk to it")
+      if (/\b(app\s+guide|guide\s+(?:for|to|through|on)\s+(?:this\s+|the\s+)?(?:app|resq)|how\s+(?:do\s+(?:i|we)\s+use|does\s+(?:the\s+|this\s+|resq\s+)?(?:app\s+)?work|to\s+use\s+(?:the\s+|this\s+|resq\s+)?app)|what\s+does\s+(?:this\s+)?(?:app|resq)\s+do|walk(?:through)?\s+(?:me\s+through\s+)?(?:the\s+)?app|app\s+(?:manual|instructions|features|overview)|explain\s+(?:the\s+)?(?:app|resq)|features\s+of\s+(?:this\s+)?app)\b/i.test(q)) {
+        return `${ackPrefix}Here is the complete guide on how **ResQ** works to keep you alive and locate victims without internet:\n\n` +
+          `1. 🆘 **Home Screen (SOS Emergency Beacon)**:\n` +
+          `   • Tap the large red SOS button. Your phone broadcasts Bluetooth Low Energy (BLE) advertisements.\n` +
+          `   • Works 100% offline—no Wi-Fi, cellular towers, or SIM card needed.\n` +
+          `   • Features a 15-minute rotating ephemeral ID to protect your privacy while allowing search teams to track you.\n` +
+          `   • Runs with your screen turned off inside your pocket.\n\n` +
+          `2. 📡 **Radar Screen (Proximity Tracking & AI Denoising)**:\n` +
+          `   • Scans the 2.4 GHz spectrum for nearby victim beacons.\n` +
+          `   • Displays 3 Proximity Zones: **Immediate (<2m)**, **Near (<5m)**, and **Far (<15m)**.\n` +
+          `   • Follow the trend badge: **Approaching** (green) means you are stepping closer to the victim!\n` +
+          `   • Built-in 1D-CNN temporal filter eliminates concrete wall radio bounces (±10 dBm jitter).\n\n` +
+          `3. 🚨 **Remote Siren (Acoustic Rubble Pinpointing)**:\n` +
+          `   • When a searcher closes in within <2m, they tap 'Sound Siren' on the radar victim card.\n` +
+          `   • Sends a BLE GATT command that forces the victim's phone to sound a piercing 1400 Hz / 800 Hz alarm, pinpointing them under rubble or in pitch black.\n\n` +
+          `4. 💬 **Chat Screen (Offline P2P Mesh)**:\n` +
+          `   • Text directly phone-to-phone via BLE packets with zero cell towers.\n` +
+          `   • Tap 'Talk to resQ' at the top to open me anytime.\n\n` +
+          `5. 🛡️ **Profile Screen (Medical Triage)**:\n` +
+          `   • Declare your blood type and conditions (diabetic, asthma, mobility, allergies) so search teams bring the right extraction gear.\n\n` +
+          `Which feature would you like me to demonstrate or explain further?`;
+      }
+
+      // E. Specific App Feature Questions
+      if (/radar|denois|kalman|proximity|rings|distance|trend|approaching/i.test(q)) {
+        return `${ackPrefix}Here is how the **ResQ Search Radar** operates in disaster environments:\n\n` +
+          `• **3 Proximity Zones**:\n` +
+          `  - **Immediate (<2m)**: The victim is right next to you or directly buried under the rubble at your feet.\n` +
+          `  - **Near (<5m)**: Close acoustic range; prepare to call out or trigger the remote siren.\n` +
+          `  - **Far (<15m)**: Outer detection perimeter.\n\n` +
+          `• **Edge AI Denoising (1D-CNN + Kalman)**:\n` +
+          `  In collapsed structures, raw Bluetooth signals bounce violently off concrete, rebar, and human bodies (±10 dBm jitter). ResQ's neural filter removes false spikes so the radar needle stays locked and true.\n\n` +
+          `• **How to Search**:\n` +
+          `  Walk 3 to 4 paces in one direction. If the trend badge turns green (**Approaching**), you are moving in the right direction! If it turns red (**Moving Away**), turn around.`;
+      }
+
+      if (/siren|alarm|sound|buzzer|audio/i.test(q)) {
+        return `${ackPrefix}The **Remote Siren** is designed to pinpoint victims when visibility is zero:\n\n` +
+          `• **Triggering**: When searchers reach the Immediate Zone (<2m), they tap 'Sound Siren' on the victim's radar card.\n` +
+          `• **Hardware Override**: ResQ sends a Bluetooth GATT command packet (0x01) that bypasses Android's silent/vibrate switches and plays a piercing 1400 Hz / 800 Hz alarm at maximum volume.\n` +
+          `• **Acoustic Homing**: Rescuers listen for the tone to pinpoint the exact slab of rubble to excavate.\n` +
+          `• **Silencing**: The victim can tap 'Mute Siren' from their own phone screen once contact is made.`;
+      }
+
+      if (/beacon|sos|broadcast|offline|wifi|internet|cellular|sim|ephemeral|privacy|track/i.test(q)) {
+        return `${ackPrefix}Here is why ResQ's **Emergency Beacon** is built for extreme disasters:\n\n` +
+          `• **100% Zero Internet**: Operates entirely over Bluetooth Low Energy (BLE) advertisements. No Wi-Fi, mobile data, or SIM card required.\n` +
+          `• **15-Minute Rotating Ephemeral ID**: To protect your safety and prevent civilian stalkers or malicious actors from tracking you, your broadcast identifier rotates automatically every 15 minutes.\n` +
+          `• **Encrypted Medical Sharing**: Rescuers only see medical conditions you explicitly marked in your Profile.\n` +
+          `• **Runs With Screen Off**: ResQ uses an Android foreground service with a wake-lock so your phone keeps broadcasting even inside your pocket with the screen locked.`;
+      }
+
+      if (/\b(profile|blood\s*type|medical\s*profile|medical\s*conditions|set\s*profile|edit\s*profile)\b/i.test(q)) {
+        return `${ackPrefix}Your **Medical Profile** is critical for extraction safety:\n\n` +
+          `• In the **Profile** tab, you can set your **Blood Type** and check any conditions (Diabetic, Mobility Impaired, Asthma, Cardiac, Allergies).\n` +
+          `• When you trigger an SOS, this profile is encoded into your emergency beacon. Rescuers reading your beacon immediately know if you need insulin, oxygen, or a spinal backboard before they dig you out.\n` +
+          `• All profile records are stored strictly encrypted on your phone—zero cloud storage.`;
+      }
+
+      if (/mesh|chat|p2p|message|text/i.test(q)) {
+        return `${ackPrefix}Here is how **Offline Mesh Chat** keeps you connected:\n\n` +
+          `• In the **Chat** tab, you can send text messages phone-to-phone over Bluetooth Low Energy.\n` +
+          `• **Channel #911**: Default emergency broadcast channel shared with all nearby victims and rescue teams.\n` +
+          `• **Multi-Hop Relay**: Messages hop across intervening devices so they can travel beyond direct 30-meter radio range.\n` +
+          `• You can also switch channels at the top to talk with me (**resQ**) anytime!`;
+      }
+
+      // F. Survival & First Aid Guidance (Informing information needed for survival)
+      if (/bleeding|blood|cut|wound|hemorrhage|tourniquet|artery|spurting/i.test(q)) {
+        return `${ackPrefix}Here is how to stop **Severe Bleeding** immediately:\n\n` +
+          `1. **Direct Firm Pressure**: Take a clean cloth, shirt, or pad and press directly down onto the wound with both hands. Maintain firm, continuous pressure for at least 5 to 10 minutes. Do NOT lift the cloth to check.\n` +
+          `2. **Apply a Tourniquet (Limb Only)**: If blood is bright red, spurting, or soaking through pads rapidly, place a tourniquet 2 to 3 inches above the wound (never over a joint). Tighten the windlass until bleeding stops completely.\n` +
+          `3. **Record Time**: Note the exact application time on the victim's forehead or arm (e.g. "TK 21:15").\n` +
+          `4. **Prevent Shock**: Keep the victim lying down, warm, and calm.\n\n` +
+          `⚠️ **CRITICAL WARNING**: Never pull out deeply embedded objects like glass or rebar. Pack cloth around them to stabilize them in place!`;
+      }
+
+      if (resQSession.isTrapped || /\b(trapped|rubble|concrete|collapse|pinned|buried|debris|stuck|cant get out|can't get out)\b/i.test(q)) {
+        const floorNote = resQSession.userLocation ? ` on the ${resQSession.userLocation}` : '';
+        const compNote = resQSession.companions ? ` with your ${resQSession.companions}` : '';
+        const condNote = resQSession.conditions.size > 0 ? ` (noted: ${[...resQSession.conditions].join(', ')})` : '';
+        const greeting = resQSession.userName ? `Hello ${resQSession.userName}! ` : '';
+
+        return `${greeting}I hear you loud and clear. Take a slow, steady breath—I am right here with you and we will handle this together.\n\n` +
+          `I have logged your emergency: **Trapped${floorNote}${compNote}${condNote}**.\n\n` +
+          `Here are your immediate life-safety actions right now:\n` +
+          `1. **Protect Your Airway**: Pull a shirt or cloth over your nose and mouth immediately to block suffocating concrete dust.${resQSession.conditions.has('Asthma') ? ' Since there is an asthma condition, keep them seated upright with back supported to keep the airway open and have their rescue inhaler in hand.' : ''}\n` +
+          `2. **Activate ResQ SOS Beacon**: Tap the big red **SOS button** on the **Home** tab right now! Rescuers searching nearby will lock onto your phone with their radar within 30 meters.\n` +
+          `3. **Update Profile**: In the **Profile** tab, make sure ${[...resQSession.conditions].join(' and ') || 'your medical conditions'} are toggled on so rescuers bring the right equipment before excavating.\n` +
+          `4. **Acoustic Signaling**: Tap rhythmically on metal pipes or walls in sets of three: **TAP—TAP—TAP ... (pause) ... TAP—TAP—TAP**. Don't scream continuously to save oxygen.\n` +
+          `5. **No Open Flames**: Never light matches or lighters due to ruptured gas mains in rubble.\n\n` +
+          `Are either of you bleeding or injured? Are you seeing any smoke or smelling gas?`;
+      }
+
+      if (/crush|crush\s+syndrome|pinned\s+limb|heavy\s+slab|heavy\s+weight/i.test(q)) {
+        return `${ackPrefix}🚨 **CRITICAL LIFE-SAFETY WARNING on Crush Injuries**:\n\n` +
+          `If a heavy weight (concrete beam, wall, vehicle) has pinned a victim's limb for **more than 15 minutes**, **DO NOT lift the weight off suddenly** without emergency medical support present!\n\n` +
+          `• **Why?** Prolonged compression cuts off blood flow, causing muscle breakdown that releases lethal amounts of potassium, myoglobin, and acid into the trapped limb. When decompressed suddenly, this toxic blood floods the heart, causing sudden cardiac arrest (Crush Syndrome).\n` +
+          `• **What to do**: Keep the victim warm and calm. If conscious, give small sips of water. Notify incoming search teams via ResQ BLE chat so paramedics can administer IV saline before lifting the load.`;
+      }
+
+      if (/cpr|heart\s+attack|cardiac|not\s+breathing|unresponsive|unconscious|pulse|revive/i.test(q)) {
+        return `${ackPrefix}Here is how to perform **Adult CPR** immediately:\n\n` +
+          `1. **Check Response**: Tap shoulders and shout "Are you okay?". Check chest for normal breathing (no more than 10 seconds).\n` +
+          `2. **Hand Position**: Place the heel of one hand in the center of their chest (lower half of breastbone). Interlock your other hand on top.\n` +
+          `3. **Hard & Fast Compressions**: Push down 5 to 6 cm deep at 100–120 beats per minute (to the tempo of "Stayin' Alive"). Deliver **30 compressions**.\n` +
+          `4. **Rescue Breaths**: Tilt head back gently, pinch the nose, and deliver **2 rescue breaths** (1 second each, watch chest rise).\n` +
+          `5. **Repeat**: Continue the 30:2 ratio without stopping until help arrives or the victim moves.\n\n` +
+          `*If you cannot give breaths, perform continuous hands-only chest compressions without stopping!*`;
+      }
+
+      if (/chok|heimlich|cant\s+breathe|coughing|throat/i.test(q)) {
+        return `${ackPrefix}Here is how to save someone who is **Choking**:\n\n` +
+          `1. **Assess**: If they can cough forcefully or speak, encourage coughing. Do NOT slap their back.\n` +
+          `2. **If Unable to Breathe/Speak**: Stand behind them, wrap your arms around their waist.\n` +
+          `3. **Hand Position**: Make a fist, place the thumb side just above their navel (well below the ribcage). Grasp the fist with your other hand.\n` +
+          `4. **Abdominal Thrusts (Heimlich)**: Deliver quick, upward and inward thrusts until the object is expelled.\n` +
+          `5. **If Alone**: Press your upper abdomen forcefully against a sturdy chair back, table edge, or railing.`;
+      }
+
+      if (/earthquake|tremor|quake|shaking|aftershock/i.test(q)) {
+        return `${ackPrefix}Survival rules during and immediately after an **Earthquake**:\n\n` +
+          `1. **DROP, COVER, AND HOLD ON**: Drop to your hands and knees. Cover your head and neck under sturdy furniture. Hold on until shaking stops.\n` +
+          `2. **Stay Inside**: Do not run outside while masonry, glass facades, and power lines are falling.\n` +
+          `3. **After Shaking Stops**: Evacuate calmly. Never use elevators.\n` +
+          `4. **Watch for Fire & Gas**: Smell for gas leaks. If you smell sulfur/gas, shut off the main valve if safe and do NOT touch electrical switches.\n` +
+          `5. **Expect Aftershocks**: Stay clear of damaged brick walls and chimneys.\n` +
+          `6. **Turn on ResQ SOS**: Broadcast your beacon so search teams know your status.`;
+      }
+
+      if (/flood|water|rising|drowning|typhoon|storm\s+surge|tsunami/i.test(q)) {
+        return `${ackPrefix}Survival rules for **Flash Floods & Rising Water**:\n\n` +
+          `1. **Seek High Ground Immediately**: Never wait until water enters your home. Move to upper floors or high terrain.\n` +
+          `2. **Never Walk in Moving Water**: Just 15 cm (6 inches) of moving water can knock down an adult. Avoid currents.\n` +
+          `3. **Never Drive into Floods**: 30 cm (1 foot) of water can float and carry away most passenger cars.\n` +
+          `4. **If Trapped in a Building**: Move to the roof. Do NOT hide in an enclosed attic without a roof exit.\n` +
+          `5. **Turn off Power**: Disconnect the main electrical switch if water is rising and you can safely reach it.`;
+      }
+
+      if (/burn|fire|smoke|flame|heat|inhalation/i.test(q)) {
+        return `${ackPrefix}Here is what to do for **Fire & Burns**:\n\n` +
+          `1. **Crawl Low Under Smoke**: Smoke and toxic gases rise. The coolest, most oxygenated air is 30 cm (1 foot) off the floor.\n` +
+          `2. **Filter Air**: Cover your nose and mouth with a damp or dry cloth.\n` +
+          `3. **Test Doors**: Check doorknobs with the BACK of your hand before opening. If warm, do NOT open.\n` +
+          `4. **First Aid for Thermal Burns**:\n` +
+          `   • Cool under clean, room-temperature running water for 10–20 minutes.\n` +
+          `   • NEVER use ice, butter, or oil, and do not puncture blisters.\n` +
+          `   • Cover loosely with a clean, dry, sterile dressing.`;
+      }
+
+      if (/water|drink|thirst|dehydration|purif|boil/i.test(q)) {
+        return `${ackPrefix}How to secure safe **Drinking Water** during a disaster:\n\n` +
+          `1. **Boiling**: Bringing water to a rolling boil for 1 full minute kills all bacteria, viruses, and parasites.\n` +
+          `2. **Cloth Filtration**: If water is cloudy or muddy, filter it through clean cotton fabric or let it settle before boiling.\n` +
+          `3. **Emergency Indoor Water Sources**: Water heater tanks, melted ice cubes, and clean toilet tank reservoirs (not the toilet bowl).\n` +
+          `4. **NEVER Drink**: Floodwater, radiator water, or seawater—they contain lethal industrial chemicals and bacteria.`;
+      }
+
+      if (/battery|phone|charge|power|blackout/i.test(q)) {
+        return `${ackPrefix}How to **Preserve Your Phone Battery** during a disaster:\n\n` +
+          `1. Turn on Android's **Extreme Battery Saver** or **Power Saving Mode**.\n` +
+          `2. Lower screen brightness to absolute minimum.\n` +
+          `3. Close all background social media, video, and gaming apps.\n` +
+          `4. Keep **Bluetooth ON** and leave **ResQ** running—ResQ's low-energy BLE beacon consumes minimal battery and will broadcast your SOS for hours.\n` +
+          `5. Keep your phone warm in cold weather (inside body pocket)—cold batteries drain up to 50% faster.`;
+      }
+
+      if (/gobag|kit|supplies|pack|prep|survival kit/i.test(q)) {
+        return `${ackPrefix}Essential items for a **72-Hour Emergency Go-Bag**:\n\n` +
+          `• **Water**: 3 liters per person per day for at least 3 days.\n` +
+          `• **Food**: Non-perishable, high-calorie food (bars, canned goods, dried fruit).\n` +
+          `• **Light & Power**: Flashlight/headlamp, extra batteries, fully charged high-capacity power bank.\n` +
+          `• **First Aid**: Sterile gauze, adhesive bandages, antiseptic wipes, tourniquet, 7-day prescription meds.\n` +
+          `• **Signaling & Tools**: Loud emergency whistle, multi-tool, duct tape, waterproof pouch with copies of IDs.`;
+      }
+
+      if (/fracture|broken\s+bone|broken\s+leg|broken\s+arm|sprain|splint/i.test(q)) {
+        return `${ackPrefix}How to manage **Bone Fractures & Splints**:\n\n` +
+          `1. **Do NOT Straighten**: Support the limb in the exact position found. Never force an angulated bone.\n` +
+          `2. **Splint Rigidly**: Use rolled cardboard, wood, or an umbrella. Immobilize the joint ABOVE and the joint BELOW the fracture.\n` +
+          `3. **Tie Gently**: Secure with cloth strips. Check that fingers or toes remain warm with normal sensation.\n` +
+          `4. **Open Fracture**: If bone broke through the skin, cover with a clean moist cloth. Never attempt to push the bone back in!`;
+      }
+
+      if (/hypothermia|cold|freezing|frostbite|shivering/i.test(q)) {
+        return `${ackPrefix}How to treat **Hypothermia & Cold Exposure**:\n\n` +
+          `1. **Insulate From the Ground**: Put dry cardboard, blankets, or coats between the victim and cold floors/ground.\n` +
+          `2. **Remove Wet Clothing**: Replace with dry layers immediately.\n` +
+          `3. **Warm the Core First**: Wrap the chest, neck, and head in blankets. Share body heat under blankets if possible.\n` +
+          `4. **Warm Drinks**: Give warm, sweet liquids only if they are fully conscious.\n` +
+          `5. **No Direct High Heat**: Avoid hot baths or open fires directly on limbs—it causes dangerous circulatory shock.`;
+      }
+
+      if (/heat|heatstroke|exhaustion|sun|dehydrated/i.test(q)) {
+        return `${ackPrefix}How to treat **Heatstroke & Heat Exhaustion**:\n\n` +
+          `1. **Move to Shade**: Get the victim out of direct sun and remove heavy outer clothing.\n` +
+          `2. **Active Cooling**: Apply cool damp towels or mist with water. Place cool cloths at neck, armpits, and groin.\n` +
+          `3. **Fan Continuously**: Rapid air circulation speeds up evaporative cooling.\n` +
+          `4. **Hydrate**: Provide small sips of cool water if conscious.\n` +
+          `5. **Heatstroke Warning**: Hot, dry red skin, confusion, or fainting is life-threatening heatstroke—cool immediately!`;
+      }
+
+      // G. Contextual Follow-ups & Gratitude
+      if (/what\s+next|what\s+should\s+i\s+do\s+now|then\s+what|now\s+what|more\s+details/i.test(q)) {
+        return `${ackPrefix}Here are your next steps right now:\n\n` +
+          `1. Confirm immediate physical safety: Protect your head and check for gas, fire, or falling hazards.\n` +
+          `2. Ensure your **ResQ SOS Beacon** is broadcasting on the Home screen.\n` +
+          `3. If someone is with you or injured, make sure bleeding is controlled and their airway is clear.\n` +
+          `4. Conserve your phone battery and water.\n\n` +
+          `Tell me what specific situation you're dealing with right now and I will guide you through it step by step.`;
+      }
+
+      if (/thank|thanks|great|awesome|helpful|ok|okay|got\s+it/i.test(q)) {
+        return `You're very welcome${resQSession.userName ? ', ' + resQSession.userName : ''}! I am always right here on your phone whenever you need me.\n\nStay alert, keep your phone battery safe, and let me know if anything changes around you!`;
+      }
+
+      // H. Protocol Matching Fallback
+      for (const p of survivalProtocolsDB) {
+        let score = 0;
+        p.tags.forEach(t => {
+          if (q.includes(t)) score += 3;
+        });
+        if (q.includes(p.title.toLowerCase())) score += 5;
+        if (score >= 2) {
+          let ans = `${ackPrefix}Here is the verified protocol for **${p.title}** (${p.subtitle}):\n\n`;
+          p.steps.forEach((s, idx) => {
+            ans += `${idx + 1}. ${s}\n`;
+          });
+          if (p.warning) {
+            ans += `\n⚠️ **WARNING**: ${p.warning}`;
+          }
+          ans += `\n\nIs there anything specific about this situation you need help with?`;
+          return ans;
+        }
+      }
+
+      // I. General Conversational Emergency Response Fallback
+      return `${ackPrefix}I understand. When dealing with an emergency or disaster, remember these 3 core rules:\n\n` +
+        `1. **Ensure Immediate Safety**: Check for structural collapse, fire, gas, and power line hazards before moving.\n` +
+        `2. **Broadcast with ResQ**: Tap the SOS button on the Home screen. Rescuers using the radar can find your phone within 30 meters without any internet.\n` +
+        `3. **Signal for Help**: If you are trapped, tap on metal pipes or walls in rhythmic sets of 3 (**TAP—TAP—TAP**).\n\n` +
+        `You can talk to me naturally, inform me of your location and conditions, or ask: *"How do I treat severe bleeding?"*, *"How does the radar work?"*, or *"Guide me through the app"*. How can I help you right now?`;
+    }
+
+    function querySurvivalAssistant() {
+      const input = document.getElementById('survivalAiInput');
+      const box = document.getElementById('survivalAiResponseBox');
+      const textEl = document.getElementById('survivalAiResText');
+      const badgeEl = document.getElementById('survivalAiResBadge');
+
+      const query = (input ? input.value : '').trim();
+      if (!query) return;
+
+      // Check if native Android bridge has local LLM inference available
+      if (window.ResQNative && typeof window.ResQNative.queryLocalLlm === 'function') {
+        try {
+          const nativeResp = window.ResQNative.queryLocalLlm(query);
+          if (nativeResp) {
+            badgeEl.innerText = "🤖 resQ ON-DEVICE LLM";
+            textEl.innerText = nativeResp;
+            box.classList.add('active');
+            return;
+          }
+        } catch (e) {
+          console.log("Native local LLM query fallback:", e);
+        }
+      }
+
+      badgeEl.innerText = "🛡️ resQ OFFLINE ASSISTANT";
+      textEl.innerText = generateResQConversationalReply(query);
+      box.classList.add('active');
+    }
+
+    /* ============================================================
+       INTERACTIVE AI CHAT HEAD & REAL-TIME CONVERSATION
+       ============================================================ */
+    function openAiChatModal() {
+      const overlay = document.getElementById('aiChatModalOverlay');
+      const head = document.getElementById('aiFloatingChatHead');
+      if (overlay) overlay.classList.add('active');
+      if (head) head.classList.add('hidden');
+
+      const stream = document.getElementById('aiModalStreamBox');
+      if (stream) stream.scrollTop = stream.scrollHeight;
+
+      setTimeout(() => {
+        const input = document.getElementById('aiModalInput');
+        if (input) input.focus();
+      }, 300);
+    }
+
+    function closeAiChatModal() {
+      const overlay = document.getElementById('aiChatModalOverlay');
+      const head = document.getElementById('aiFloatingChatHead');
+      if (overlay) overlay.classList.remove('active');
+      if (head) head.classList.remove('hidden');
+    }
+
+    function switchChatChannel(ch) {
+      const btnMesh = document.getElementById('btnChannelMesh');
+      const btnAi = document.getElementById('btnChannelAi');
+      if (ch === 'mesh') {
+        if (btnMesh) btnMesh.classList.add('active');
+        if (btnAi) btnAi.classList.remove('active');
+      } else {
+        openAiChatModal();
+      }
+    }
+
+    function sendAiChatQuickPrompt(promptText) {
+      const input = document.getElementById('aiModalInput');
+      if (input) input.value = promptText;
+      sendAiChatMessage();
+    }
+
+    function formatMarkdownText(text) {
+      if (!text) return '';
+      let formatted = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      formatted = formatted.replace(/\n/g, '<br>');
+      return formatted;
+    }
+
+    function appendAiUserBubble(message) {
+      const stream = document.getElementById('aiModalStreamBox');
+      const bubble = document.createElement('div');
+      bubble.className = 'ai-msg-bubble ai-msg-user';
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      bubble.innerHTML = `
+        <div class="ai-bubble-content">${formatMarkdownText(message)}</div>
+        <div class="ai-bubble-time">${timeStr} • SENT</div>
+      `;
+      stream.appendChild(bubble);
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    function appendAiBotBubble(message, isLlm) {
+      const stream = document.getElementById('aiModalStreamBox');
+      const bubble = document.createElement('div');
+      bubble.className = 'ai-msg-bubble ai-msg-bot';
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const badgeText = isLlm ? '🤖 resQ ON-DEVICE LLM' : '🛡️ resQ OFFLINE AI';
+      bubble.innerHTML = `
+        <div class="ai-bubble-sender">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          <span>resQ</span>
+        </div>
+        <div class="ai-bubble-content">${formatMarkdownText(message)}</div>
+        <div class="ai-bubble-time">${timeStr} • ${badgeText}</div>
+      `;
+      stream.appendChild(bubble);
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    function sendAiChatMessage() {
+      const input = document.getElementById('aiModalInput');
+      const text = input ? input.value.trim() : '';
+      if (!text) return;
+
+      appendAiUserBubble(text);
+      if (input) input.value = '';
+
+      const typingRow = document.getElementById('aiTypingRow');
+      if (typingRow) typingRow.style.display = 'flex';
+      const stream = document.getElementById('aiModalStreamBox');
+      if (stream) stream.scrollTop = stream.scrollHeight;
+
+      // Realistic thinking delay
+      setTimeout(() => {
+        let answer = '';
+        let isLlm = false;
+
+        // 1. Native LLM Check
+        if (window.ResQNative && typeof window.ResQNative.queryLocalLlm === 'function') {
+          try {
+            const nativeResp = window.ResQNative.queryLocalLlm(text);
+            if (nativeResp) {
+              answer = nativeResp;
+              isLlm = true;
+            }
+          } catch (e) {
+            console.log("Native local LLM query fallback:", e);
+          }
+        }
+
+        // 2. resQ Conversational Engine
+        if (!answer) {
+          answer = generateResQConversationalReply(text);
+        }
+
+        if (typingRow) typingRow.style.display = 'none';
+        appendAiBotBubble(answer, isLlm);
+
+        if (window.ResQNative && typeof window.ResQNative.triggerVibrate === 'function') {
+          window.ResQNative.triggerVibrate(60);
+        }
+      }, 350);
+    }
+
     // App Initialization
     window.addEventListener('DOMContentLoaded', () => {
       loadProfile();
       loadSavedVolume();
       loadChatHistory();
       initGeolocation();
+      renderSurvivalProtocols();
     });
   </script>
 </body>

@@ -16,9 +16,10 @@ import { StatusChips } from '../components/StatusChips';
 interface SosHomeScreenProps {
   onOpenProfile: () => void;
   onOpenChat: () => void;
+  onOpenSurvival?: () => void;
 }
 
-export const SosHomeScreen: React.FC<SosHomeScreenProps> = ({ onOpenProfile, onOpenChat }) => {
+export const SosHomeScreen: React.FC<SosHomeScreenProps> = ({ onOpenProfile, onOpenChat, onOpenSurvival }) => {
   const { isSosActive, setSosActive } = useModeStore();
   const { getSanitizedPublicProfile } = useProfileStore();
   const [currentCondition, setCurrentCondition] = useState<VictimStatusCondition>('CONSCIOUS');
@@ -126,6 +127,12 @@ export const SosHomeScreen: React.FC<SosHomeScreenProps> = ({ onOpenProfile, onO
             <Text style={styles.navCardIcon}>💬</Text>
             <Text style={styles.navCardTitle}>Offline Chat</Text>
             <Text style={styles.navCardSub}>P2P BLE link</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={onOpenSurvival} style={styles.navCard}>
+            <Text style={styles.navCardIcon}>⚡</Text>
+            <Text style={styles.navCardTitle}>Survival & AI</Text>
+            <Text style={styles.navCardSub}>Offline Guide</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

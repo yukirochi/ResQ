@@ -5,6 +5,7 @@ import { ModePickerScreen } from '../features/onboarding/ModePickerScreen';
 import { ProfileEditorScreen } from '../features/profile/screens/ProfileEditorScreen';
 import { RadarScreen } from '../features/rescue/screens/RadarScreen';
 import { VictimDetailScreen } from '../features/rescue/screens/VictimDetailScreen';
+import { SurvivalGuideScreen } from '../features/survival/screens/SurvivalGuideScreen';
 import { SosHomeScreen } from '../features/victim/screens/SosHomeScreen';
 import { useModeStore } from '../store/modeStore';
 import { useProfileStore } from '../store/profileStore';
@@ -12,7 +13,7 @@ import { useVictimsStore } from '../store/victimsStore';
 import { DiscoveredVictim } from '../types';
 import { THEME } from '../ui/theme';
 
-type ActiveView = 'MAIN' | 'PROFILE_EDITOR' | 'VICTIM_DETAIL' | 'CHAT';
+type ActiveView = 'MAIN' | 'PROFILE_EDITOR' | 'VICTIM_DETAIL' | 'CHAT' | 'SURVIVAL_GUIDE';
 
 export default function App() {
   const { mode, init: initMode } = useModeStore();
@@ -42,6 +43,10 @@ export default function App() {
       return <ModePickerScreen />;
     }
 
+    if (activeView === 'SURVIVAL_GUIDE') {
+      return <SurvivalGuideScreen onBack={() => setActiveView('MAIN')} />;
+    }
+
     // Victim Mode Flow
     if (mode === 'VICTIM') {
       if (activeView === 'PROFILE_EDITOR') {
@@ -57,6 +62,7 @@ export default function App() {
             setActiveChatVictimId('RESCUER_CHANNEL');
             setActiveView('CHAT');
           }}
+          onOpenSurvival={() => setActiveView('SURVIVAL_GUIDE')}
         />
       );
     }
