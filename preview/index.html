@@ -2276,10 +2276,69 @@
       activeTargetNode.trueDistance = Math.max(0.4, activeTargetNode.trueDistance + delta);
     }
 
+    /* ============================================================
+       NATIVE HARDWARE BLE MESH BEACON LISTENER
+       ============================================================ */
+    window.onNativeBleBeaconDetected = function(address, rawRssi, profileJson) {
+      let parsed = null;
+      try {
+        if (profileJson) parsed = JSON.parse(profileJson);
+      } catch (e) {}
+
+      const victimName = (parsed && parsed.name) ? parsed.name : ("Victim [" + address.substring(address.length - 5) + "]");
+      const bloodType = (parsed && parsed.bloodType) ? parsed.bloodType : "O+";
+      const conditions = (parsed && parsed.conditions) ? parsed.conditions : { diabetic: false, mobility: false, asthma: false, cardiac: false, hearing: false, allergy: false };
+
+      if (!activeTargetNode || activeTargetNode.address !== address) {
+        activeTargetNode = {
+          address: address,
+          name: victimName,
+          bloodType: bloodType,
+          conditions: conditions,
+          angleDeg: 32,
+          trueDistance: calculateDistance(rawRssi),
+          filteredRssi: rawRssi,
+          kalmanP: 0.05,
+          conditionDesc: "Hardware BLE Beacon Locked",
+          isRealHardware: true
+        };
+        const targetName = document.getElementById('radarTargetName');
+        const targetDesc = document.getElementById('radarTargetDesc');
+        if (targetName) targetName.innerText = activeTargetNode.name;
+        if (targetDesc) targetDesc.innerText = activeTargetNode.conditionDesc + " • " + calculateDistance(rawRssi).toFixed(2) + "m away";
+        
+        renderRadarVictimCard(activeTargetNode);
+        showToast("Emergency Beacon Locked: " + victimName);
+        if (window.ResQNative && typeof window.ResQNative.triggerVibrate === 'function') {
+          window.ResQNative.triggerVibrate(150);
+        }
+      } else {
+        if (parsed) {
+          activeTargetNode.name = victimName;
+          activeTargetNode.bloodType = bloodType;
+          activeTargetNode.conditions = conditions;
+          const targetName = document.getElementById('radarTargetName');
+          if (targetName) targetName.innerText = activeTargetNode.name;
+          renderRadarVictimCard(activeTargetNode);
+        }
+        updateKalman(rawRssi);
+      }
+    };
+
     function switchTab(screenId) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.dock-tab').forEach(t => t.classList.remove('active'));
       const dock = document.getElementById('bottomDock');
+
+      if (screenId === 'radar') {
+        if (window.ResQNative && typeof window.ResQNative.startBleScanning === 'function') {
+          window.ResQNative.startBleScanning();
+        }
+      } else {
+        if (window.ResQNative && typeof window.ResQNative.stopBleScanning === 'function') {
+          window.ResQNative.stopBleScanning();
+        }
+      }
 
       let targetScreen = null;
       if (screenId === 'home') {
@@ -2395,10 +2454,17 @@
           isSirenActive = true;
           btn.classList.add('active');
           txt.innerText = 'Siren Active (Mute)';
+
+          if (activeTargetNode && activeTargetNode.address && window.ResQNative && typeof window.ResQNative.triggerRemoteSiren === 'function') {
+            window.ResQNative.triggerRemoteSiren(activeTargetNode.address, 1);
+          }
         } catch (e) {
           console.warn("Audio blocked:", e);
         }
       } else {
+        if (activeTargetNode && activeTargetNode.address && window.ResQNative && typeof window.ResQNative.triggerRemoteSiren === 'function') {
+          window.ResQNative.triggerRemoteSiren(activeTargetNode.address, 0);
+        }
         if (sirenOsc) {
           try { sirenOsc.stop(); sirenOsc.disconnect(); } catch (e) {}
           sirenOsc = null;

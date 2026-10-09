@@ -57,10 +57,14 @@ class BleAdvertiserModule(private val context: Context) {
         }
         payload[8] = (statusByte and 0xFF).toByte()
 
-        val data = AdvertiseData.Builder()
+        val advertiseData = AdvertiseData.Builder()
             .setIncludeDeviceName(false)
             .setIncludeTxPowerLevel(true)
             .addServiceUuid(ParcelUuid(SERVICE_UUID))
+            .build()
+
+        val scanResponse = AdvertiseData.Builder()
+            .setIncludeDeviceName(false)
             .addServiceData(ParcelUuid(SERVICE_UUID), payload)
             .build()
 
@@ -80,7 +84,7 @@ class BleAdvertiserModule(private val context: Context) {
             }
         }
 
-        advertiser?.startAdvertising(settings, data, callback)
+        advertiser?.startAdvertising(settings, advertiseData, scanResponse, callback)
     }
 
     fun stopAdvertising() {

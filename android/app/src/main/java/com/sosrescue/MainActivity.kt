@@ -106,6 +106,39 @@ class MainActivity : AppCompatActivity() {
         webView.loadUrl("file:///android_asset/index.html")
     }
 
+    var bleScanner: com.sosrescue.ble.BleScannerModule? = null
+
+    private val sirenReceiver = object : android.content.BroadcastReceiver() {
+        override fun onReceive(context: android.content.Context?, intent: android.content.Intent?) {
+            webView.post {
+                webView.evaluateJavascript("if (typeof toggleAudioSiren === 'function' && !isSirenActive) toggleAudioSiren();", null)
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val filter = android.content.IntentFilter(com.sosrescue.service.VictimModeService.ACTION_TRIGGER_SIREN)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(sirenReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(sirenReceiver, filter)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        try {
+            unregisterReceiver(sirenReceiver)
+        } catch (e: Exception) {}
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        bleScanner?.stopScanning()
+        bleScanner = null
+    }
+
     class ResQNativeBridge(private val activity: MainActivity) {
         @android.webkit.JavascriptInterface
         fun isNative(): Boolean = true
@@ -115,6 +148,7 @@ class MainActivity : AppCompatActivity() {
             try {
                 val serviceIntent = android.content.Intent(activity, com.sosrescue.service.VictimModeService::class.java).apply {
                     action = com.sosrescue.service.VictimModeService.ACTION_START
+                    putExtra(com.sosrescue.service.VictimModeService.EXTRA_PROFILE_JSON, profileJson)
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     activity.startForegroundService(serviceIntent)
@@ -135,6 +169,34 @@ class MainActivity : AppCompatActivity() {
                 activity.startService(serviceIntent)
             } catch (e: Exception) {
                 android.util.Log.e("ResQNativeBridge", "Error stopping victim mode", e)
+            }
+        }
+
+        @android.webkit.JavascriptInterface
+        fun startBleScanning() {
+            activity.runOnUiThread {
+                if (activity.bleScanner == null) {
+                    activity.bleScanner = com.sosrescue.ble.BleScannerModule(activity) { address, rssi, profileJson ->
+                        val escapedProfile = profileJson?.replace("\\", "\\\\")?.replace("'", "\\'")?.replace("\n", " ")
+                        val js = "if (typeof window.onNativeBleBeaconDetected === 'function') { window.onNativeBleBeaconDetected('$address', $rssi, ${if (escapedProfile != null) "'$escapedProfile'" else "null"}); }"
+                        activity.webView.evaluateJavascript(js, null)
+                    }
+                }
+                activity.bleScanner?.startScanning()
+            }
+        }
+
+        @android.webkit.JavascriptInterface
+        fun stopBleScanning() {
+            activity.runOnUiThread {
+                activity.bleScanner?.stopScanning()
+            }
+        }
+
+        @android.webkit.JavascriptInterface
+        fun triggerRemoteSiren(address: String, command: Int) {
+            activity.runOnUiThread {
+                activity.bleScanner?.triggerRemoteSiren(address, command)
             }
         }
 

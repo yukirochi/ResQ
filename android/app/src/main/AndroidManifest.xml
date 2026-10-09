@@ -3,15 +3,18 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     
-    <!-- Bluetooth Classic & Low Energy permissions for Android 12+ (API 31+) -->
-    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
-        android:usesPermissionFlags="neverForLocation" />
+    <!-- Bluetooth Classic & Low Energy permissions -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
-    <!-- Legacy Location permission required for BLE discovery on Android 11 and below -->
+    <!-- Location permission required for BLE RSSI proximity & radar estimation -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="true" />
 
     <!-- Foreground Service permissions for 24/7 locked beaconing -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />

@@ -12,11 +12,17 @@ class VictimModeService : Service() {
 
     private var wakeLock: PowerManager.WakeLock? = null
 
+    private var advertiserModule: com.sosrescue.ble.BleAdvertiserModule? = null
+    private var gattServerModule: com.sosrescue.ble.GattServerModule? = null
+
     companion object {
         const val CHANNEL_ID = "ResQ_Victim_Channel"
         const val NOTIFICATION_ID = 911
         const val ACTION_START = "ACTION_START_VICTIM_MODE"
         const val ACTION_STOP = "ACTION_STOP_VICTIM_MODE"
+        const val EXTRA_PROFILE_JSON = "EXTRA_PROFILE_JSON"
+        const val ACTION_TRIGGER_SIREN = "com.sosrescue.TRIGGER_SIREN"
+        var isRunning = false
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -32,6 +38,9 @@ class VictimModeService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.action == ACTION_STOP) {
+            stopBleComponents()
+            isRunning = false
+            @Suppress("DEPRECATION")
             stopForeground(true)
             stopSelf()
             return START_NOT_STICKY
@@ -40,7 +49,48 @@ class VictimModeService : Service() {
         val notification = createNotification()
         startForeground(NOTIFICATION_ID, notification)
 
+        val profileJson = intent?.getStringExtra(EXTRA_PROFILE_JSON) ?: "{}"
+        startBleComponents(profileJson)
+        isRunning = true
+
         return START_STICKY
+    }
+
+    private fun startBleComponents(profileJson: String) {
+        if (advertiserModule == null) {
+            advertiserModule = com.sosrescue.ble.BleAdvertiserModule(this)
+        }
+        if (gattServerModule == null) {
+            gattServerModule = com.sosrescue.ble.GattServerModule(this)
+        }
+
+        // Ephemeral ID: 16 hex characters
+        val ephemeralIdHex = java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 16)
+        advertiserModule?.startAdvertising(
+            ephemeralIdHex = ephemeralIdHex,
+            statusByte = 1,
+            onSuccess = {
+                android.util.Log.d("VictimModeService", "Hardware BLE Beacon Advertising started successfully.")
+            },
+            onError = { err ->
+                android.util.Log.e("VictimModeService", "BLE Advertising error: $err")
+            }
+        )
+
+        gattServerModule?.startGattServer(isSos = true, profileJson = profileJson)
+        gattServerModule?.onSirenCommandReceived = { cmd ->
+            if (cmd == 1) {
+                val sirenIntent = Intent(ACTION_TRIGGER_SIREN)
+                sendBroadcast(sirenIntent)
+            }
+        }
+    }
+
+    private fun stopBleComponents() {
+        advertiserModule?.stopAdvertising()
+        gattServerModule?.stopGattServer()
+        advertiserModule = null
+        gattServerModule = null
     }
 
     private fun createNotification(): Notification {
@@ -78,6 +128,8 @@ class VictimModeService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        stopBleComponents()
+        isRunning = false
         wakeLock?.let {
             if (it.isHeld) it.release()
         }
