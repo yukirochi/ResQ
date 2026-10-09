@@ -659,6 +659,260 @@
       fill: var(--red-primary);
     }
 
+    /* Victim Info Tags on Target Card */
+    .victim-tag-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .victim-blood-pill {
+      font-size: 11px;
+      font-weight: 800;
+      color: #FFFFFF;
+      background: var(--red-primary);
+      padding: 3px 8px;
+      border-radius: 999px;
+      letter-spacing: 0.3px;
+    }
+    .victim-med-pill {
+      font-size: 11px;
+      font-weight: 700;
+      color: #991B1B;
+      background: #FEE2E2;
+      border: 1px solid rgba(220, 38, 38, 0.25);
+      padding: 3px 8px;
+      border-radius: 999px;
+    }
+    .btn-view-med-sheet {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--red-primary);
+      background: #FFF0F0;
+      border: 1px solid rgba(229, 57, 53, 0.25);
+      border-radius: 12px;
+      padding: 4px 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+    .btn-view-med-sheet:active {
+      transform: scale(0.96);
+      background: #FDE8E8;
+    }
+
+    /* Victim Medical Details Modal Sheet */
+    .victim-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 2000;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+    .victim-modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+    .victim-modal-sheet {
+      width: 100%;
+      max-width: 480px;
+      background: #FFFFFF;
+      border-radius: 28px 28px 0 0;
+      padding: 16px 20px 32px 20px;
+      box-shadow: 0 -8px 30px rgba(0,0,0,0.25);
+      max-height: 85vh;
+      overflow-y: auto;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .victim-modal-overlay.active .victim-modal-sheet {
+      transform: translateY(0);
+    }
+    .modal-grab-bar {
+      width: 40px;
+      height: 4px;
+      border-radius: 2px;
+      background: #CBD5E1;
+      margin: 0 auto 14px auto;
+    }
+    .modal-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .modal-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .modal-sub-label {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: var(--red-primary);
+      text-transform: uppercase;
+    }
+    .modal-victim-name {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--text-main);
+    }
+    .modal-close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #F1F5F9;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+    }
+    .modal-card {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+    }
+    .modal-card-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .modal-blood-display {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .blood-badge-large {
+      font-size: 20px;
+      font-weight: 900;
+      color: #FFFFFF;
+      background: var(--red-primary);
+      padding: 6px 14px;
+      border-radius: 12px;
+      letter-spacing: 0.5px;
+    }
+    .blood-desc-text {
+      font-size: 12px;
+      color: var(--text-main);
+      font-weight: 600;
+      line-height: 16px;
+    }
+    .modal-condition-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid #EDF2F7;
+    }
+    .modal-condition-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .condition-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--red-primary);
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+    .condition-item-name {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+    .condition-item-sub {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      line-height: 14px;
+    }
+    .modal-telem-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .modal-telem-cell {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 10px;
+      padding: 8px;
+      text-align: center;
+    }
+    .modal-telem-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+    .modal-telem-val {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+    .modal-action-btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .modal-btn-siren {
+      flex: 1;
+      height: 44px;
+      border-radius: 22px;
+      background: var(--red-primary);
+      color: #FFFFFF;
+      border: none;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .modal-btn-chat {
+      flex: 1;
+      height: 44px;
+      border-radius: 22px;
+      background: #F1F5F9;
+      color: var(--text-main);
+      border: none;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
     .target-actions-row { display: flex; gap: 8px; }
     .btn-alert-siren {
       flex: 1;
@@ -993,11 +1247,21 @@
       <!-- Target Status Card -->
       <div class="radar-target-card">
         <div class="target-card-top">
-          <span class="target-name" id="radarTargetName">No Target Locked</span>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="target-name" id="radarTargetName">No Target Locked</span>
+            <span class="victim-blood-pill" id="radarVictimBlood" style="display:none;">O+</span>
+          </div>
+          <button class="btn-view-med-sheet" id="btnViewVictimInfo" onclick="openVictimInfoModal()" style="display:none;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            <span>Medical Info</span>
+          </button>
         </div>
         <div class="target-desc-row" id="radarTargetDesc">
           Listening on 2.4 GHz Emergency Mesh for active victim beacons...
         </div>
+
+        <!-- Victim Declared Conditions Tags -->
+        <div class="victim-tag-row" id="radarVictimTags" style="display:none;"></div>
 
         <!-- Volume Control Slider & Presets -->
         <div class="alarm-volume-card">
@@ -1207,6 +1471,79 @@
         <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
         <span>Profile</span>
       </button>
+    </div>
+
+    <!-- VICTIM MEDICAL DETAILS MODAL SHEET -->
+    <div class="victim-modal-overlay" id="victimModalOverlay" onclick="closeVictimInfoModal()">
+      <div class="victim-modal-sheet" onclick="event.stopPropagation()">
+        <div class="modal-grab-bar"></div>
+        <div class="modal-header-row">
+          <div class="modal-title-wrap">
+            <span class="modal-sub-label">Locked Beacon Triage Record</span>
+            <h3 class="modal-victim-name" id="modalVictimName">Victim Profile</h3>
+          </div>
+          <button class="modal-close-btn" onclick="closeVictimInfoModal()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+
+        <!-- Blood Type Card -->
+        <div class="modal-card">
+          <div class="modal-card-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+            <span>Blood Group & Extraction Compatibility</span>
+          </div>
+          <div class="modal-blood-display">
+            <div class="blood-badge-large" id="modalVictimBlood">O+</div>
+            <div class="blood-desc-text" id="modalBloodDesc">Standard field transfusion compatibility. Declared by beacon.</div>
+          </div>
+        </div>
+
+        <!-- Declared Medical Conditions & Extraction Hazards -->
+        <div class="modal-card">
+          <div class="modal-card-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+            <span>Declared Illnesses & Extraction Hazards</span>
+          </div>
+          <div id="modalConditionsList">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Live Beacon Distance & Fix -->
+        <div class="modal-card">
+          <div class="modal-card-label">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span>Live Mesh Telemetry</span>
+          </div>
+          <div class="modal-telem-grid">
+            <div class="modal-telem-cell">
+              <div class="modal-telem-label">Distance</div>
+              <div class="modal-telem-val" id="modalTelemDist">1.75 m</div>
+            </div>
+            <div class="modal-telem-cell">
+              <div class="modal-telem-label">Signal</div>
+              <div class="modal-telem-val" id="modalTelemSignal">-74 dBm</div>
+            </div>
+            <div class="modal-telem-cell">
+              <div class="modal-telem-label">Channel</div>
+              <div class="modal-telem-val">2.4 GHz Mesh</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions Row -->
+        <div class="modal-action-btn-row">
+          <button class="modal-btn-siren" onclick="toggleAudioSiren(); closeVictimInfoModal();">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+            <span>Sound Siren</span>
+          </button>
+          <button class="modal-btn-chat" onclick="switchTab('chat'); closeVictimInfoModal();">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            <span>Message</span>
+          </button>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -1775,6 +2112,116 @@
       }
     }, 400);
 
+    function openVictimInfoModal() {
+      if (!activeTargetNode) {
+        showToast("No active victim beacon locked");
+        return;
+      }
+      populateVictimModal(activeTargetNode);
+      document.getElementById('victimModalOverlay').classList.add('active');
+    }
+
+    function closeVictimInfoModal() {
+      document.getElementById('victimModalOverlay').classList.remove('active');
+    }
+
+    function populateVictimModal(node) {
+      document.getElementById('modalVictimName').innerText = node.name || "Victim Profile";
+      document.getElementById('modalVictimBlood').innerText = node.bloodType || "O+";
+      
+      const bloodDescMap = {
+        'O+': 'Universal red cell emergency donor. Compatible with all positive blood groups.',
+        'O-': 'Universal red cell emergency donor for all patients. Critical immediate match.',
+        'A+': 'Can receive from A+, A-, O+, O-. Can donate to A+ and AB+.',
+        'A-': 'Can receive from A- and O-. Universal platelet donor considerations.',
+        'B+': 'Can receive from B+, B-, O+, O-. Field plasma match.',
+        'B-': 'Can receive from B- and O-. Rare field type.',
+        'AB+': 'Universal recipient. Can receive red blood cells from all blood types.',
+        'AB-': 'Can receive from all negative types (AB-, A-, B-, O-).'
+      };
+      document.getElementById('modalBloodDesc').innerText = bloodDescMap[node.bloodType] || "Declared blood type for field transfusion.";
+
+      const listEl = document.getElementById('modalConditionsList');
+      listEl.innerHTML = '';
+
+      const condDefs = {
+        diabetic: { title: "Diabetic (Insulin Dependent)", desc: "Susceptible to ketoacidosis. Requires insulin/glucose upon recovery." },
+        mobility: { title: "Physical Disability / Mobility Impaired", desc: "Unable to self-evacuate. Requires stretcher or physical extraction team." },
+        asthma: { title: "Asthma / Respiratory Distress", desc: "High hazard in dusty rubble and smoke. Requires bronchodilator / oxygen." },
+        cardiac: { title: "Cardiac Condition", desc: "Pre-existing heart distress risk. Continuous cardiac telemetry required." },
+        hearing: { title: "Hearing / Speech Impaired", desc: "Cannot hear voice callouts. Rescuers must use tactile contact and strobes." },
+        allergy: { title: "Severe Drug Allergies", desc: "Penicillin / antibiotic hazard. Verify medic emergency kit before dosing." }
+      };
+
+      let count = 0;
+      if (node.conditions) {
+        for (const [key, isDeclared] of Object.entries(node.conditions)) {
+          if (isDeclared && condDefs[key]) {
+            count++;
+            const item = document.createElement('div');
+            item.className = 'modal-condition-item';
+            item.innerHTML = `
+              <div class="condition-dot"></div>
+              <div>
+                <div class="condition-item-name">${condDefs[key].title}</div>
+                <div class="condition-item-sub">${condDefs[key].desc}</div>
+              </div>
+            `;
+            listEl.appendChild(item);
+          }
+        }
+      }
+
+      if (count === 0) {
+        listEl.innerHTML = '<div style="font-size:12px; color:var(--text-muted); font-weight:600; padding:6px 0;">No critical chronic conditions declared by victim beacon.</div>';
+      }
+
+      const estDist = calculateDistance(node.filteredRssi);
+      document.getElementById('modalTelemDist').innerText = estDist.toFixed(2) + " m";
+      document.getElementById('modalTelemSignal').innerText = Math.round(node.filteredRssi) + " dBm";
+    }
+
+    function renderRadarVictimCard(node) {
+      const bloodPill = document.getElementById('radarVictimBlood');
+      const medBtn = document.getElementById('btnViewVictimInfo');
+      const tagsRow = document.getElementById('radarVictimTags');
+
+      if (node) {
+        bloodPill.style.display = 'inline-block';
+        bloodPill.innerText = node.bloodType || 'O+';
+        medBtn.style.display = 'inline-flex';
+        tagsRow.style.display = 'flex';
+        tagsRow.innerHTML = '';
+
+        const shortCondMap = {
+          diabetic: 'Diabetic (Insulin)',
+          mobility: 'Mobility Impaired',
+          asthma: 'Asthma',
+          cardiac: 'Cardiac',
+          hearing: 'Hearing Impaired',
+          allergy: 'Drug Allergies'
+        };
+
+        let hasCond = false;
+        if (node.conditions) {
+          for (const [key, val] of Object.entries(node.conditions)) {
+            if (val && shortCondMap[key]) {
+              hasCond = true;
+              tagsRow.innerHTML += `<span class="victim-med-pill">${shortCondMap[key]}</span>`;
+            }
+          }
+        }
+        if (!hasCond) {
+          tagsRow.innerHTML = `<span style="font-size:11px; color:var(--text-muted); font-weight:600;">Standard Triage • No critical conditions</span>`;
+        }
+      } else {
+        bloodPill.style.display = 'none';
+        medBtn.style.display = 'none';
+        tagsRow.style.display = 'none';
+        tagsRow.innerHTML = '';
+      }
+    }
+
     /* Toggle Inbound Test Beacon */
     function toggleTestBeacon() {
       const btn = document.getElementById('btnToggleBeacon');
@@ -1784,7 +2231,11 @@
 
       if (!activeTargetNode) {
         activeTargetNode = {
-          name: "Inbound Victim",
+          name: (userProfile && userProfile.name) ? userProfile.name : "Alex Rivera",
+          bloodType: (userProfile && userProfile.bloodType) ? userProfile.bloodType : "O+",
+          conditions: (userProfile && userProfile.conditions && Object.values(userProfile.conditions).some(v => v))
+            ? userProfile.conditions
+            : { diabetic: true, mobility: true, asthma: false, cardiac: false, hearing: false, allergy: true },
           angleDeg: 28,
           trueDistance: 1.75,
           filteredRssi: -74.0,
@@ -1795,13 +2246,15 @@
         btnText.innerText = "Clear Detected Beacon (Return to Idle)";
         targetName.innerText = activeTargetNode.name;
         targetDesc.innerText = activeTargetNode.conditionDesc + " • 1.75m away";
-        showToast("Emergency Beacon Locked on Radar");
+        renderRadarVictimCard(activeTargetNode);
+        showToast("Emergency Beacon Locked • Medical Info Available");
       } else {
         activeTargetNode = null;
         btn.classList.remove('active');
         btnText.innerText = "Simulate Nearby Beacon (Test Detection)";
         targetName.innerText = "No Target Locked";
         targetDesc.innerText = "Listening on 2.4 GHz Emergency Mesh for active victim beacons...";
+        renderRadarVictimCard(null);
         showToast("Beacon Cleared • Idle Scanning");
       }
     }
