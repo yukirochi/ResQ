@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -9,10 +12,45 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SURVIVAL_PROTOCOLS } from '../data/survivalProtocols';
+import { AssistantResponse, localLlm } from '../services/localLlmService';
 import { Card } from '../../../ui/components/Card';
 import { THEME } from '../../../ui/theme';
-import { SURVIVAL_PROTOCOLS, SurvivalProtocol } from '../data/survivalProtocols';
-import { AssistantResponse, localLlm } from '../services/localLlmService';
+
+// AI Persona images from src/assets
+const AVATAR_1 = require('../../../assets/persona1.jpg');
+const AVATAR_2 = require('../../../assets/persona2.jpg');
+const AVATAR_3 = require('../../../assets/persona3.jpg');
+
+const PERSONAS = [
+  {
+    id: '1',
+    name: 'resQ Medic',
+    role: 'Medical Triage',
+    img: AVATAR_1,
+    badge: 'MEDICAL',
+    color: '#10B981',
+    chips: ['Severe bleeding', 'Adult CPR', 'Shock treatment', 'Fracture care'],
+  },
+  {
+    id: '2',
+    name: 'resQ Engineer',
+    role: 'Rescue Tech',
+    img: AVATAR_2,
+    badge: 'TACTICAL',
+    color: '#3B82F6',
+    chips: ['Trapped in rubble', 'Check Bluetooth', 'How radar works', 'Signal loss'],
+  },
+  {
+    id: '3',
+    name: 'resQ Survival',
+    role: 'Field Expert',
+    img: AVATAR_3,
+    badge: 'SURVIVAL',
+    color: '#F59E0B',
+    chips: ['Find clean water', 'Wildfire escape', 'Enable Auto SOS', 'Night shelter'],
+  },
+];
 
 interface SurvivalGuideScreenProps {
   onBack: () => void;
@@ -26,456 +64,319 @@ export const SurvivalGuideScreen: React.FC<SurvivalGuideScreenProps> = ({ onBack
   const [aiResponse, setAiResponse] = useState<AssistantResponse | null>(null);
   const [isAiThinking, setIsAiThinking] = useState(false);
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
+  const [activePersona, setActivePersona] = useState(PERSONAS[0]);
 
   const handleAskAi = async (customPrompt?: string) => {
-    const queryToUse = customPrompt || searchQuery;
-    if (!queryToUse.trim()) return;
-
+    const q = customPrompt || searchQuery;
+    if (!q.trim()) return;
     setIsAiThinking(true);
+    setAiResponse(null);
     try {
-      const resp = await localLlm.query(queryToUse);
+      const resp = await localLlm.query(q);
       setAiResponse(resp);
-    } catch (err) {
-      console.warn('AI Query failed:', err);
+    } catch {
+      // silent fail
     } finally {
       setIsAiThinking(false);
     }
   };
 
   const filteredProtocols = SURVIVAL_PROTOCOLS.filter((p) => {
-    const matchesCategory = selectedCategory === 'ALL' || p.category === selectedCategory;
-    const matchesSearch =
+    const matchCat = selectedCategory === 'ALL' || p.category === selectedCategory;
+    const matchSearch =
       searchQuery === '' ||
       p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesCategory && matchesSearch;
+    return matchCat && matchSearch;
   });
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Top Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backBtn} onPress={onBack}>
-          <Text style={styles.backBtnText}>←</Text>
-        </TouchableOpacity>
-        <View style={styles.headerTitles}>
-          <Text style={styles.headerTitle}>Survival & App Guide</Text>
-          <Text style={styles.headerSubtitle}>Offline AI Assistant • Zero Internet Needed</Text>
-        </View>
-        <View style={styles.offlinePill}>
-          <View style={styles.greenDot} />
-          <Text style={styles.offlineText}>OFFLINE</Text>
-        </View>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Local LLM Assistant Box */}
-        <Card style={styles.aiCard}>
-          <View style={styles.aiHeaderRow}>
-            <Text style={styles.aiTitle}>⚡ Talk to resQ</Text>
-            <Text style={styles.aiModelBadge}>QWEN2.5-1.5B</Text>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={onBack} style={styles.backBtn}>
+            <Text style={styles.backBtnText}>←</Text>
+          </TouchableOpacity>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.headerTitle}>Survival & App Guide</Text>
+            <Text style={styles.headerSub}>Verified Triage & Offline AI Knowledge Base</Text>
           </View>
-          <Text style={styles.aiSubText}>
-            Conversational emergency assistant powered by Qwen2.5-1.5B on-device. Higher reasoning triage & app guidance.
-          </Text>
+          <View style={styles.offlineBadge}>
+            <View style={styles.offlineDot} />
+            <Text style={styles.offlineBadgeText}>100% OFFLINE</Text>
+          </View>
+        </View>
 
-          <View style={styles.inputRow}>
-            <TextInput
-              style={styles.textInput}
-              placeholder="Talk to resQ (survival advice or app guide)..."
-              placeholderTextColor={THEME.colors.textMuted}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              onSubmitEditing={() => handleAskAi()}
-            />
-            <TouchableOpacity
-              style={styles.askButton}
-              onPress={() => handleAskAi()}
-              disabled={isAiThinking}
-            >
-              {isAiThinking ? (
-                <ActivityIndicator size="small" color="#FFFFFF" />
-              ) : (
-                <Text style={styles.askButtonText}>Ask</Text>
-              )}
-            </TouchableOpacity>
+        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+
+          {/* === AI SPECIALIST PERSONA PICKER === */}
+          <Text style={styles.sectionTitle}>AI SPECIALISTS</Text>
+          <View style={styles.personaRow}>
+            {PERSONAS.map((p) => {
+              const active = activePersona.id === p.id;
+              return (
+                <TouchableOpacity
+                  key={p.id}
+                  activeOpacity={0.85}
+                  onPress={() => { setActivePersona(p); setAiResponse(null); setSearchQuery(''); }}
+                  style={[styles.personaCard, active && { borderColor: p.color, backgroundColor: `${p.color}12` }]}
+                >
+                  <View style={[styles.personaImgWrap, active && { borderColor: p.color }]}>
+                    <Image source={p.img} style={styles.personaImg} />
+                    {active && <View style={[styles.activeDot, { backgroundColor: p.color }]} />}
+                  </View>
+                  <Text style={[styles.personaName, active && { color: p.color }]}>{p.name}</Text>
+                  <Text style={styles.personaRole}>{p.role}</Text>
+                  <View style={[styles.personaBadge, { backgroundColor: `${p.color}20` }]}>
+                    <Text style={[styles.personaBadgeText, { color: p.color }]}>{p.badge}</Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
-          {/* Quick Query Suggestions */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.quickChipsScroll}>
-            {[
-              'Trapped in rubble',
-              'Severe bleeding',
-              'Adult CPR steps',
-              'How radar works',
-              'Acoustic siren',
-            ].map((q) => (
+          {/* === AI CHAT CARD === */}
+          <Card style={[styles.aiCard, { borderColor: `${activePersona.color}60` }]}>
+            <View style={styles.aiCardHeader}>
+              <Image source={activePersona.img} style={[styles.aiAvatar, { borderColor: activePersona.color }]} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.aiName}>{activePersona.name}</Text>
+                <Text style={styles.aiRole}>{activePersona.role}</Text>
+              </View>
+              <View style={[styles.aiOnlineDot, { backgroundColor: activePersona.color }]} />
+            </View>
+
+            <View style={styles.inputRow}>
+              <TextInput
+                style={styles.input}
+                placeholder={`Ask ${activePersona.name}...`}
+                placeholderTextColor={THEME.colors.textMuted}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                onSubmitEditing={() => handleAskAi()}
+                returnKeyType="send"
+              />
               <TouchableOpacity
-                key={q}
-                style={styles.chip}
-                onPress={() => {
-                  setSearchQuery(q);
-                  handleAskAi(q);
-                }}
+                onPress={() => handleAskAi()}
+                disabled={isAiThinking}
+                style={[styles.askBtn, { backgroundColor: activePersona.color }]}
               >
-                <Text style={styles.chipText}>{q}</Text>
+                {isAiThinking
+                  ? <ActivityIndicator size="small" color="#fff" />
+                  : <Text style={styles.askBtnText}>Ask →</Text>}
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {activePersona.chips.map((chip) => (
+                <TouchableOpacity
+                  key={chip}
+                  onPress={() => { setSearchQuery(chip); handleAskAi(chip); }}
+                  style={[styles.chip, { borderColor: `${activePersona.color}50` }]}
+                >
+                  <Text style={[styles.chipText, { color: activePersona.color }]}>{chip}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            {isAiThinking && (
+              <View style={styles.thinkRow}>
+                <ActivityIndicator size="small" color={activePersona.color} />
+                <Text style={[styles.thinkText, { color: activePersona.color }]}>{activePersona.name} is thinking...</Text>
+              </View>
+            )}
+
+            {aiResponse && !isAiThinking && (
+              <View style={[styles.responseBox, { borderLeftColor: activePersona.color }]}>
+                <View style={styles.responseHeaderRow}>
+                  <Text style={[styles.responseBadge, { color: activePersona.color }]}>
+                    {aiResponse.source === 'LOCAL_LLM' ? '🤖 ON-DEVICE LLM' : `🛡️ ${activePersona.badge} AI`}
+                  </Text>
+                  <TouchableOpacity onPress={() => setAiResponse(null)}>
+                    <Text style={styles.dismissText}>✕</Text>
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.responseText}>{aiResponse.answer}</Text>
+              </View>
+            )}
+          </Card>
+
+          {/* === CATEGORY FILTER === */}
+          <View style={styles.catRow}>
+            {(['ALL', 'MEDICAL', 'DISASTER', 'APP_MANUAL'] as FilterCategory[]).map((cat) => (
+              <TouchableOpacity
+                key={cat}
+                onPress={() => setSelectedCategory(cat)}
+                style={[styles.catBtn, selectedCategory === cat && styles.catBtnActive]}
+              >
+                <Text style={[styles.catBtnText, selectedCategory === cat && styles.catBtnTextActive]}>
+                  {cat === 'APP_MANUAL' ? 'APP' : cat}
+                </Text>
               </TouchableOpacity>
             ))}
-          </ScrollView>
+          </View>
 
-          {/* AI Response Display */}
-          {aiResponse && (
-            <View style={styles.responseContainer}>
-              <View style={styles.responseHeaderRow}>
-                <Text style={styles.responseSourceBadge}>
-                  {aiResponse.source === 'LOCAL_LLM' ? '🤖 resQ ON-DEVICE LLM' : '🛡️ resQ OFFLINE PROTOCOL'}
-                </Text>
-                <TouchableOpacity onPress={() => setAiResponse(null)}>
-                  <Text style={styles.clearResponseText}>Dismiss</Text>
-                </TouchableOpacity>
-              </View>
-              <Text style={styles.responseText}>{aiResponse.answer}</Text>
-            </View>
-          )}
-        </Card>
-
-        {/* Category Tabs */}
-        <View style={styles.categoryRow}>
-          {(['ALL', 'MEDICAL', 'DISASTER', 'APP_MANUAL'] as FilterCategory[]).map((cat) => (
-            <TouchableOpacity
-              key={cat}
-              style={[styles.categoryBtn, selectedCategory === cat && styles.categoryBtnActive]}
-              onPress={() => setSelectedCategory(cat)}
-            >
-              <Text
-                style={[styles.categoryBtnText, selectedCategory === cat && styles.categoryBtnTextActive]}
-              >
-                {cat === 'APP_MANUAL' ? 'RESQ APP' : cat}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Survival Protocols List */}
-        {filteredProtocols.map((protocol) => {
-          const isExpanded = expandedCardId === protocol.id;
-          return (
-            <TouchableOpacity
-              key={protocol.id}
-              activeOpacity={0.85}
-              onPress={() => setExpandedCardId(isExpanded ? null : protocol.id)}
-            >
-              <Card style={styles.protocolCard}>
-                <View style={styles.protocolTopRow}>
-                  <View style={styles.protocolTitleWrap}>
-                    <Text style={styles.protocolTitle}>{protocol.title}</Text>
-                    <Text style={styles.protocolSub}>{protocol.subtitle}</Text>
-                  </View>
-                  <View
-                    style={[
-                      styles.severityBadge,
-                      protocol.severity === 'CRITICAL' && styles.severityCritical,
-                      protocol.severity === 'HIGH' && styles.severityHigh,
-                      protocol.severity === 'INFO' && styles.severityInfo,
-                    ]}
-                  >
-                    <Text style={styles.severityText}>{protocol.severity}</Text>
-                  </View>
-                </View>
-
-                {/* Steps */}
-                <View style={styles.stepsContainer}>
-                  {(isExpanded ? protocol.steps : protocol.steps.slice(0, 2)).map((step, idx) => (
-                    <View key={idx} style={styles.stepRow}>
-                      <Text style={styles.stepNum}>{idx + 1}.</Text>
-                      <Text style={styles.stepText}>{step}</Text>
+          {/* === SURVIVAL PROTOCOL CARDS === */}
+          {filteredProtocols.map((protocol) => {
+            const expanded = expandedCardId === protocol.id;
+            return (
+              <TouchableOpacity key={protocol.id} activeOpacity={0.85} onPress={() => setExpandedCardId(expanded ? null : protocol.id)}>
+                <Card style={styles.protocolCard}>
+                  <View style={styles.protocolHeader}>
+                    <View style={{ flex: 1, marginRight: 8 }}>
+                      <Text style={styles.protocolTitle}>{protocol.title}</Text>
+                      <Text style={styles.protocolSub}>{protocol.subtitle}</Text>
                     </View>
-                  ))}
-                </View>
-
-                {protocol.warning && isExpanded && (
-                  <View style={styles.warningBox}>
-                    <Text style={styles.warningText}>⚠️ {protocol.warning}</Text>
+                    <View style={[
+                      styles.severityBadge,
+                      protocol.severity === 'CRITICAL' && styles.sevCritical,
+                      protocol.severity === 'HIGH' && styles.sevHigh,
+                      protocol.severity === 'INFO' && styles.sevInfo,
+                    ]}>
+                      <Text style={styles.severityText}>{protocol.severity}</Text>
+                    </View>
                   </View>
-                )}
-
-                <Text style={styles.expandHint}>
-                  {isExpanded ? 'Tap to collapse ▲' : `View all ${protocol.steps.length} steps ▼`}
-                </Text>
-              </Card>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+                  <View style={{ gap: 5 }}>
+                    {(expanded ? protocol.steps : protocol.steps.slice(0, 2)).map((step, i) => (
+                      <View key={i} style={styles.stepRow}>
+                        <Text style={styles.stepNum}>{i + 1}.</Text>
+                        <Text style={styles.stepText}>{step}</Text>
+                      </View>
+                    ))}
+                  </View>
+                  {protocol.warning && expanded && (
+                    <View style={styles.warningBox}>
+                      <Text style={styles.warningText}>⚠️ {protocol.warning}</Text>
+                    </View>
+                  )}
+                  <Text style={styles.expandHint}>
+                    {expanded ? 'Tap to collapse ▲' : `View all ${protocol.steps.length} steps ▼`}
+                  </Text>
+                </Card>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: THEME.colors.background,
-  },
+  container: { flex: 1, backgroundColor: THEME.colors.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.08)',
+    borderBottomColor: THEME.colors.surfaceBorderStrong,
+    backgroundColor: THEME.colors.surface,
   },
-  backBtn: {
-    padding: 8,
-    marginRight: 8,
+  backBtn: { padding: 6, marginRight: 10 },
+  backBtnText: { fontSize: 22, color: THEME.colors.textTitle, fontWeight: '700' },
+  headerTitle: { fontSize: 16, fontWeight: '800', color: THEME.colors.textTitle },
+  headerSub: { fontSize: 11, color: THEME.colors.textMuted, marginTop: 1 },
+  offlineBadge: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    backgroundColor: '#ECFDF5', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10,
   },
-  backBtnText: {
-    fontSize: 22,
-    color: '#FFFFFF',
-    fontWeight: '700',
+  offlineDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#10B981' },
+  offlineBadgeText: { fontSize: 9, fontWeight: '800', color: '#10B981', letterSpacing: 0.5 },
+  scroll: { padding: 16, paddingBottom: 40 },
+  sectionTitle: {
+    fontSize: 10, fontWeight: '800', color: THEME.colors.textMuted,
+    letterSpacing: 1.5, marginBottom: 12,
   },
-  headerTitles: {
-    flex: 1,
+
+  // Persona cards
+  personaRow: { flexDirection: 'row', gap: 10, marginBottom: 18 },
+  personaCard: {
+    flex: 1, alignItems: 'center',
+    backgroundColor: THEME.colors.surface,
+    borderRadius: 16, borderWidth: 1.5,
+    borderColor: THEME.colors.surfaceBorderStrong,
+    paddingVertical: 14, paddingHorizontal: 4, gap: 5,
+    shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 6, elevation: 2,
   },
-  headerTitle: {
-    fontSize: 17,
-    fontWeight: '800',
-    color: '#FFFFFF',
+  personaImgWrap: {
+    width: 56, height: 56, borderRadius: 28,
+    borderWidth: 2, borderColor: THEME.colors.surfaceBorderStrong, overflow: 'hidden',
   },
-  headerSubtitle: {
-    fontSize: 11,
-    color: THEME.colors.textMuted,
+  personaImg: { width: '100%', height: '100%' },
+  activeDot: {
+    position: 'absolute', bottom: 1, right: 1,
+    width: 10, height: 10, borderRadius: 5,
+    borderWidth: 1.5, borderColor: '#fff',
   },
-  offlinePill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(76, 175, 80, 0.15)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    gap: 5,
-  },
-  greenDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#4CAF50',
-  },
-  offlineText: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#4CAF50',
-  },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 40,
-  },
+  personaName: { fontSize: 11, fontWeight: '800', color: THEME.colors.textTitle, textAlign: 'center' },
+  personaRole: { fontSize: 9, color: THEME.colors.textMuted, textAlign: 'center' },
+  personaBadge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 },
+  personaBadgeText: { fontSize: 8, fontWeight: '800', letterSpacing: 0.5 },
+
+  // AI Chat
   aiCard: {
-    backgroundColor: '#1E222A',
-    borderColor: 'rgba(229, 57, 53, 0.3)',
-    marginBottom: 16,
+    borderWidth: 1.5, marginBottom: 16,
+    backgroundColor: THEME.colors.surface,
   },
-  aiHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 4,
+  aiCardHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 12 },
+  aiAvatar: { width: 44, height: 44, borderRadius: 22, borderWidth: 2 },
+  aiName: { fontSize: 15, fontWeight: '800', color: THEME.colors.textTitle },
+  aiRole: { fontSize: 11, color: THEME.colors.textMuted, marginTop: 1 },
+  aiOnlineDot: { width: 10, height: 10, borderRadius: 5 },
+  inputRow: { flexDirection: 'row', gap: 8, marginBottom: 10 },
+  input: {
+    flex: 1, backgroundColor: THEME.colors.surfaceSubtle, borderRadius: 12,
+    paddingHorizontal: 14, paddingVertical: 10,
+    color: THEME.colors.textTitle, fontSize: 13,
+    borderWidth: 1, borderColor: THEME.colors.surfaceBorderStrong,
   },
-  aiTitle: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#FFFFFF',
-  },
-  aiModelBadge: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: THEME.colors.primary,
-    backgroundColor: 'rgba(229, 57, 53, 0.15)',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  aiSubText: {
-    fontSize: 12,
-    color: THEME.colors.textMuted,
-    marginBottom: 12,
-    lineHeight: 16,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 10,
-  },
-  textInput: {
-    flex: 1,
-    backgroundColor: '#14171D',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    color: '#FFFFFF',
-    fontSize: 13,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-  },
-  askButton: {
-    backgroundColor: THEME.colors.primary,
-    paddingHorizontal: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 12,
-  },
-  askButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '800',
-    fontSize: 13,
-  },
-  quickChipsScroll: {
-    flexDirection: 'row',
-    marginBottom: 8,
-  },
+  askBtn: { paddingHorizontal: 16, justifyContent: 'center', alignItems: 'center', borderRadius: 12, minWidth: 72 },
+  askBtnText: { color: '#fff', fontWeight: '800', fontSize: 12 },
   chip: {
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 14,
-    marginRight: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: THEME.colors.surfaceSubtle, paddingHorizontal: 12, paddingVertical: 6,
+    borderRadius: 14, marginRight: 8, borderWidth: 1,
   },
-  chipText: {
-    fontSize: 11,
-    color: '#D0D4DC',
-    fontWeight: '600',
+  chipText: { fontSize: 11, fontWeight: '600' },
+  thinkRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: THEME.colors.surfaceBorder },
+  thinkText: { fontSize: 13, fontWeight: '600' },
+  responseBox: {
+    marginTop: 12, backgroundColor: THEME.colors.surfaceSubtle,
+    padding: 14, borderRadius: 12, borderLeftWidth: 3,
   },
-  responseContainer: {
-    marginTop: 12,
-    backgroundColor: '#14171D',
-    padding: 12,
-    borderRadius: 12,
-    borderLeftWidth: 3,
-    borderLeftColor: THEME.colors.primary,
+  responseHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  responseBadge: { fontSize: 10, fontWeight: '800' },
+  dismissText: { fontSize: 14, color: THEME.colors.textMuted },
+  responseText: { fontSize: 13, lineHeight: 20, color: THEME.colors.textTitle },
+
+  // Category
+  catRow: { flexDirection: 'row', gap: 6, marginBottom: 14 },
+  catBtn: {
+    flex: 1, paddingVertical: 7, alignItems: 'center', borderRadius: 10,
+    backgroundColor: THEME.colors.surfaceSubtle, borderWidth: 1, borderColor: THEME.colors.surfaceBorderStrong,
   },
-  responseHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  responseSourceBadge: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#60A5FA',
-  },
-  clearResponseText: {
-    fontSize: 11,
-    color: THEME.colors.textMuted,
-  },
-  responseText: {
-    fontSize: 13,
-    lineHeight: 19,
-    color: '#E2E8F0',
-  },
-  categoryRow: {
-    flexDirection: 'row',
-    gap: 6,
-    marginBottom: 14,
-  },
-  categoryBtn: {
-    flex: 1,
-    paddingVertical: 7,
-    alignItems: 'center',
-    borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-  },
-  categoryBtnActive: {
-    backgroundColor: THEME.colors.primary,
-  },
-  categoryBtnText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: THEME.colors.textMuted,
-  },
-  categoryBtnTextActive: {
-    color: '#FFFFFF',
-  },
-  protocolCard: {
-    marginBottom: 12,
-  },
-  protocolTopRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 10,
-  },
-  protocolTitleWrap: {
-    flex: 1,
-    marginRight: 8,
-  },
-  protocolTitle: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#FFFFFF',
-    marginBottom: 2,
-  },
-  protocolSub: {
-    fontSize: 12,
-    color: THEME.colors.textMuted,
-  },
-  severityBadge: {
-    paddingHorizontal: 7,
-    paddingVertical: 3,
-    borderRadius: 6,
-  },
-  severityCritical: {
-    backgroundColor: 'rgba(229, 57, 53, 0.2)',
-  },
-  severityHigh: {
-    backgroundColor: 'rgba(245, 158, 11, 0.2)',
-  },
-  severityInfo: {
-    backgroundColor: 'rgba(59, 130, 246, 0.2)',
-  },
-  severityText: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#FFFFFF',
-  },
-  stepsContainer: {
-    gap: 6,
-  },
-  stepRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-  },
-  stepNum: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: THEME.colors.primary,
-    width: 20,
-  },
-  stepText: {
-    flex: 1,
-    fontSize: 13,
-    lineHeight: 18,
-    color: '#D1D5DB',
-  },
+  catBtnActive: { backgroundColor: THEME.colors.primaryRed, borderColor: THEME.colors.primaryRed },
+  catBtnText: { fontSize: 10, fontWeight: '700', color: THEME.colors.textSub },
+  catBtnTextActive: { color: '#fff' },
+
+  // Protocol cards
+  protocolCard: { marginBottom: 12, backgroundColor: THEME.colors.surface },
+  protocolHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 },
+  protocolTitle: { fontSize: 15, fontWeight: '800', color: THEME.colors.textTitle, marginBottom: 2 },
+  protocolSub: { fontSize: 12, color: THEME.colors.textSub },
+  severityBadge: { paddingHorizontal: 7, paddingVertical: 3, borderRadius: 6 },
+  sevCritical: { backgroundColor: 'rgba(229,57,53,0.1)' },
+  sevHigh: { backgroundColor: 'rgba(245,158,11,0.1)' },
+  sevInfo: { backgroundColor: 'rgba(59,130,246,0.1)' },
+  severityText: { fontSize: 10, fontWeight: '800', color: THEME.colors.textTitle },
+  stepRow: { flexDirection: 'row', alignItems: 'flex-start' },
+  stepNum: { fontSize: 12, fontWeight: '800', color: THEME.colors.primaryRed, width: 20 },
+  stepText: { flex: 1, fontSize: 13, lineHeight: 18, color: THEME.colors.textSub },
   warningBox: {
-    marginTop: 8,
-    backgroundColor: 'rgba(239, 68, 68, 0.12)',
-    padding: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(239, 68, 68, 0.25)',
+    marginTop: 8, backgroundColor: 'rgba(239,68,68,0.07)',
+    padding: 8, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(239,68,68,0.2)',
   },
-  warningText: {
-    fontSize: 12,
-    color: '#FCA5A5',
-    fontWeight: '600',
-  },
-  expandHint: {
-    fontSize: 11,
-    color: THEME.colors.primary,
-    fontWeight: '700',
-    marginTop: 10,
-    textAlign: 'center',
-  },
+  warningText: { fontSize: 12, color: '#DC2626', fontWeight: '600' },
+  expandHint: { fontSize: 11, color: THEME.colors.primaryRed, fontWeight: '700', marginTop: 10, textAlign: 'center' },
 });

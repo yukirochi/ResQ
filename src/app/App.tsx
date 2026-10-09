@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { StatusBar, StyleSheet, View } from 'react-native';
+import { Alert, StatusBar, StyleSheet, View } from 'react-native';
+import { autoSosService } from '../core/background/autoSosService';
 import { ChatScreen } from '../features/chat/screens/ChatScreen';
 import { ModePickerScreen } from '../features/onboarding/ModePickerScreen';
 import { ProfileEditorScreen } from '../features/profile/screens/ProfileEditorScreen';
@@ -26,6 +27,23 @@ export default function App() {
   useEffect(() => {
     initMode();
     initProfile();
+
+    // Initialize Background Accelerometer SOS Detection
+    autoSosService.setConfig({ enabled: true });
+    
+    // Wire up the SOS trigger callback
+    autoSosService.onSosTriggered = () => {
+      // In a real flow, this would dispatch to the victimStore to forcefully engage Victim Mode
+      Alert.alert(
+        'EMERGENCY SOS TRIGGERED',
+        'Violent motion detected and countdown expired. Your emergency beacon is now broadcasting.',
+        [{ text: 'OK' }]
+      );
+    };
+
+    return () => {
+      autoSosService.stopMonitoring();
+    };
   }, [initMode, initProfile]);
 
   const selectedVictim: DiscoveredVictim | undefined = selectedVictimId

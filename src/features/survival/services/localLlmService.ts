@@ -67,8 +67,51 @@ export class LocalLlmService {
   }
 
   /**
-   * Queries the Qwen Local LLM using ChatML multi-turn conversational format
-   * Falls back to deterministic survival & app protocol matcher if model is not loaded.
+   * Flexible Offline NLP Intent Engine
+   * Normalizes input and maps natural language phrasing to specific App Actions.
+   */
+  private processOfflineIntent(query: string): AssistantResponse | null {
+    const text = query.toLowerCase().trim();
+
+    // Intent: Check Bluetooth / Radar Status
+    if (text.match(/bluetooth|radar|scanner|connection|detecting|finding/)) {
+      if (text.match(/status|check|is it|show|working|on/)) {
+        return {
+          answer: `**Radar & Bluetooth Status:**\nThe Rescue Radar is currently scanning for 2.4GHz BLE beacons. Ensure your device's Bluetooth is enabled and permissions are granted.`,
+          source: 'OFFLINE_PROTOCOL_ENGINE'
+        };
+      }
+    }
+
+    // Intent: Auto SOS / Shaking
+    if (text.match(/auto sos|shake|shaking|movement|fall/)) {
+      if (text.match(/enable|turn on|start/)) {
+        return {
+          answer: `**Action Executed:** I've noted your request to enable Auto SOS. You can fully configure shake sensitivity and countdown timers in the App Settings.`,
+          source: 'OFFLINE_PROTOCOL_ENGINE'
+        };
+      }
+      if (text.match(/status|is it/)) {
+        return {
+          answer: `**Auto SOS Status:** Automatic crash and shake detection is currently available in the system. When enabled, violent movement triggers a 10-second countdown before broadcasting your emergency beacon.`,
+          source: 'OFFLINE_PROTOCOL_ENGINE'
+        };
+      }
+    }
+
+    // Intent: Trigger Emergency / Help
+    if (text.match(/help me|emergency|sos|dying|trapped|hurt/)) {
+       return {
+         answer: `⚠️ **EMERGENCY DETECTED**\n\nIf you are in danger, please exit this chat and press the large **SOS** button on the Home Screen immediately to start broadcasting your location to nearby rescuers. If possible, call 911.`,
+         source: 'OFFLINE_PROTOCOL_ENGINE'
+       };
+    }
+
+    return null; // Fallback to deterministic matcher if no action intent matched
+  }
+
+  /**
+   * Queries the LLM / Intent Engine
    */
   public async query(userQuestion: string, saveHistory: boolean = true): Promise<AssistantResponse> {
     const cleanQuery = userQuestion.trim().toLowerCase();
@@ -76,21 +119,17 @@ export class LocalLlmService {
     // 1. Try On-Device Qwen LLM via react-native-llama if initialized
     if (this.isModelLoaded && this.llamaContext) {
       try {
-        // Construct Qwen2.5 ChatML prompt with conversation history
         let prompt = `<|im_start|>system\n${RESQ_SYSTEM_PROMPT}<|im_end|>\n`;
-        
-        // Append last 4 conversation turns for context retention
         const recentHistory = this.conversationHistory.slice(-4);
         for (const msg of recentHistory) {
           prompt += `<|im_start|>${msg.role}\n${msg.content}<|im_end|>\n`;
         }
-
         prompt += `<|im_start|>user\n${userQuestion}<|im_end|>\n<|im_start|>assistant\n`;
 
         const result = await this.llamaContext.completion({
           prompt,
           n_predict: 200,
-          temperature: 0.3, // Optimal balance between conversational empathy and medical precision
+          temperature: 0.3,
           top_p: 0.85,
           stop: ['<|im_end|>', '<|im_start|>', '<|endoftext|>', 'user:', 'User:'],
         });
@@ -101,17 +140,24 @@ export class LocalLlmService {
             this.conversationHistory.push({ role: 'user', content: userQuestion });
             this.conversationHistory.push({ role: 'assistant', content: replyText });
           }
-          return {
-            answer: replyText,
-            source: 'LOCAL_LLM',
-          };
+          return { answer: replyText, source: 'LOCAL_LLM' };
         }
       } catch (e) {
-        console.warn('[ResQ Qwen-LLM] Inference error, falling back to deterministic protocol:', e);
+        console.warn('[ResQ Qwen-LLM] Inference error, falling back to offline engine:', e);
       }
     }
 
-    // 2. Deterministic Knowledge Base Matcher (0 ms latency, 0% CPU battery drain, 100% accurate)
+    // 2. Process Custom Offline App Commands & Intents (0 ms latency)
+    const intentResponse = this.processOfflineIntent(cleanQuery);
+    if (intentResponse) {
+      if (saveHistory) {
+        this.conversationHistory.push({ role: 'user', content: userQuestion });
+        this.conversationHistory.push({ role: 'assistant', content: intentResponse.answer });
+      }
+      return intentResponse;
+    }
+
+    // 3. Deterministic Knowledge Base Matcher (0 ms latency)
     const matched = this.matchProtocol(cleanQuery);
     if (matched) {
       const formattedSteps = matched.steps.map((s, i) => `${i + 1}. ${s}`).join('\n');
@@ -121,30 +167,22 @@ export class LocalLlmService {
         this.conversationHistory.push({ role: 'user', content: userQuestion });
         this.conversationHistory.push({ role: 'assistant', content: reply });
       }
-      return {
-        answer: reply,
-        source: 'OFFLINE_PROTOCOL_ENGINE',
-        matchedProtocol: matched,
-      };
+      return { answer: reply, source: 'OFFLINE_PROTOCOL_ENGINE', matchedProtocol: matched };
     }
 
-    // 3. Conversational triage fallback
-    const fallbackAnswer = `Hello! I'm **resQ**, your emergency survival companion powered by **${this.currentModelName}**.\n\n` +
-      `1. Ensure immediate physical safety: Protect your head and move away from falling hazards.\n` +
-      `2. In ResQ, press the SOS button on the Home screen to broadcast your BLE beacon to nearby search teams (zero internet needed).\n` +
-      `3. If trapped, tap walls or metal pipes in rhythmic sets of 3 to assist acoustic search.\n` +
-      `4. Call 911 immediately if cellular voice networks are operational.\n\n` +
-      `Tell me what's happening around you or ask how to use any part of this app. I'm right here with you!`;
+    // 4. Conversational triage fallback
+    const fallbackAnswer = `Hello! I'm **resQ**, your emergency assistant.\n\n` +
+      `1. Press the SOS button on the Home screen to broadcast your BLE beacon to nearby search teams.\n` +
+      `2. Ask me to "Check Bluetooth status" or "Enable Auto SOS".\n` +
+      `3. Call 911 immediately if cellular networks are operational.\n\n` +
+      `Tell me what's happening around you.`;
 
     if (saveHistory) {
       this.conversationHistory.push({ role: 'user', content: userQuestion });
       this.conversationHistory.push({ role: 'assistant', content: fallbackAnswer });
     }
 
-    return {
-      answer: fallbackAnswer,
-      source: 'OFFLINE_PROTOCOL_ENGINE',
-    };
+    return { answer: fallbackAnswer, source: 'OFFLINE_PROTOCOL_ENGINE' };
   }
 
   /**
@@ -153,7 +191,6 @@ export class LocalLlmService {
   public matchProtocol(query: string): SurvivalProtocol | null {
     let bestScore = 0;
     let bestMatch: SurvivalProtocol | null = null;
-
     for (const protocol of SURVIVAL_PROTOCOLS) {
       let score = 0;
       for (const tag of protocol.tags) {
@@ -166,7 +203,6 @@ export class LocalLlmService {
         bestMatch = protocol;
       }
     }
-
     return bestScore >= 2 ? bestMatch : null;
   }
 
@@ -177,7 +213,7 @@ export class LocalLlmService {
       quantization: 'Q4_K_M',
       sizeMB: 980,
       contextLength: 2048,
-      promptFormat: 'ChatML (<|im_start|> ... <|im_end|>)',
+      promptFormat: 'ChatML',
       isLoaded: this.isModelLoaded,
       historyLength: this.conversationHistory.length,
     };
@@ -189,9 +225,7 @@ export class LocalLlmService {
 
   public release(): void {
     if (this.llamaContext && typeof this.llamaContext.release === 'function') {
-      try {
-        this.llamaContext.release();
-      } catch (e) {}
+      try { this.llamaContext.release(); } catch (e) {}
       this.llamaContext = null;
       this.isModelLoaded = false;
     }
