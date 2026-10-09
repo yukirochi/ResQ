@@ -52,7 +52,11 @@ class BleAdvertiserModule(private val context: Context) {
         // Pack 8-byte Ephemeral ID + 1-byte Status Flag
         val payload = ByteArray(9)
         val cleanHex = ephemeralIdHex.replace("[^0-9A-Fa-f]".toRegex(), "").padEnd(16, '0').substring(0, 16)
-        for (i in 0 until 8) {
+        val stableId = ResQDeviceIdentity.get(context)
+        for (i in 0 until 4) {
+            payload[i] = stableId.substring(i * 2, i * 2 + 2).toInt(16).toByte()
+        }
+        for (i in 4 until 8) {
             payload[i] = cleanHex.substring(i * 2, i * 2 + 2).toInt(16).toByte()
         }
         payload[8] = (statusByte and 0xFF).toByte()

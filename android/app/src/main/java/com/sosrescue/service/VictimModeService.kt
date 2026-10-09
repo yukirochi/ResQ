@@ -96,10 +96,11 @@ class VictimModeService : Service() {
         )
 
         gattServerModule?.startGattServer(isSos = true, profileJson = profileJson)
-        gattServerModule?.onInboundChatMessageReceived = { address, messageId, message ->
+        gattServerModule?.onInboundChatMessageReceived = { address, messageId, message, senderDeviceId ->
             sendBroadcast(Intent(com.sosrescue.ble.BleChatMeshModule.ACTION_INCOMING)
                 .setPackage(packageName)
                 .putExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_PEER, address)
+                .putExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_DEVICE_ID, senderDeviceId)
                 .putExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_MESSAGE_ID, messageId)
                 .putExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_TEXT, message))
         }

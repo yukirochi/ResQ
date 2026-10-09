@@ -408,6 +408,20 @@
     }
     .radar-header-title { font-size: 20px; font-weight: 900; color: var(--text-main); }
     .radar-header-mascot { width: 56px; height: 56px; object-fit: contain; border-radius: 14px; background: #FFF8F8; border: 1px solid var(--border-subtle); }
+    .radar-scan-row { display:flex; align-items:center; gap:10px; margin:0 0 12px; }
+    .btn-radar-scan { flex:1; min-height:44px; border:0; border-radius:14px; background:var(--red-primary); color:#fff; font-family:inherit; font-size:13px; font-weight:800; cursor:pointer; box-shadow:0 5px 14px rgba(229,57,53,.2); }
+    .btn-radar-scan.active { background:#2f8f62; box-shadow:0 5px 14px rgba(47,143,98,.18); }
+    .radar-scan-status { min-width:90px; color:var(--text-muted); font-size:10px; font-weight:700; }
+    .people-picker { background:var(--bg-card); border:1px solid var(--border-subtle); border-radius:16px; padding:9px 10px; margin:0 0 10px; box-shadow:var(--shadow-card); }
+    .people-picker-heading { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; color:var(--text-main); font-size:11px; font-weight:800; }
+    .people-picker-count { color:var(--text-muted); font-size:10px; font-weight:700; }
+    .people-picker-list { display:flex; flex-direction:column; gap:6px; max-height:112px; overflow-y:auto; overscroll-behavior:contain; padding:1px 3px 1px 1px; scrollbar-width:thin; scrollbar-color:#d5bfc1 transparent; }
+    .people-picker-list::-webkit-scrollbar { width:4px; }
+    .people-picker-list::-webkit-scrollbar-thumb { background:#d5bfc1; border-radius:4px; }
+    .people-picker-list:empty::after { content:'No people detected yet'; padding:7px 3px; color:var(--text-muted); font-size:10px; }
+    .person-select-row { flex:0 0 auto; width:100%; min-height:34px; display:flex; align-items:center; justify-content:space-between; gap:8px; border:1px solid var(--border-subtle); border-radius:11px; padding:7px 10px; background:#fff; color:var(--text-main); font-family:inherit; font-size:11px; font-weight:700; text-align:left; cursor:pointer; }
+    .person-select-row.selected { border-color:var(--red-primary); background:var(--red-soft); }
+    .person-select-meta { color:var(--text-muted); font-size:10px; white-space:nowrap; }
 
     .radar-scope-wrapper {
       background: var(--bg-card);
@@ -1057,6 +1071,8 @@
     .chat-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border-subtle); }
     .chat-header-mascot { width: 56px; height: 56px; object-fit: contain; border-radius: 14px; background: #FFF8F8; border: 1px solid var(--border-subtle); flex-shrink: 0; }
     .chat-stream-box { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; min-height: 200px; }
+    #screenChat { overflow-y:auto; }
+    #screenChat .chat-people-picker { flex-shrink:0; position:relative; z-index:1; }
     .chat-bubble { max-width: 82%; padding: 10px 14px; font-size: 13px; line-height: 18px; border-radius: 18px; }
     .bubble-in { align-self: flex-start; background: #F0F2F5; color: var(--text-main); border-bottom-left-radius: 4px; }
     .bubble-out { align-self: flex-end; background: var(--red-primary); color: #FFFFFF; border-bottom-right-radius: 4px; box-shadow: 0 4px 12px rgba(229, 57, 53, 0.25); }
@@ -1795,6 +1811,11 @@
         <img class="radar-header-mascot" src="images/3.jpg" alt="ResQ scout using binoculars">
       </div>
 
+      <div class="radar-scan-row">
+        <button id="btnRadarScan" class="btn-radar-scan" type="button" aria-pressed="false" onclick="toggleRadarScan()">Scan nearby</button>
+        <span id="radarScanStatus" class="radar-scan-status" aria-live="polite">Scan when ready</span>
+      </div>
+
       <!-- Scope Housing -->
       <div class="radar-scope-wrapper">
         <div class="radar-scale-bar">
@@ -1821,7 +1842,10 @@
         <span id="btnToggleBeaconText">Simulate Nearby People</span>
       </button>
 
-      <div id="radarPeopleList" style="display:flex; gap:8px; overflow-x:auto; padding:8px 2px;"></div>
+      <div class="people-picker" aria-label="Detected people">
+        <div class="people-picker-heading"><span>Detected people</span><span id="radarPeerCount" class="people-picker-count">0 nearby</span></div>
+        <div id="radarPeopleList" class="people-picker-list" role="listbox" aria-label="Select a person to view details"></div>
+      </div>
 
       <!-- Quick Proximity Adjustment (Active when target is locked) -->
       <div class="quick-calib-row" id="quickCalibRow">
@@ -2042,7 +2066,10 @@
         </button>
       </div>
 
-      <div id="chatPeopleList" style="display:flex; gap:8px; overflow-x:auto; padding:8px 12px;"></div>
+      <div class="people-picker chat-people-picker" aria-label="People available to message">
+        <div class="people-picker-heading"><span>People nearby</span><span id="chatPeerCount" class="people-picker-count">0 available</span></div>
+        <div id="chatPeopleList" class="people-picker-list" role="listbox" aria-label="Select a person to message"></div>
+      </div>
 
       <div class="chat-stream-box" id="chatStreamBox">
         <div class="chat-empty-hint" id="chatEmptyHint">
@@ -2629,21 +2656,50 @@
     // Active target node is NULL by default
     let activeTargetNode = null;
     const radarTargets = new Map();
+    let radarScanActive = false;
     let activeChatPeerId = 'nearby';
     let activeChatPeerName = 'Nearby';
 
     function targetId(node) { return node.isSimulated ? node.id : node.address; }
     function chatStorageKey() { return STORAGE_KEY_CHAT + ':' + activeChatPeerId; }
+    function setRadarScanActive(active) {
+      radarScanActive = !!active;
+      const button = document.getElementById('btnRadarScan');
+      const status = document.getElementById('radarScanStatus');
+      if (button) { button.classList.toggle('active', radarScanActive); button.setAttribute('aria-pressed', String(radarScanActive)); button.textContent = radarScanActive ? 'Stop scanning' : 'Scan nearby'; }
+      if (status) status.textContent = radarScanActive ? 'Searching nearby beacons' : 'Scan when ready';
+    }
+    function toggleRadarScan() {
+      if (!window.ResQNative) { showToast('Bluetooth scanning is unavailable'); return; }
+      if (radarScanActive) {
+        if (typeof window.ResQNative.stopBleScanning === 'function') window.ResQNative.stopBleScanning();
+        setRadarScanActive(false);
+      } else if (typeof window.ResQNative.startBleScanning === 'function') {
+        window.ResQNative.startBleScanning();
+        setRadarScanActive(true);
+      } else showToast('Bluetooth scanning is unavailable');
+    }
     function renderPeopleLists() {
       const targets = Array.from(radarTargets.values());
       const radarList = document.getElementById('radarPeopleList');
       const chatList = document.getElementById('chatPeopleList');
+      const radarCount = document.getElementById('radarPeerCount');
+      const chatCount = document.getElementById('chatPeerCount');
+      if (radarCount) radarCount.textContent = targets.length + ' nearby';
+      if (chatCount) chatCount.textContent = targets.length + ' available';
       const chip = (node, chat) => {
         const id = targetId(node);
         const button = document.createElement('button');
         button.type = 'button';
-        button.textContent = node.name + (chat ? '' : ' · ' + calculateDistance(node.filteredRssi).toFixed(1) + 'm');
-        button.style.cssText = 'white-space:nowrap;border:1px solid #e6dadd;border-radius:18px;padding:8px 12px;background:' + ((chat ? activeChatPeerId === id : activeTargetNode === node) ? '#fde8e8' : '#fff') + ';color:#383038;font-weight:700;';
+        button.className = 'person-select-row' + ((chat ? activeChatPeerId === id : activeTargetNode === node) ? ' selected' : '');
+        button.setAttribute('role', 'option');
+        button.setAttribute('aria-selected', String(chat ? activeChatPeerId === id : activeTargetNode === node));
+        const name = document.createElement('span');
+        name.textContent = node.name;
+        const meta = document.createElement('span');
+        meta.className = 'person-select-meta';
+        meta.textContent = chat ? 'Message' : calculateDistance(node.filteredRssi).toFixed(1) + ' m away';
+        button.append(name, meta);
         button.onclick = () => chat ? selectChatPeer(node) : selectRadarTarget(node);
         return button;
       };
@@ -3034,21 +3090,18 @@
     /* ============================================================
        NATIVE HARDWARE BLE MESH BEACON LISTENER
        ============================================================ */
-    window.onNativeBleBeaconDetected=function(address,rawRssi,profileJson){let parsed=null;try{if(profileJson)parsed=JSON.parse(profileJson)}catch(e){}const name=(parsed&&parsed.name)||('Victim ['+address.slice(-5)+']'), blood=(parsed&&parsed.bloodType)||'O+', conditions=(parsed&&parsed.conditions)||{};let node=radarTargets.get(address);if(!node){let hash=0;for(let i=0;i<address.length;i++)hash=(hash*31+address.charCodeAt(i))|0;node={address,name,bloodType:blood,conditions,angleDeg:((Math.abs(hash)%360)||35),trueDistance:calculateDistance(rawRssi),filteredRssi:rawRssi,kalmanP:.05,conditionDesc:'Hardware BLE Beacon Locked',isRealHardware:true};radarTargets.set(address,node);if(!activeTargetNode)activeTargetNode=node;showToast('Emergency beacon detected: '+name);if(window.ResQNative&&window.ResQNative.triggerVibrate)window.ResQNative.triggerVibrate(100)}else{const prior=node.kalmanP+.04,gain=prior/(prior+1.8);node.filteredRssi+=gain*(rawRssi-node.filteredRssi);node.kalmanP=(1-gain)*prior;node.trueDistance=calculateDistance(rawRssi);if(parsed){node.name=name;node.bloodType=blood;node.conditions=conditions}}if(activeTargetNode===node)selectRadarTarget(node);else renderPeopleLists()};
+    window.onNativeBleBeaconDetected=function(address,rawRssi,profileJson){let parsed=null;try{if(profileJson)parsed=JSON.parse(profileJson)}catch(e){}const name=(parsed&&parsed.name)||('Victim ['+address.slice(-5)+']'), blood=(parsed&&parsed.bloodType)||'O+', conditions=(parsed&&parsed.conditions)||{};let node=radarTargets.get(address);if(!node&&parsed?.deviceId){const match=Array.from(radarTargets.entries()).find(([,candidate])=>candidate.deviceId===parsed.deviceId);if(match){const [oldAddress,existing]=match;radarTargets.delete(oldAddress);existing.address=address;node=existing;radarTargets.set(address,node);if(activeChatPeerId===oldAddress){const historyKey=STORAGE_KEY_CHAT+':'+oldAddress,history=localStorage.getItem(historyKey);if(history){localStorage.setItem(STORAGE_KEY_CHAT+':'+address,history);localStorage.removeItem(historyKey)}activeChatPeerId=address}}}if(!node){let hash=0;for(let i=0;i<address.length;i++)hash=(hash*31+address.charCodeAt(i))|0;node={address,name,bloodType:blood,conditions,deviceId:(parsed&&parsed.deviceId)||'',angleDeg:((Math.abs(hash)%360)||35),trueDistance:calculateDistance(rawRssi),filteredRssi:rawRssi,kalmanP:.05,conditionDesc:'Hardware BLE Beacon Locked',isRealHardware:true};radarTargets.set(address,node);if(!activeTargetNode)activeTargetNode=node;showToast('Emergency beacon detected: '+name);if(window.ResQNative&&window.ResQNative.triggerVibrate)window.ResQNative.triggerVibrate(100)}else{const prior=node.kalmanP+.04,gain=prior/(prior+1.8);node.filteredRssi+=gain*(rawRssi-node.filteredRssi);node.kalmanP=(1-gain)*prior;node.trueDistance=calculateDistance(rawRssi);if(parsed){node.name=name;node.bloodType=blood;node.conditions=conditions;node.deviceId=parsed.deviceId||node.deviceId}}if(activeTargetNode===node)selectRadarTarget(node);else renderPeopleLists()};
 
     function switchTab(screenId) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.dock-tab').forEach(t => t.classList.remove('active'));
       const dock = document.getElementById('bottomDock');
 
-      if (screenId === 'radar') {
-        if (window.ResQNative && typeof window.ResQNative.startBleScanning === 'function') {
-          window.ResQNative.startBleScanning();
-        }
-      } else {
+      if (screenId !== 'radar') {
         if (window.ResQNative && typeof window.ResQNative.stopBleScanning === 'function') {
           window.ResQNative.stopBleScanning();
         }
+        setRadarScanActive(false);
       }
 
       if (screenId === 'chat' && window.ResQNative && typeof window.ResQNative.startBleChat === 'function') {
@@ -3248,7 +3301,8 @@
     function renderChatBubble(text,type,timeStr,messageId='',status='',detail=''){const stream=document.getElementById('chatStreamBox'),bubble=document.createElement('div');if(type==='system'){bubble.className='chat-bubble bubble-system';bubble.textContent=text}else{const incoming=type==='in';bubble.className=incoming?'chat-bubble bubble-in':'chat-bubble bubble-out';if(messageId)bubble.dataset.messageId=String(messageId);bubble.textContent=text;const meta=document.createElement('div');meta.className='bubble-sub';meta.textContent=[timeStr,status,detail].filter(Boolean).join(' ? ');bubble.appendChild(meta)}stream.appendChild(bubble);stream.scrollTop=stream.scrollHeight}
     function addChatMessage(text,type,messageId='',status='',messageKey=''){const hint=document.getElementById('chatEmptyHint');if(hint)hint.style.display='none';const time=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});try{const list=JSON.parse(localStorage.getItem(chatStorageKey())||'[]');list.push({text,type,time,messageId,status,messageKey});localStorage.setItem(chatStorageKey(),JSON.stringify(list.slice(-300)))}catch(e){}renderChatBubble(text,type,time,messageId,status)}
     function updateChatDelivery(messageId,status,detail,peerId=activeChatPeerId){const labels={delivered:'DELIVERED',partial:'PARTIALLY DELIVERED',failed:'NOT SENT'};try{const key=STORAGE_KEY_CHAT+':'+peerId,list=JSON.parse(localStorage.getItem(key)||'[]'),item=list.find(entry=>String(entry.messageId)===String(messageId));if(item){item.status=labels[status]||'SENDING';item.detail=detail||'';localStorage.setItem(key,JSON.stringify(list))}}catch(e){}if(peerId===activeChatPeerId){const bubble=Array.from(document.querySelectorAll('#chatStreamBox .chat-bubble[data-message-id]')).find(item=>item.dataset.messageId===String(messageId));if(bubble){const meta=bubble.querySelector('.bubble-sub');if(meta)meta.textContent=labels[status]||'SENDING'}}}
-    window.onNativeBleChatMessage=function(address,messageId,text){const key=STORAGE_KEY_CHAT+':'+address,messageKey=address+':'+messageId;try{const history=JSON.parse(localStorage.getItem(key)||'[]');if(history.some(item=>item.messageKey===messageKey))return;const time=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});history.push({text,type:'in',time,status:'RECEIVED',messageKey});localStorage.setItem(key,JSON.stringify(history.slice(-300)))}catch(e){}if(activeChatPeerId===address)loadChatHistory();showToast('Message received from '+(radarTargets.get(address)?.name||address.slice(-5)))};
+    window.onNativeBleChatPeerDiscovered=function(address,name,deviceId,rssi=-80){if(!address)return;let node=radarTargets.get(address);if(!node&&deviceId){const match=Array.from(radarTargets.entries()).find(([,candidate])=>candidate.deviceId===deviceId);if(match){const [oldAddress,existing]=match;radarTargets.delete(oldAddress);existing.address=address;node=existing;radarTargets.set(address,node);if(activeChatPeerId===oldAddress)activeChatPeerId=address}}if(!node){const stableName=name||('Nearby peer ['+address.slice(-5)+']');let hash=0;for(let i=0;i<address.length;i++)hash=(hash*31+address.charCodeAt(i))|0;node={address,name:stableName,deviceId:deviceId||'',bloodType:'',conditions:{},angleDeg:((Math.abs(hash)%360)||35),trueDistance:calculateDistance(rssi),filteredRssi:rssi,kalmanP:.05,conditionDesc:'Nearby ResQ device',isRealHardware:true};radarTargets.set(address,node)}else{node.name=name||node.name;if(deviceId)node.deviceId=deviceId;node.filteredRssi=rssi;node.trueDistance=calculateDistance(rssi)}renderPeopleLists()};
+    window.onNativeBleChatMessage=function(address,messageId,text,senderDeviceId=''){window.onNativeBleChatPeerDiscovered(address,'Nearby peer ['+address.slice(-5)+']',senderDeviceId,-80);const matchedPeer=Array.from(radarTargets.values()).find(node=>senderDeviceId&&node.deviceId===senderDeviceId),peerId=matchedPeer?.address||address,key=STORAGE_KEY_CHAT+':'+peerId,messageKey=peerId+':'+messageId;try{const history=JSON.parse(localStorage.getItem(key)||'[]');if(history.some(item=>item.messageKey===messageKey))return;const time=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});history.push({text,type:'in',time,status:'RECEIVED',messageKey});localStorage.setItem(key,JSON.stringify(history.slice(-300)))}catch(e){}if(activeChatPeerId==='nearby'){activeChatPeerId=peerId;activeChatPeerName=radarTargets.get(peerId)?.name||'Nearby peer';document.getElementById('chatChannelTitle').innerText='Chat with '+activeChatPeerName}if(activeChatPeerId===peerId)loadChatHistory();renderPeopleLists();showToast('Message received from '+(radarTargets.get(peerId)?.name||peerId.slice(-5)))};
     window.onNativeBleChatDelivery=function(messageId,status,detail,address){updateChatDelivery(messageId,status,detail,address||activeChatPeerId)};
     function sendChatMessage(){const input=document.getElementById('chatInput'),text=input.value.trim();if(!text)return;if(text.length>500){showToast('Messages can be up to 500 characters.');return}const messageId=window.crypto&&crypto.getRandomValues?(crypto.getRandomValues(new Uint32Array(1))[0]&0x7fffffff):(Date.now()&0x7fffffff);input.value='';if(activeChatPeerId.startsWith('sim-')){addChatMessage(text,'out',messageId,'SIMULATION ONLY');return}if(activeChatPeerId==='nearby'){showToast('Select a detected person before sending.');return}addChatMessage(text,'out',messageId,'SENDING');if(window.ResQNative&&typeof window.ResQNative.sendBleChatMessage==='function')window.ResQNative.sendBleChatMessage(messageId,activeChatPeerId,text);else updateChatDelivery(messageId,'failed','Bluetooth messaging requires the ResQ Android app.')}
     /* ============================================================

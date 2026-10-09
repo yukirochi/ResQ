@@ -128,8 +128,9 @@ class MainActivity : AppCompatActivity() {
                     val address = org.json.JSONObject.quote(intent.getStringExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_PEER) ?: "")
                     val messageId = org.json.JSONObject.quote(intent.getStringExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_MESSAGE_ID) ?: "")
                     val text = org.json.JSONObject.quote(intent.getStringExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_TEXT) ?: "")
+                    val deviceId = org.json.JSONObject.quote(intent.getStringExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_DEVICE_ID) ?: "")
                     webView.post {
-                        webView.evaluateJavascript("if (typeof window.onNativeBleChatMessage === 'function') window.onNativeBleChatMessage($address, $messageId, $text);", null)
+                        webView.evaluateJavascript("if (typeof window.onNativeBleChatMessage === 'function') window.onNativeBleChatMessage($address, $messageId, $text, $deviceId);", null)
                     }
                 }
                 com.sosrescue.ble.BleChatMeshModule.ACTION_DELIVERY -> {
@@ -141,6 +142,15 @@ class MainActivity : AppCompatActivity() {
                         webView.evaluateJavascript("if (typeof window.onNativeBleChatDelivery === 'function') window.onNativeBleChatDelivery($messageId, $status, $detail, $address);", null)
                     }
                 }
+                com.sosrescue.ble.BleChatMeshModule.ACTION_PEER_DISCOVERED -> {
+                    val address = org.json.JSONObject.quote(intent.getStringExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_PEER) ?: "")
+                    val deviceId = org.json.JSONObject.quote(intent.getStringExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_DEVICE_ID) ?: "")
+                    val name = org.json.JSONObject.quote(intent.getStringExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_NAME) ?: "Nearby peer")
+                    val rssi = intent.getIntExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_RSSI, -80)
+                    webView.post {
+                        webView.evaluateJavascript("if (typeof window.onNativeBleChatPeerDiscovered === 'function') window.onNativeBleChatPeerDiscovered($address, $name, $deviceId, $rssi);", null)
+                    }
+                }
             }
         }
     }
@@ -149,6 +159,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         val filter = android.content.IntentFilter(com.sosrescue.ble.BleChatMeshModule.ACTION_INCOMING)
         filter.addAction(com.sosrescue.ble.BleChatMeshModule.ACTION_DELIVERY)
+        filter.addAction(com.sosrescue.ble.BleChatMeshModule.ACTION_PEER_DISCOVERED)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(sirenReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
         } else {
@@ -185,9 +196,10 @@ class MainActivity : AppCompatActivity() {
         @android.webkit.JavascriptInterface
         fun startEmergencyBeacon(profileJson: String) {
             try {
+                val profileWithDeviceId = org.json.JSONObject(profileJson).put("deviceId", com.sosrescue.ble.ResQDeviceIdentity.get(activity)).toString()
                 val serviceIntent = android.content.Intent(activity, com.sosrescue.service.VictimModeService::class.java).apply {
                     action = com.sosrescue.service.VictimModeService.ACTION_START
-                    putExtra(com.sosrescue.service.VictimModeService.EXTRA_PROFILE_JSON, profileJson)
+                    putExtra(com.sosrescue.service.VictimModeService.EXTRA_PROFILE_JSON, profileWithDeviceId)
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     activity.startForegroundService(serviceIntent)

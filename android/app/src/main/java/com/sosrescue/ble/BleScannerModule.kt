@@ -58,6 +58,8 @@ class BleScannerModule(
                 ?.firstOrNull { it.key.uuid == SERVICE_UUID }
                 ?.value
             if (beaconPayload == null) return
+            val stableDeviceId = beaconPayload.takeIf { it.size >= 4 }
+                ?.take(4)?.joinToString("") { byte -> "%02x".format(byte.toInt() and 0xff) }
 
             Log.d(TAG, "Discovered ResQ Beacon: $address, RSSI: $rssi dBm")
 
@@ -65,11 +67,11 @@ class BleScannerModule(
             val cachedProfile = profileCache[address]
             if (cachedProfile != null) {
                 mainHandler.post {
-                    onBeaconFound(address, rssi, cachedProfile)
+                    onBeaconFound(address, rssi, mergeDeviceId(cachedProfile, stableDeviceId))
                 }
             } else {
                 mainHandler.post {
-                    onBeaconFound(address, rssi, null)
+                    onBeaconFound(address, rssi, stableDeviceId?.let { "{\"deviceId\":\"$it\"}" })
                 }
                 // Connect via GATT in background to retrieve the full medical profile
                 connectAndReadProfile(device)
@@ -86,6 +88,15 @@ class BleScannerModule(
             isScanning = false
             Log.e(TAG, "BLE Scan failed with errorCode: $errorCode")
             scheduleScanRetry(errorCode)
+        }
+    }
+
+    private fun mergeDeviceId(profileJson: String, deviceId: String?): String {
+        if (deviceId == null) return profileJson
+        return try {
+            org.json.JSONObject(profileJson).put("deviceId", deviceId).toString()
+        } catch (_: Exception) {
+            "{\"deviceId\":\"$deviceId\"}"
         }
     }
 

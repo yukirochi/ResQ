@@ -11,8 +11,8 @@ Download `ResQ.apk` to an Android phone and open it to install. Android may ask 
 ## What ResQ does
 
 - **SOS beacon:** A person can activate SOS so their phone advertises a BLE emergency signal for nearby ResQ scanners.
-- **Nearby radar:** Rescuers can scan for ResQ emergency beacons, see multiple detected people, and select a person to view the estimated proximity and available medical information. Use the built-in multi-person simulation to explore the interface without another phone.
-- **Person-to-person messages:** Open a separate conversation for each detected person. Messages are sent over BLE to the selected phone when it is in range and connected.
+- **Nearby radar:** Tap **Scan nearby** to search for ResQ SOS beacons. The radar shows multiple detected people in a scrollable list; select someone to view estimated proximity and available medical information. Use the built-in multi-person simulation to explore the interface without another phone.
+- **Two-way person-to-person messages:** ResQ phones discover nearby chat peers while Chat is open. Select a person from the scrollable people list to open a private conversation. Messages travel directly over BLE, and the recipient can reply from their own conversation.
 - **Remote siren:** A rescuer can request that the selected phone sound its siren, helping locate it nearby.
 - **Medical profile:** Users can record medical information to help rescuers understand important needs during a response.
 - **Survival Guide:** Browse emergency and first-aid guidance included with the app.
@@ -27,9 +27,14 @@ The Bluetooth radar separately smooths noisy signal-strength readings with a Kal
 ## Connectivity and safety
 
 - BLE discovery, messaging, and remote siren control require Bluetooth to be enabled and the phones to be within Bluetooth range. Actual range and reliability vary with hardware and surroundings.
+- To message between two phones, open Chat on both phones and select the other phone from **People nearby**. To locate an SOS user, activate SOS on their phone and tap **Scan nearby** on the rescuer's Radar screen. The scan control starts and stops detection; the rescuer does not need to activate SOS.
 - The SOS beacon and scanner must have the Bluetooth permissions requested by Android. Background operation can also depend on Android battery and app settings.
 - The assistant and Survival Guide provide general information and are not a substitute for emergency services or professional medical care. Call local emergency services when possible.
 - The built-in multi-person simulation is for interface testing only. Simulated people do not represent nearby phones, and simulated messages are not transmitted.
+
+## Messaging test
+
+The BLE messaging flow was exercised between two Android emulators: each phone discovered the other, sent a message, and received a reply. For a repeatable manual check, install the same current build on both devices, enable Bluetooth, open Chat on both, select the other phone, then send a short message in each direction. A **Delivered** status means the other phone acknowledged the BLE write; confirm the incoming message appears in its conversation.
 
 ## Build the Android app
 

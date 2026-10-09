@@ -7,13 +7,14 @@ import java.nio.ByteOrder
 internal object BleChatProtocol {
     private const val MAGIC_1: Byte = 0x52
     private const val MAGIC_2: Byte = 0x51
-    private const val HEADER_SIZE = 8
-    private const val DATA_SIZE = 12 // 20 byte ATT payload at the default MTU of 23.
+    private const val HEADER_SIZE = 12
+    private const val DATA_SIZE = 8 // 20 byte ATT payload at the default MTU of 23.
     private const val MAX_MESSAGE_BYTES = DATA_SIZE * 255
 
-    data class Frame(val messageId: Int, val index: Int, val count: Int, val payload: ByteArray)
+    data class Frame(val messageId: Int, val senderDeviceId: String, val index: Int, val count: Int, val payload: ByteArray)
 
-    fun fragment(messageId: Int, message: String): List<ByteArray> {
+    fun fragment(messageId: Int, senderDeviceId: String, message: String): List<ByteArray> {
+        require(senderDeviceId.matches(Regex("[0-9a-fA-F]{8}"))) { "Invalid sender identity." }
         val bytes = message.toByteArray(Charsets.UTF_8)
         require(bytes.isNotEmpty() && bytes.size <= MAX_MESSAGE_BYTES) { "Message is too long." }
         val count = (bytes.size + DATA_SIZE - 1) / DATA_SIZE
@@ -25,6 +26,7 @@ internal object BleChatProtocol {
                 .put(MAGIC_1)
                 .put(MAGIC_2)
                 .putInt(messageId)
+                .putInt(senderDeviceId.toLong(16).toInt())
                 .put(index.toByte())
                 .put(count.toByte())
                 .put(bytes, start, end - start)
@@ -37,10 +39,11 @@ internal object BleChatProtocol {
         val input = ByteBuffer.wrap(packet).order(ByteOrder.BIG_ENDIAN)
         input.position(2)
         val messageId = input.int
+        val senderDeviceId = "%08x".format(input.int)
         val index = input.get().toInt() and 0xff
         val count = input.get().toInt() and 0xff
         if (count == 0 || index >= count) return null
-        return Frame(messageId, index, count, packet.copyOfRange(HEADER_SIZE, packet.size))
+        return Frame(messageId, senderDeviceId, index, count, packet.copyOfRange(HEADER_SIZE, packet.size))
     }
 
     class Reassembler {
@@ -49,7 +52,7 @@ internal object BleChatProtocol {
 
         @Synchronized
         fun accept(peerAddress: String, frame: Frame): String? {
-            val key = "$peerAddress:${frame.messageId}"
+            val key = "$peerAddress:${frame.senderDeviceId}:${frame.messageId}"
             val partial = partials.getOrPut(key) { Partial(arrayOfNulls(frame.count)) }
             if (partial.parts.size != frame.count) {
                 partials.remove(key)

@@ -12,7 +12,7 @@ class GattServerModule(private val context: Context) {
     private var cachedProfileJson: String = ""
 
     var onSirenCommandReceived: ((Int) -> Unit)? = null
-    var onInboundChatMessageReceived: ((String, String, String) -> Unit)? = null
+    var onInboundChatMessageReceived: ((String, String, String, String) -> Unit)? = null
     private val chatReassembler = BleChatProtocol.Reassembler()
 
     companion object {
@@ -59,15 +59,19 @@ class GattServerModule(private val context: Context) {
                 offset: Int,
                 value: ByteArray?
             ) {
+                val peerAddress = try { device?.address } catch (_: SecurityException) { null }
+                Log.d(TAG, "GATT write request from $peerAddress for ${characteristic?.uuid}; bytes=${value?.size ?: 0}; response=$responseNeeded")
                 if (characteristic?.uuid == SIREN_CHAR_UUID && value != null && value.isNotEmpty()) {
                     val command = value[0].toInt()
                     onSirenCommandReceived?.invoke(command)
                 } else if (characteristic?.uuid == CHAT_TX_CHAR_UUID && value != null) {
-                    val address = try { device?.address } catch (_: SecurityException) { null }
+                    val address = peerAddress
                     val frame = BleChatProtocol.parse(value)
                     val message = if (address != null && frame != null) chatReassembler.accept(address, frame) else null
+                    Log.d(TAG, "Chat frame from $address parsed=${frame != null} messageComplete=${message != null}")
                     if (address != null && frame != null && message != null) {
-                        onInboundChatMessageReceived?.invoke(address, frame.messageId.toString(), message)
+                        Log.i(TAG, "Received BLE chat message from $address (${message.length} chars)")
+                        onInboundChatMessageReceived?.invoke(address, frame.messageId.toString(), message, frame.senderDeviceId)
                     }
                 }
 

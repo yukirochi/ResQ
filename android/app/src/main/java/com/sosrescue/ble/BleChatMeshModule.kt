@@ -33,10 +33,14 @@ class BleChatMeshModule(private val context: Context) {
         const val TAG = "ResQ_BleChat"
         const val ACTION_INCOMING = "com.sosrescue.BLE_CHAT_INCOMING"
         const val ACTION_DELIVERY = "com.sosrescue.BLE_CHAT_DELIVERY"
+        const val ACTION_PEER_DISCOVERED = "com.sosrescue.BLE_CHAT_PEER_DISCOVERED"
         const val EXTRA_PEER = "peer"
         const val EXTRA_TEXT = "text"
         const val EXTRA_MESSAGE_ID = "message_id"
+        const val EXTRA_DEVICE_ID = "device_id"
         const val EXTRA_STATUS = "status"
+        const val EXTRA_NAME = "name"
+        const val EXTRA_RSSI = "rssi"
 
         private val SERVICE_UUID = UUID.fromString("7e500001-b5a3-f393-e0a9-e50e24dcca9e")
         private val CHAT_TX_UUID = UUID.fromString("7e500004-b5a3-f393-e0a9-e50e24dcca9e")
@@ -60,6 +64,7 @@ class BleChatMeshModule(private val context: Context) {
     private val manager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     private val handler = Handler(Looper.getMainLooper())
     private val peers = ConcurrentHashMap<String, Peer>()
+    private val peerAnnouncements = ConcurrentHashMap<String, Long>()
     private val deliveries = ConcurrentHashMap<Int, Delivery>()
     private val waitingMessages = ConcurrentHashMap<Int, WaitingMessage>()
     private val reassembler = BleChatProtocol.Reassembler()
@@ -86,6 +91,18 @@ class BleChatMeshModule(private val context: Context) {
             val device = result?.device ?: return
             val address = try { device.address } catch (e: SecurityException) { return }
             if (address.isNullOrBlank()) return
+            val deviceId = result.scanRecord?.getServiceData(android.os.ParcelUuid(SERVICE_UUID))
+                ?.takeIf { it.size >= 4 }?.take(4)?.joinToString("") { byte -> "%02x".format(byte.toInt() and 0xff) } ?: ""
+            val name = try { device.name } catch (_: SecurityException) { null }
+            val now = System.currentTimeMillis()
+            val lastAnnouncement = peerAnnouncements.put(address, now)
+            if (lastAnnouncement == null || now - lastAnnouncement > 5_000L) {
+                context.sendBroadcast(Intent(ACTION_PEER_DISCOVERED).setPackage(context.packageName)
+                    .putExtra(EXTRA_PEER, address)
+                    .putExtra(EXTRA_DEVICE_ID, deviceId)
+                    .putExtra(EXTRA_NAME, name ?: "Nearby peer [${address.takeLast(5)}]")
+                    .putExtra(EXTRA_RSSI, result.rssi))
+            }
             connectTo(device)
         }
 
@@ -117,6 +134,7 @@ class BleChatMeshModule(private val context: Context) {
                     Log.d(TAG, "Received BLE chat message from $address")
                     context.sendBroadcast(Intent(ACTION_INCOMING).setPackage(context.packageName)
                         .putExtra(EXTRA_PEER, address)
+                        .putExtra(EXTRA_DEVICE_ID, frame.senderDeviceId)
                         .putExtra(EXTRA_MESSAGE_ID, frame.messageId.toString())
                         .putExtra(EXTRA_TEXT, message))
                 }
@@ -208,6 +226,10 @@ class BleChatMeshModule(private val context: Context) {
             .setIncludeDeviceName(false)
             .addServiceUuid(ParcelUuid(SERVICE_UUID))
             .build()
+        val scanResponse = AdvertiseData.Builder()
+            .setIncludeDeviceName(false)
+            .addServiceData(ParcelUuid(SERVICE_UUID), ResQDeviceIdentity.get(context).chunked(2).map { it.toInt(16).toByte() }.toByteArray())
+            .build()
         val settings = AdvertiseSettings.Builder()
             .setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
             .setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_HIGH)
@@ -226,7 +248,7 @@ class BleChatMeshModule(private val context: Context) {
             }
         }
         try {
-            advertiser?.startAdvertising(settings, data, advertiseCallback)
+            advertiser?.startAdvertising(settings, data, scanResponse, advertiseCallback)
         } catch (e: Exception) {
             Log.e(TAG, "Unable to start BLE chat advertising.", e)
             advertiseCallback = null
@@ -344,7 +366,7 @@ class BleChatMeshModule(private val context: Context) {
     }
 
     private fun enqueueMessage(messageId: Int, text: String, readyPeers: List<Peer>) {
-        val packets = try { BleChatProtocol.fragment(messageId, text) } catch (e: IllegalArgumentException) {
+        val packets = try { BleChatProtocol.fragment(messageId, ResQDeviceIdentity.get(context), text) } catch (e: IllegalArgumentException) {
             emitDelivery(messageId, "failed", e.message ?: "Message could not be sent.")
             return
         }
@@ -462,6 +484,7 @@ class BleChatMeshModule(private val context: Context) {
         }
         waitingMessages.clear()
         deliveries.clear()
+        peerAnnouncements.clear()
         Log.d(TAG, "BLE peer chat stopped.")
     }
 }
