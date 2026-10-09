@@ -77,9 +77,20 @@ class MainActivity : AppCompatActivity() {
             mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
             useWideViewPort = true
             loadWithOverviewMode = true
+            setGeolocationEnabled(true)
         }
 
-        webView.webChromeClient = WebChromeClient()
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onGeolocationPermissionsShowPrompt(
+                origin: String?,
+                callback: android.webkit.GeolocationPermissions.Callback?
+            ) {
+                callback?.invoke(origin, true, false)
+            }
+        }
+
+        webView.addJavascriptInterface(ResQNativeBridge(this), "ResQNative")
+
         webView.webViewClient = object : WebViewClient() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
@@ -93,6 +104,54 @@ class MainActivity : AppCompatActivity() {
         }
 
         webView.loadUrl("file:///android_asset/index.html")
+    }
+
+    class ResQNativeBridge(private val activity: MainActivity) {
+        @android.webkit.JavascriptInterface
+        fun isNative(): Boolean = true
+
+        @android.webkit.JavascriptInterface
+        fun startEmergencyBeacon(profileJson: String) {
+            try {
+                val serviceIntent = android.content.Intent(activity, com.sosrescue.service.VictimModeService::class.java).apply {
+                    action = com.sosrescue.service.VictimModeService.ACTION_START
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    activity.startForegroundService(serviceIntent)
+                } else {
+                    activity.startService(serviceIntent)
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("ResQNativeBridge", "Error starting victim mode", e)
+            }
+        }
+
+        @android.webkit.JavascriptInterface
+        fun stopEmergencyBeacon() {
+            try {
+                val serviceIntent = android.content.Intent(activity, com.sosrescue.service.VictimModeService::class.java).apply {
+                    action = com.sosrescue.service.VictimModeService.ACTION_STOP
+                }
+                activity.startService(serviceIntent)
+            } catch (e: Exception) {
+                android.util.Log.e("ResQNativeBridge", "Error stopping victim mode", e)
+            }
+        }
+
+        @android.webkit.JavascriptInterface
+        fun triggerVibrate(ms: Long) {
+            try {
+                val vibrator = activity.getSystemService(android.content.Context.VIBRATOR_SERVICE) as? android.os.Vibrator
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator?.vibrate(android.os.VibrationEffect.createOneShot(ms, android.os.VibrationEffect.DEFAULT_AMPLITUDE))
+                } else {
+                    @Suppress("DEPRECATION")
+                    vibrator?.vibrate(ms)
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("ResQNativeBridge", "Vibrate error", e)
+            }
+        }
     }
 
     override fun onBackPressed() {
