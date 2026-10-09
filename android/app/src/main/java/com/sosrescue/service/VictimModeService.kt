@@ -5,7 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.os.Handler
+import android.os.Looper
 import android.os.PowerManager
+import android.media.AudioManager
+import android.media.ToneGenerator
 import androidx.core.app.NotificationCompat
 
 class VictimModeService : Service() {
@@ -14,6 +18,21 @@ class VictimModeService : Service() {
 
     private var advertiserModule: com.sosrescue.ble.BleAdvertiserModule? = null
     private var gattServerModule: com.sosrescue.ble.GattServerModule? = null
+    private val sirenHandler = Handler(Looper.getMainLooper())
+    private var sirenTone: ToneGenerator? = null
+    private var remoteSirenActive = false
+    private var nextSirenToneHigh = true
+
+    private val remoteSirenLoop = object : Runnable {
+        override fun run() {
+            if (!remoteSirenActive) return
+            val tone = if (nextSirenToneHigh) ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD
+                else ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK
+            nextSirenToneHigh = !nextSirenToneHigh
+            sirenTone?.startTone(tone, 450)
+            sirenHandler.postDelayed(this, 500)
+        }
+    }
 
     companion object {
         const val CHANNEL_ID = "ResQ_Victim_Channel"
@@ -21,7 +40,6 @@ class VictimModeService : Service() {
         const val ACTION_START = "ACTION_START_VICTIM_MODE"
         const val ACTION_STOP = "ACTION_STOP_VICTIM_MODE"
         const val EXTRA_PROFILE_JSON = "EXTRA_PROFILE_JSON"
-        const val ACTION_TRIGGER_SIREN = "com.sosrescue.TRIGGER_SIREN"
         var isRunning = false
     }
 
@@ -78,11 +96,39 @@ class VictimModeService : Service() {
         )
 
         gattServerModule?.startGattServer(isSos = true, profileJson = profileJson)
+        gattServerModule?.onInboundChatMessageReceived = { address, messageId, message ->
+            sendBroadcast(Intent(com.sosrescue.ble.BleChatMeshModule.ACTION_INCOMING)
+                .setPackage(packageName)
+                .putExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_PEER, address)
+                .putExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_MESSAGE_ID, messageId)
+                .putExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_TEXT, message))
+        }
         gattServerModule?.onSirenCommandReceived = { cmd ->
-            if (cmd == 1) {
-                val sirenIntent = Intent(ACTION_TRIGGER_SIREN)
-                sendBroadcast(sirenIntent)
+            if (cmd == 1 || cmd == 0) {
+                sirenHandler.post { setRemoteSirenActive(cmd == 1) }
             }
+        }
+    }
+
+    private fun setRemoteSirenActive(active: Boolean) {
+        if (remoteSirenActive == active) return
+        remoteSirenActive = active
+        sirenHandler.removeCallbacks(remoteSirenLoop)
+        if (active) {
+            try {
+                sirenTone = ToneGenerator(AudioManager.STREAM_ALARM, 100)
+                nextSirenToneHigh = true
+                sirenHandler.post(remoteSirenLoop)
+                android.util.Log.i("VictimModeService", "Remote siren started on this phone.")
+            } catch (e: Exception) {
+                remoteSirenActive = false
+                android.util.Log.e("VictimModeService", "Unable to start remote siren on this phone.", e)
+            }
+        } else {
+            sirenTone?.stopTone()
+            sirenTone?.release()
+            sirenTone = null
+            android.util.Log.i("VictimModeService", "Remote siren stopped on this phone.")
         }
     }
 
@@ -128,6 +174,7 @@ class VictimModeService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        setRemoteSirenActive(false)
         stopBleComponents()
         isRunning = false
         wakeLock?.let {

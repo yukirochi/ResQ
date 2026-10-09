@@ -12,7 +12,8 @@ class GattServerModule(private val context: Context) {
     private var cachedProfileJson: String = ""
 
     var onSirenCommandReceived: ((Int) -> Unit)? = null
-    var onInboundChatMessageReceived: ((String) -> Unit)? = null
+    var onInboundChatMessageReceived: ((String, String, String) -> Unit)? = null
+    private val chatReassembler = BleChatProtocol.Reassembler()
 
     companion object {
         const val TAG = "ResQ_GattServer"
@@ -62,8 +63,12 @@ class GattServerModule(private val context: Context) {
                     val command = value[0].toInt()
                     onSirenCommandReceived?.invoke(command)
                 } else if (characteristic?.uuid == CHAT_TX_CHAR_UUID && value != null) {
-                    val message = String(value, Charsets.UTF_8)
-                    onInboundChatMessageReceived?.invoke(message)
+                    val address = try { device?.address } catch (_: SecurityException) { null }
+                    val frame = BleChatProtocol.parse(value)
+                    val message = if (address != null && frame != null) chatReassembler.accept(address, frame) else null
+                    if (address != null && frame != null && message != null) {
+                        onInboundChatMessageReceived?.invoke(address, frame.messageId.toString(), message)
+                    }
                 }
 
                 if (responseNeeded) {

@@ -107,27 +107,64 @@ class MainActivity : AppCompatActivity() {
     }
 
     var bleScanner: com.sosrescue.ble.BleScannerModule? = null
+    var bleChatMesh: com.sosrescue.ble.BleChatMeshModule? = null
+
+    fun ensureBleScanner(): com.sosrescue.ble.BleScannerModule {
+        bleScanner?.let { return it }
+        val created = com.sosrescue.ble.BleScannerModule(this) { address, rssi, profileJson ->
+            val safeAddress = org.json.JSONObject.quote(address)
+            val safeProfile = profileJson?.let { org.json.JSONObject.quote(it) } ?: "null"
+            val js = "if (typeof window.onNativeBleBeaconDetected === 'function') window.onNativeBleBeaconDetected($safeAddress, $rssi, $safeProfile);"
+            webView.evaluateJavascript(js, null)
+        }
+        bleScanner = created
+        return created
+    }
 
     private val sirenReceiver = object : android.content.BroadcastReceiver() {
         override fun onReceive(context: android.content.Context?, intent: android.content.Intent?) {
-            webView.post {
-                webView.evaluateJavascript("if (typeof toggleAudioSiren === 'function' && !isSirenActive) toggleAudioSiren();", null)
+            when (intent?.action) {
+                com.sosrescue.ble.BleChatMeshModule.ACTION_INCOMING -> {
+                    val address = org.json.JSONObject.quote(intent.getStringExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_PEER) ?: "")
+                    val messageId = org.json.JSONObject.quote(intent.getStringExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_MESSAGE_ID) ?: "")
+                    val text = org.json.JSONObject.quote(intent.getStringExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_TEXT) ?: "")
+                    webView.post {
+                        webView.evaluateJavascript("if (typeof window.onNativeBleChatMessage === 'function') window.onNativeBleChatMessage($address, $messageId, $text);", null)
+                    }
+                }
+                com.sosrescue.ble.BleChatMeshModule.ACTION_DELIVERY -> {
+                    val address = org.json.JSONObject.quote(intent.getStringExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_PEER) ?: "")
+                    val messageId = org.json.JSONObject.quote(intent.getStringExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_MESSAGE_ID) ?: "")
+                    val status = org.json.JSONObject.quote(intent.getStringExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_STATUS) ?: "failed")
+                    val detail = org.json.JSONObject.quote(intent.getStringExtra(com.sosrescue.ble.BleChatMeshModule.EXTRA_TEXT) ?: "")
+                    webView.post {
+                        webView.evaluateJavascript("if (typeof window.onNativeBleChatDelivery === 'function') window.onNativeBleChatDelivery($messageId, $status, $detail, $address);", null)
+                    }
+                }
             }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        val filter = android.content.IntentFilter(com.sosrescue.service.VictimModeService.ACTION_TRIGGER_SIREN)
+        val filter = android.content.IntentFilter(com.sosrescue.ble.BleChatMeshModule.ACTION_INCOMING)
+        filter.addAction(com.sosrescue.ble.BleChatMeshModule.ACTION_DELIVERY)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(sirenReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
         } else {
             registerReceiver(sirenReceiver, filter)
         }
+        webView.postDelayed({
+            webView.evaluateJavascript(
+                "if (document.getElementById('screenChat')?.classList.contains('active') && window.ResQNative) window.ResQNative.startBleChat();",
+                null
+            )
+        }, 300L)
     }
 
     override fun onPause() {
         super.onPause()
+        bleChatMesh?.stop()
         try {
             unregisterReceiver(sirenReceiver)
         } catch (e: Exception) {}
@@ -137,6 +174,8 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         bleScanner?.stopScanning()
         bleScanner = null
+        bleChatMesh?.stop()
+        bleChatMesh = null
     }
 
     class ResQNativeBridge(private val activity: MainActivity) {
@@ -175,14 +214,7 @@ class MainActivity : AppCompatActivity() {
         @android.webkit.JavascriptInterface
         fun startBleScanning() {
             activity.runOnUiThread {
-                if (activity.bleScanner == null) {
-                    activity.bleScanner = com.sosrescue.ble.BleScannerModule(activity) { address, rssi, profileJson ->
-                        val escapedProfile = profileJson?.replace("\\", "\\\\")?.replace("'", "\\'")?.replace("\n", " ")
-                        val js = "if (typeof window.onNativeBleBeaconDetected === 'function') { window.onNativeBleBeaconDetected('$address', $rssi, ${if (escapedProfile != null) "'$escapedProfile'" else "null"}); }"
-                        activity.webView.evaluateJavascript(js, null)
-                    }
-                }
-                activity.bleScanner?.startScanning()
+                activity.ensureBleScanner().startScanning()
             }
         }
 
@@ -194,9 +226,38 @@ class MainActivity : AppCompatActivity() {
         }
 
         @android.webkit.JavascriptInterface
+        fun startBleChat() {
+            activity.runOnUiThread {
+                if (activity.bleChatMesh == null) {
+                    activity.bleChatMesh = com.sosrescue.ble.BleChatMeshModule(activity)
+                }
+                activity.bleChatMesh?.start()
+            }
+        }
+
+        @android.webkit.JavascriptInterface
+        fun sendBleChatMessage(messageId: Int, address: String, text: String) {
+            activity.runOnUiThread {
+                if (activity.bleChatMesh == null) {
+                    activity.bleChatMesh = com.sosrescue.ble.BleChatMeshModule(activity)
+                    activity.bleChatMesh?.start()
+                }
+                activity.bleChatMesh?.sendMessage(messageId, address, text)
+            }
+        }
+
+        @android.webkit.JavascriptInterface
         fun triggerRemoteSiren(address: String, command: Int) {
             activity.runOnUiThread {
-                activity.bleScanner?.triggerRemoteSiren(address, command)
+                activity.ensureBleScanner().triggerRemoteSiren(address, command) { succeeded ->
+                    val safeAddress = org.json.JSONObject.quote(address)
+                    activity.webView.post {
+                        activity.webView.evaluateJavascript(
+                            "if (typeof window.onNativeRemoteSirenResult === 'function') window.onNativeRemoteSirenResult($safeAddress, $command, $succeeded);",
+                            null
+                        )
+                    }
+                }
             }
         }
 
