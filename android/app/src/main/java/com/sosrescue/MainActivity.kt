@@ -62,6 +62,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupWebView() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(true)
+        }
+
         webView.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
@@ -71,6 +75,8 @@ class MainActivity : AppCompatActivity() {
             mediaPlaybackRequiresUserGesture = false
             cacheMode = WebSettings.LOAD_DEFAULT
             mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+            useWideViewPort = true
+            loadWithOverviewMode = true
         }
 
         webView.webChromeClient = WebChromeClient()
@@ -79,9 +85,13 @@ class MainActivity : AppCompatActivity() {
                 super.onPageFinished(view, url)
                 loadingSpinner.visibility = View.GONE
             }
+
+            override fun onRenderProcessGone(view: WebView?, detail: android.webkit.RenderProcessGoneDetail?): Boolean {
+                view?.loadUrl("file:///android_asset/index.html")
+                return true
+            }
         }
 
-        // Try local emulator bridge or bundled offline asset
         webView.loadUrl("file:///android_asset/index.html")
     }
 

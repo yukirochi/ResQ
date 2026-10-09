@@ -2,699 +2,937 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ResQ - Offline BLE Emergency Rescue Interactive Simulator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ResQ - Emergency Rescue & Offline Mesh</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #070A11;
-      --surface: #0E1524;
-      --surface-card: #141E34;
-      --surface-hover: #1B2947;
-      --border: #213052;
-      --border-subtle: #18233C;
-      --sos-red: #EF4444;
-      --sos-red-dark: #DC2626;
-      --radar-blue: #3B82F6;
-      --radar-blue-dark: #2563EB;
-      --immediate-green: #10B981;
-      --near-amber: #F59E0B;
-      --far-red: #EF4444;
-      --text-main: #F8FAFC;
-      --text-muted: #64748B;
-      --text-sec: #94A3B8;
+      --primary-red: #E53935;
+      --primary-red-hover: #D32F2F;
+      --primary-red-dark: #B71C1C;
+      --primary-gradient: linear-gradient(180deg, #E53935 0%, #D32F2F 100%);
+      --dispatch-gradient: linear-gradient(180deg, #DE352B 0%, #E63946 50%, #FF5A5F 100%);
+      
+      --ripple-1: rgba(229, 57, 53, 0.08);
+      --ripple-2: rgba(229, 57, 53, 0.16);
+      --ripple-3: rgba(229, 57, 53, 0.26);
+
+      --bg-page: #FBFBFC;
+      --bg-card: #FFFFFF;
+      --text-title: #191C21;
+      --text-sub: #7A828E;
+      --text-muted: #9EABB8;
+      --border-light: #F0F2F5;
+      --border-card: #EAECEF;
+
+      --status-green: #10B981;
+      --status-amber: #F59E0B;
+      --status-red: #E53935;
+      
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.03);
+      --shadow-md: 0 10px 25px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 18px 40px rgba(0, 0, 0, 0.08);
+      --shadow-sos: 0 16px 36px rgba(229, 57, 53, 0.38);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    
     body {
-      background-color: var(--bg);
-      color: var(--text-main);
-      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      background-color: #E9ECEF;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text-title);
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       overflow-x: hidden;
     }
 
-    /* Top Global Header */
-    header {
-      background: rgba(14, 21, 36, 0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .brand-wrap { display: flex; align-items: center; gap: 12px; }
-    .brand-logo { font-size: 24px; font-weight: 900; color: var(--sos-red); letter-spacing: -0.5px; }
-    .pill-offline {
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: var(--immediate-green);
-      font-size: 11px;
-      font-weight: 800;
-      padding: 4px 10px;
-      border-radius: 999px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .pill-offline::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--immediate-green); box-shadow: 0 0 8px var(--immediate-green); }
-
-    /* Layout Container */
-    .app-layout {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 40px;
-      padding: 30px 20px;
-    }
-
-    /* Phone Mockup */
-    .phone-frame {
-      width: 380px;
-      height: 760px;
-      background: #090D16;
-      border-radius: 46px;
-      border: 10px solid #1E293B;
-      box-shadow: 0 25px 60px -15px rgba(0,0,0,0.8), 0 0 40px rgba(59, 130, 246, 0.1);
+    .app-viewport {
+      width: 100vw;
+      max-width: 412px;
+      height: 100vh;
+      max-height: 892px;
+      background: var(--bg-page);
+      position: relative;
       display: flex;
       flex-direction: column;
-      position: relative;
       overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.18);
+      border-radius: 40px;
     }
-    .phone-notch {
+
+    @media (max-width: 480px) {
+      body { background: var(--bg-page); }
+      .app-viewport {
+        max-width: 100vw;
+        max-height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+
+    .bottom-dock {
       position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 140px;
-      height: 24px;
-      background: #1E293B;
-      border-bottom-left-radius: 16px;
-      border-bottom-right-radius: 16px;
-      z-index: 50;
+      bottom: 22px;
+      left: 20px;
+      right: 20px;
+      height: 64px;
+      background: #FFFFFF;
+      border-radius: 36px;
+      box-shadow: var(--shadow-lg), 0 2px 8px rgba(0,0,0,0.04);
+      border: 1px solid var(--border-light);
       display: flex;
       align-items: center;
-      justify-content: center;
-    }
-    .notch-speaker { width: 44px; height: 4px; border-radius: 2px; background: #0F172A; }
-
-    .phone-screen {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding-top: 26px;
-      overflow-y: auto;
-      position: relative;
+      justify-content: space-around;
+      padding: 0 8px;
+      z-index: 100;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
     }
 
-    /* Control Panel on the Side */
-    .control-deck {
-      width: 360px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 24px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-    }
-    .deck-title { font-size: 16px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
-    .deck-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; }
-    .deck-card {
-      background: var(--surface-card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 14px;
-    }
-    .deck-label { font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 8px; text-transform: uppercase; }
-    .btn-row { display: flex; gap: 8px; }
-    .deck-btn {
-      flex: 1;
-      background: var(--surface-hover);
-      border: 1px solid var(--border);
-      color: var(--text-main);
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      text-align: center;
-    }
-    .deck-btn:hover { background: #223458; border-color: var(--radar-blue); }
-    .deck-btn.active { background: rgba(59, 130, 246, 0.2); border-color: var(--radar-blue); color: var(--radar-blue); }
-
-    /* In-Phone Screen Views */
-    .screen-view { display: none; flex-direction: column; flex: 1; padding: 16px; }
-    .screen-view.active { display: flex; }
-
-    /* Mode Picker View */
-    .mode-header { text-align: center; margin-top: 20px; margin-bottom: 24px; }
-    .mode-app-title { font-size: 38px; font-weight: 900; color: var(--sos-red); letter-spacing: -1px; }
-    .mode-tagline { font-size: 13px; font-weight: 700; color: var(--text-sec); margin-top: 2px; }
-    .mode-card-select {
-      background: var(--surface-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 16px;
-      cursor: pointer;
-      transition: transform 0.15s, border-color 0.15s;
-    }
-    .mode-card-select:hover { transform: translateY(-2px); }
-    .mode-card-victim { border-color: rgba(239, 68, 68, 0.4); }
-    .mode-card-victim:hover { border-color: var(--sos-red); box-shadow: 0 8px 24px rgba(239, 68, 68, 0.2); }
-    .mode-card-rescue { border-color: rgba(59, 130, 246, 0.4); }
-    .mode-card-rescue:hover { border-color: var(--radar-blue); box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2); }
-    .mode-card-title { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
-    .mode-card-desc { font-size: 12px; color: var(--text-sec); margin: 6px 0 12px 0; line-height: 16px; }
-    .mode-cta { font-size: 12px; font-weight: 800; padding: 10px; border-radius: 8px; text-align: center; }
-    .cta-victim { background: var(--sos-red); color: #FFF; }
-    .cta-rescue { background: var(--radar-blue); color: #FFF; }
-
-    /* Top In-App Phone Nav */
-    .phone-nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--border-subtle);
-      margin-bottom: 12px;
-    }
-    .nav-title { font-size: 18px; font-weight: 900; }
-    .nav-back { font-size: 12px; font-weight: 700; color: var(--radar-blue); cursor: pointer; }
-
-    /* Victim Mode Screen */
-    .beacon-status-pill {
-      background: var(--surface-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--text-sec);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-    .beacon-status-pill.active {
-      background: rgba(239, 68, 68, 0.15);
-      border-color: var(--sos-red);
-      color: #FFF;
-    }
-    .beacon-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); }
-    .beacon-status-pill.active .beacon-dot { background: var(--sos-red); box-shadow: 0 0 10px var(--sos-red); animation: pulse 1.2s infinite; }
-
-    /* SOS Button */
-    .sos-btn-wrapper {
-      position: relative;
-      width: 170px;
-      height: 170px;
-      margin: 10px auto 20px auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .sos-pulse-ring {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      background: rgba(239, 68, 68, 0.35);
-      transform: scale(1);
+    .bottom-dock.dock-hidden {
+      transform: translateY(120%);
       opacity: 0;
       pointer-events: none;
     }
-    .sos-btn {
-      width: 150px;
-      height: 150px;
+
+    .dock-tab {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 26px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .dock-tab svg { width: 20px; height: 20px; fill: currentColor; }
+
+    .dock-tab.active {
+      background: var(--primary-red);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(229, 57, 53, 0.35);
+    }
+
+    .dock-tab:hover:not(.active) {
+      color: var(--text-title);
+      background: #F4F6F8;
+    }
+
+    .screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 24px 20px 100px 20px;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .screen.active {
+      display: flex;
+      animation: fadeIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.985); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    #screenHome { background: var(--bg-page); }
+
+    .home-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+      margin-bottom: 24px;
+    }
+
+    .home-user-info .user-greeting { font-size: 13px; color: var(--text-sub); font-weight: 500; }
+    .home-user-info .user-name { font-size: 18px; font-weight: 800; color: var(--text-title); letter-spacing: -0.3px; }
+    .home-avatar-wrap { position: relative; cursor: pointer; }
+    .avatar-img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid #FFFFFF; box-shadow: var(--shadow-sm); }
+    .avatar-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
-      background: var(--surface-card);
-      border: 4px solid var(--border);
-      color: #FFF;
+      background: var(--primary-red);
+      color: #FFFFFF;
+      font-size: 10px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #FFFFFF;
+    }
+
+    .hero-title-wrap { text-align: center; margin-bottom: 28px; }
+    .hero-title { font-size: 26px; font-weight: 900; color: var(--text-title); letter-spacing: -0.5px; margin-bottom: 6px; }
+    .hero-sub { font-size: 13px; color: var(--text-sub); font-weight: 500; line-height: 19px; max-width: 250px; margin: 0 auto; }
+
+    .sos-ripple-stage {
+      position: relative;
+      width: 290px;
+      height: 290px;
+      margin: 0 auto 30px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ripple-ring { position: absolute; border-radius: 50%; transition: all 0.4s ease; pointer-events: none; }
+    .ring-3 { width: 285px; height: 285px; background: var(--ripple-1); animation: pulseGlow 3.5s ease-in-out infinite; }
+    .ring-2 { width: 220px; height: 220px; background: var(--ripple-2); animation: pulseGlow 3.5s ease-in-out infinite 0.6s; }
+    .ring-1 { width: 165px; height: 165px; background: var(--ripple-3); animation: pulseGlow 3.5s ease-in-out infinite 1.2s; }
+
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.04); opacity: 1; }
+    }
+
+    .sos-core-btn {
+      position: relative;
+      width: 124px;
+      height: 124px;
+      border-radius: 50%;
+      background: var(--primary-gradient);
+      box-shadow: var(--shadow-sos);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      color: #FFFFFF;
       cursor: pointer;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-      transition: all 0.2s ease;
-      z-index: 2;
-    }
-    .sos-btn.active {
-      background: var(--sos-red);
-      border-color: #FCA5A5;
-      box-shadow: 0 0 35px rgba(239, 68, 68, 0.7);
-    }
-    .sos-btn.active ~ .sos-pulse-ring { animation: ripple 1.6s infinite ease-out; }
-    .sos-label { font-size: 22px; font-weight: 900; letter-spacing: 0.5px; }
-    .sos-sub { font-size: 9px; font-weight: 800; opacity: 0.85; margin-top: 4px; letter-spacing: 0.5px; }
-
-    @keyframes ripple {
-      0% { transform: scale(0.9); opacity: 0.8; }
-      100% { transform: scale(1.6); opacity: 0; }
-    }
-    @keyframes pulse {
-      0% { opacity: 0.5; }
-      50% { opacity: 1; }
-      100% { opacity: 0.5; }
+      border: none;
+      outline: none;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+      z-index: 10;
     }
 
-    /* Direct 911 Call Button */
-    .call-911-btn {
-      background: #7F1D1D;
-      border: 1px solid var(--sos-red);
-      border-radius: 12px;
-      padding: 12px;
+    .sos-core-btn:active { transform: scale(0.92); box-shadow: 0 8px 20px rgba(229, 57, 53, 0.4); }
+    .sos-btn-text { font-size: 34px; font-weight: 900; letter-spacing: 0.5px; line-height: 1; }
+    .sos-btn-sub { font-size: 9px; font-weight: 800; letter-spacing: 1px; opacity: 0.9; margin-top: 4px; }
+
+    .address-card {
+      background: var(--bg-card);
+      border-radius: 20px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-light);
       display: flex;
       align-items: center;
-      gap: 12px;
-      cursor: pointer;
+      gap: 14px;
       margin-bottom: 16px;
     }
-    .call-911-icon { font-size: 20px; }
-    .call-911-text { font-size: 12px; font-weight: 900; color: #FFF; }
-    .call-911-sub { font-size: 10px; color: #FCA5A5; }
 
-    /* Chips */
-    .chip-grid { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
-    .status-chip {
-      background: var(--surface-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-size: 12px;
+    .address-avatar { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border-light); }
+    .address-info { flex: 1; }
+    .address-label { font-size: 13px; font-weight: 800; color: var(--text-title); margin-bottom: 2px; }
+    .address-text { font-size: 11px; color: var(--text-sub); line-height: 15px; }
+    .mesh-status-row { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 10px; font-weight: 700; color: var(--status-green); }
+    .mesh-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--status-green); box-shadow: 0 0 6px var(--status-green); }
+
+    .chips-section-title { font-size: 11px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .chips-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; }
+    .triage-chip {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-light);
+      border-radius: 14px;
+      padding: 8px 12px;
+      font-size: 11px;
       font-weight: 700;
-      color: var(--text-main);
+      color: var(--text-title);
+      white-space: nowrap;
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
     }
-    .status-chip.selected {
-      background: rgba(239, 68, 68, 0.2);
-      border-color: var(--sos-red);
-      color: #FFF;
-    }
+    .triage-chip.selected { border-color: var(--primary-red); background: #FFF5F5; color: var(--primary-red); }
 
-    /* Radar View */
-    .radar-canvas-wrap {
-      width: 260px;
-      height: 260px;
-      margin: 0 auto 12px auto;
-      position: relative;
+    #screenDispatch {
+      background: var(--dispatch-gradient);
+      color: #FFFFFF;
+      padding: 24px 24px 40px 24px;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
     }
-    canvas#radarCanvas {
-      width: 100%;
-      height: 100%;
+    #screenDispatch.active { display: flex; }
+    .dispatch-top-nav { display: flex; align-items: center; margin-top: 8px; }
+    .dispatch-back-btn {
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      background: #060910;
-      box-shadow: 0 0 30px rgba(59, 130, 246, 0.15);
-    }
-    .spotlight-box {
-      background: rgba(59, 130, 246, 0.12);
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      border-radius: 12px;
-      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.2);
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
+      color: #FFFFFF;
+      cursor: pointer;
+      border: none;
+      backdrop-filter: blur(8px);
+    }
+    .dispatch-illus-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 320px;
+      height: 200px;
+      margin: 10px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .dispatch-blob-backdrop {
+      position: absolute;
+      width: 280px;
+      height: 180px;
+      background: rgba(255, 255, 255, 0.22);
+      border-radius: 40px;
+      backdrop-filter: blur(10px);
+      box-shadow: inset 0 2px 10px rgba(255,255,255,0.4);
+    }
+    .ambulance-svg {
+      position: relative;
+      width: 250px;
+      height: auto;
+      z-index: 2;
+      animation: vehicleDrive 1.8s ease-in-out infinite alternate;
+    }
+    @keyframes vehicleDrive {
+      from { transform: translateX(-4px) translateY(0); }
+      to { transform: translateX(4px) translateY(-3px); }
+    }
+    .dispatch-content { margin-top: 10px; margin-bottom: 24px; }
+    .dispatch-title { font-size: 26px; font-weight: 900; line-height: 32px; letter-spacing: -0.5px; margin-bottom: 12px; color: #FFFFFF; }
+    .dispatch-desc { font-size: 13px; line-height: 20px; color: rgba(255, 255, 255, 0.9); font-weight: 500; }
+    .dispatch-actions { display: flex; flex-direction: column; gap: 14px; align-items: center; }
+    .btn-see-map {
+      width: 100%;
+      height: 54px;
+      background: #FFFFFF;
+      color: var(--primary-red);
+      border-radius: 28px;
+      font-size: 15px;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      transition: transform 0.2s ease;
+    }
+    .btn-see-map:active { transform: scale(0.97); }
+    .btn-cancel-req { background: transparent; border: none; color: #FFFFFF; font-size: 14px; font-weight: 700; cursor: pointer; opacity: 0.9; padding: 8px 16px; }
+
+    #screenRadar { background: var(--bg-page); padding: 20px 20px 100px 20px; }
+    .radar-nav-bar { display: flex; align-items: center; gap: 12px; margin-top: 6px; margin-bottom: 14px; }
+    .radar-back-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-title);
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+    }
+    .radar-header-info { flex: 1; }
+    .radar-main-title { font-size: 18px; font-weight: 900; color: var(--text-title); line-height: 22px; letter-spacing: -0.3px; }
+    .radar-main-sub { font-size: 11px; color: var(--text-sub); line-height: 16px; margin-top: 4px; }
+    .link-instruction { color: var(--primary-red); font-size: 11px; font-weight: 700; text-decoration: none; margin-top: 2px; display: inline-block; cursor: pointer; }
+
+    .map-container {
+      position: relative;
+      width: 100%;
+      height: 320px;
+      background: #F3F4F6;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 1px solid var(--border-card);
+      box-shadow: var(--shadow-md);
+      margin-bottom: 16px;
+    }
+    .map-svg-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+    .map-tooltip {
+      position: absolute;
+      background: #FFFFFF;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-title);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+      border: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .map-tooltip::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 5px 5px 0;
+      border-style: solid;
+      border-color: #FFFFFF transparent;
+      display: block;
+      width: 0;
+    }
+    .tooltip-target { top: 60px; right: 32px; }
+    .tooltip-responder { bottom: 70px; left: 45px; }
+
+    .pin-pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary-red);
+      box-shadow: 0 0 8px var(--primary-red);
+      animation: pinBlink 1.5s infinite;
+    }
+    @keyframes pinBlink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.3); } }
+
+    .radar-sweep-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      border: 1px dashed rgba(229, 57, 53, 0.25);
+      pointer-events: none;
+    }
+    .radar-sweep-inner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      background: rgba(16, 185, 129, 0.04);
+    }
+    .radar-needle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 110px;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(229, 57, 53, 0), rgba(229, 57, 53, 0.8));
+      transform-origin: 0% 50%;
+      animation: radarSpin 4s linear infinite;
+    }
+    @keyframes radarSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    .responder-card {
+      background: var(--bg-card);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-light);
       margin-bottom: 12px;
     }
-    .spot-left { display: flex; align-items: center; gap: 10px; }
-    .spot-dist { font-size: 22px; font-weight: 900; color: #FFF; }
-    .spot-trend { font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 999px; }
-    .trend-warmer { background: rgba(16, 185, 129, 0.2); color: var(--immediate-green); }
-    .trend-colder { background: rgba(239, 68, 68, 0.2); color: var(--sos-red); }
-
-    /* Victim Cards in Rescue List */
-    .victim-card {
-      background: var(--surface-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px;
-      margin-bottom: 8px;
-      cursor: pointer;
-    }
-    .victim-card.selected { border-color: var(--radar-blue); box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
-    .vc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
-    .vc-id { font-size: 13px; font-weight: 800; color: #FFF; }
-    .vc-zone { font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 999px; }
-    .zone-imm { background: rgba(16, 185, 129, 0.2); color: var(--immediate-green); }
-    .zone-near { background: rgba(245, 158, 11, 0.2); color: var(--near-amber); }
-    .zone-far { background: rgba(239, 68, 68, 0.2); color: var(--sos-red); }
-    .vc-telemetry { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); display: flex; gap: 10px; }
-    .vc-actions { display: flex; gap: 6px; margin-top: 8px; }
-    .btn-siren-trigger {
+    .responder-card-top { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .responder-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid #FFFFFF; box-shadow: var(--shadow-sm); }
+    .responder-meta { flex: 1; }
+    .responder-name { font-size: 14px; font-weight: 800; color: var(--text-title); }
+    .responder-role { font-size: 12px; color: var(--text-sub); font-weight: 600; margin-top: 1px; }
+    .responder-badge-proximity { background: #E8F5E9; color: var(--status-green); font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px; }
+    .responder-actions { display: flex; gap: 10px; }
+    .btn-resp-call {
       flex: 1;
-      background: var(--surface-hover);
-      border: 1px solid var(--border);
-      color: var(--sos-red);
-      font-size: 10px;
+      height: 42px;
+      background: var(--primary-red);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 21px;
+      font-size: 13px;
       font-weight: 800;
-      padding: 6px;
-      border-radius: 6px;
       cursor: pointer;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(229, 57, 53, 0.3);
     }
-    .btn-siren-trigger.active { background: var(--sos-red); color: #FFF; }
-    .btn-card-chat {
-      background: var(--surface-hover);
-      border: 1px solid var(--border);
-      color: var(--radar-blue);
-      font-size: 10px;
+    .btn-resp-call.active { background: #B71C1C; }
+    .btn-resp-msg {
+      flex: 1;
+      height: 42px;
+      background: #F0F2F5;
+      color: #555E68;
+      border: none;
+      border-radius: 21px;
+      font-size: 13px;
       font-weight: 800;
-      padding: 6px 12px;
-      border-radius: 6px;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
 
-    /* P2P Chat View */
-    .chat-stream { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
-    .chat-bubble { max-width: 80%; padding: 8px 12px; border-radius: 12px; font-size: 12px; line-height: 16px; }
-    .bubble-me { align-self: flex-end; background: var(--radar-blue); color: #FFF; border-bottom-right-radius: 2px; }
-    .bubble-them { align-self: flex-start; background: var(--surface-card); border: 1px solid var(--border); color: #FFF; border-bottom-left-radius: 2px; }
-    .bubble-receipt { font-size: 8px; opacity: 0.8; text-align: right; margin-top: 2px; }
-    .chat-input-row { display: flex; gap: 6px; }
-    .chat-input {
-      flex: 1;
-      background: var(--surface-hover);
-      border: 1px solid var(--border);
-      color: #FFF;
-      border-radius: 999px;
-      padding: 8px 14px;
-      font-size: 12px;
-      outline: none;
+    #screenChat { background: var(--bg-page); padding: 20px 20px 100px 20px; display: none; flex-direction: column; }
+    #screenChat.active { display: flex; }
+    .chat-header { display: flex; align-items: center; gap: 12px; margin-top: 6px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-light); }
+    .chat-stream-box { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; padding-right: 2px; }
+    .chat-bubble { max-width: 82%; padding: 10px 14px; font-size: 13px; line-height: 18px; border-radius: 18px; }
+    .bubble-in { align-self: flex-start; background: #F0F2F5; color: var(--text-title); border-bottom-left-radius: 4px; }
+    .bubble-out { align-self: flex-end; background: var(--primary-red); color: #FFFFFF; border-bottom-right-radius: 4px; box-shadow: 0 4px 12px rgba(229, 57, 53, 0.25); }
+    .bubble-sub { font-size: 9px; opacity: 0.8; margin-top: 4px; text-align: right; }
+    .chat-input-bar { display: flex; gap: 8px; background: #FFFFFF; border: 1px solid var(--border-light); border-radius: 28px; padding: 4px 6px 4px 16px; box-shadow: var(--shadow-sm); }
+    .chat-input-field { flex: 1; border: none; outline: none; background: transparent; font-size: 13px; font-family: inherit; }
+    .chat-send-icon-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--primary-red); color: #FFFFFF; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+    .deck-drawer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #FFFFFF;
+      border-radius: 28px 28px 0 0;
+      box-shadow: 0 -10px 40px rgba(0,0,0,0.18);
+      border: 1px solid var(--border-light);
+      padding: 20px;
+      z-index: 200;
+      transform: translateY(105%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      max-height: 80vh;
+      overflow-y: auto;
     }
-    .chat-send-btn { background: var(--radar-blue); border: none; color: #FFF; font-size: 11px; font-weight: 800; padding: 8px 14px; border-radius: 999px; cursor: pointer; }
+    .deck-drawer.open { transform: translateY(0); }
+    .deck-handle-bar { width: 40px; height: 4px; border-radius: 2px; background: #D1D5DB; margin: 0 auto 16px auto; }
+    .deck-heading { font-size: 16px; font-weight: 800; color: var(--text-title); margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; }
+    .deck-sub-text { font-size: 11px; color: var(--text-sub); line-height: 16px; margin-bottom: 16px; }
+    .deck-card { background: #F8F9FA; border-radius: 16px; padding: 12px 14px; margin-bottom: 12px; border: 1px solid var(--border-light); }
+    .deck-row-label { font-size: 11px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin-bottom: 8px; }
+    .deck-btn-group { display: flex; gap: 8px; }
+    .deck-btn-action { flex: 1; padding: 10px; border-radius: 12px; border: 1px solid var(--border-light); background: #FFFFFF; font-size: 12px; font-weight: 700; color: var(--text-title); cursor: pointer; box-shadow: var(--shadow-sm); }
+    .deck-btn-action:active { background: #F0F2F5; }
+    .telemetry-code { font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 18px; color: #374151; }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="brand-wrap">
-      <div class="brand-logo">ResQ</div>
-      <div class="pill-offline">OFFLINE P2P BLE ACTIVE</div>
-    </div>
-    <div style="font-size: 12px; color: var(--text-sec); font-weight: 600;">
-      Interactive Mobile & AI Signal Simulator
-    </div>
-  </header>
+  <div class="app-viewport">
 
-  <div class="app-layout">
-    <!-- Phone Device Shell -->
-    <div class="phone-frame">
-      <div class="phone-notch"><div class="notch-speaker"></div></div>
-      <div class="phone-screen">
+    <!-- SCREEN 2: MAIN SOS SCREEN -->
+    <div id="screenHome" class="screen active">
+      <div class="home-header">
+        <div class="home-user-info">
+          <div class="user-greeting">Welcome back,</div>
+          <div class="user-name">Jenifer Pilman</div>
+        </div>
+        <div class="home-avatar-wrap" onclick="toggleDeck()">
+          <svg class="avatar-img" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="50" fill="#FFCDD2"/>
+            <circle cx="50" cy="38" r="22" fill="#D32F2F"/>
+            <path d="M20,90 Q50,60 80,90 Z" fill="#D32F2F"/>
+          </svg>
+          <div class="avatar-badge">2</div>
+        </div>
+      </div>
 
-        <!-- VIEW 1: MODE PICKER -->
-        <div id="viewModePicker" class="screen-view active">
-          <div class="mode-header">
-            <div class="mode-app-title">ResQ</div>
-            <div class="mode-tagline">Zero-Internet Emergency Rescue</div>
-          </div>
+      <div class="hero-title-wrap">
+        <h1 class="hero-title">Are you in emergency?</h1>
+        <p class="hero-sub">Press the button below help will reach you soon.</p>
+      </div>
 
-          <div class="mode-card-select mode-card-victim" onclick="selectAppMode('VICTIM')">
-            <div class="mode-card-title"><span>🆘</span> VICTIM MODE</div>
-            <div class="mode-card-desc">I am hurt or trapped. Broadcasts background BLE rotating beacon, shares encrypted medical data, and allows rescuers to trigger locating siren.</div>
-            <div class="mode-cta cta-victim">ACTIVATE SOS BROADCAST →</div>
-          </div>
+      <div class="sos-ripple-stage">
+        <div class="ripple-ring ring-3"></div>
+        <div class="ripple-ring ring-2"></div>
+        <div class="ripple-ring ring-1"></div>
+        <button id="btnSosCore" class="sos-core-btn" onclick="triggerSosEmergency()">
+          <span class="sos-btn-text">SOS</span>
+          <span class="sos-btn-sub">PRESS</span>
+        </button>
+      </div>
 
-          <div class="mode-card-select mode-card-rescue" onclick="selectAppMode('RESCUE')">
-            <div class="mode-card-title"><span>🧭</span> RESCUE SEARCH RADAR</div>
-            <div class="mode-card-desc">Search team mode. Proximity radar with on-device AI noise denoiser, "Warmer/Colder" trend tracking, remote siren, and offline P2P chat.</div>
-            <div class="mode-cta cta-rescue">OPEN SEARCH RADAR →</div>
+      <div class="address-card">
+        <svg class="address-avatar" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="48" fill="#FEEAE6"/>
+          <path d="M50 25 C39 25 30 34 30 45 C30 60 50 78 50 78 C50 78 70 60 70 45 C70 34 61 25 50 25 Z" fill="#E53935"/>
+          <circle cx="50" cy="45" r="7" fill="#FFFFFF"/>
+        </svg>
+        <div class="address-info">
+          <div class="address-label">Your current address</div>
+          <div class="address-text">151-171 Montclair Ave Newark, NJ 07104, USA</div>
+          <div class="mesh-status-row">
+            <span class="mesh-dot"></span>
+            <span>BLE Mesh Ready • 15-min rotating ID</span>
           </div>
         </div>
+      </div>
 
-        <!-- VIEW 2: VICTIM SOS SCREEN -->
-        <div id="viewVictim" class="screen-view">
-          <div class="phone-nav">
-            <div class="nav-title">Emergency Beacon</div>
-            <div class="nav-back" onclick="selectAppMode('NONE')">Change Mode</div>
+      <div class="chips-section-title">Your Condition (Encoded in BLE Beacon)</div>
+      <div class="chips-row">
+        <div class="triage-chip selected" onclick="selectChip(this)">🗣️ Conscious</div>
+        <div class="triage-chip" onclick="selectChip(this)">🏚️ Trapped Under Debris</div>
+        <div class="triage-chip" onclick="selectChip(this)">🩸 Severe Bleeding</div>
+        <div class="triage-chip" onclick="selectChip(this)">🚷 Cannot Move Legs</div>
+      </div>
+    </div>
+
+    <!-- SCREEN 1: DISPATCH VIEW -->
+    <div id="screenDispatch" class="screen">
+      <div class="dispatch-top-nav">
+        <button class="dispatch-back-btn" onclick="switchTab('home')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+      </div>
+
+      <div class="dispatch-illus-wrap">
+        <div class="dispatch-blob-backdrop"></div>
+        <svg class="ambulance-svg" viewBox="0 0 340 160">
+          <line x1="10" y1="50" x2="60" y2="50" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+          <line x1="25" y1="70" x2="75" y2="70" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" opacity="0.9"/>
+          <line x1="5" y1="90" x2="65" y2="90" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+          <line x1="30" y1="110" x2="80" y2="110" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+          <ellipse cx="140" cy="144" rx="28" ry="6" fill="rgba(0,0,0,0.2)"/>
+          <ellipse cx="260" cy="144" rx="28" ry="6" fill="rgba(0,0,0,0.2)"/>
+          <path d="M 85 45 Q 85 35 95 35 L 235 35 Q 245 35 250 45 L 275 80 Q 285 85 285 95 L 285 125 Q 285 130 280 130 L 90 130 Q 85 130 85 125 Z" fill="#FFFFFF"/>
+          <rect x="85" y="90" width="200" height="18" fill="#E53935"/>
+          <path d="M 235 45 L 246 45 L 268 76 L 235 76 Z" fill="#B3E5FC"/>
+          <rect x="180" y="45" width="45" height="31" rx="4" fill="#B3E5FC"/>
+          <circle cx="135" cy="70" r="18" fill="#E53935"/>
+          <rect x="131" y="58" width="8" height="24" rx="2" fill="#FFFFFF"/>
+          <rect x="123" y="66" width="24" height="8" rx="2" fill="#FFFFFF"/>
+          <rect x="160" y="27" width="28" height="8" rx="4" fill="#0288D1"/>
+          <polygon points="174,15 162,25 186,25" fill="#E1F5FE" opacity="0.7"/>
+          <circle cx="140" cy="130" r="18" fill="#263238"/>
+          <circle cx="140" cy="130" r="8" fill="#ECEFF1"/>
+          <circle cx="260" cy="130" r="18" fill="#263238"/>
+          <circle cx="260" cy="130" r="8" fill="#ECEFF1"/>
+        </svg>
+      </div>
+
+      <div class="dispatch-content">
+        <h2 class="dispatch-title">Ambulance and responders are on a way</h2>
+        <p class="dispatch-desc">Speak calmly to the person until the first aider arrives. First responders are on the way and the Rescue service is alarmed.</p>
+      </div>
+
+      <div class="dispatch-actions">
+        <button class="btn-see-map" onclick="switchTab('radar')">See responders on map</button>
+        <button class="btn-cancel-req" onclick="cancelEmergency()">Cancel request</button>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: RESPONDERS RADAR / MAP SCREEN -->
+    <div id="screenRadar" class="screen">
+      <div class="radar-nav-bar">
+        <button class="radar-back-btn" onclick="switchTab('home')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <div class="radar-header-info">
+          <h2 class="radar-main-title">Ambulance and responders are on a way</h2>
+          <p class="radar-main-sub">Speak calmly to the person until the first aider arrives. First responders are on the way and the...</p>
+          <a class="link-instruction" onclick="toggleDeck()">Open full instruction</a>
+        </div>
+      </div>
+
+      <div class="map-container">
+        <svg class="map-svg-grid" viewBox="0 0 400 320">
+          <rect width="400" height="320" fill="#F4F5F7"/>
+          <rect x="20" y="20" width="100" height="80" rx="8" fill="#FFFFFF"/>
+          <rect x="140" y="20" width="140" height="60" rx="8" fill="#FFFFFF"/>
+          <rect x="300" y="20" width="80" height="90" rx="8" fill="#FFFFFF"/>
+          <rect x="30" y="140" width="90" height="110" rx="8" fill="#FFFFFF"/>
+          <rect x="150" y="180" width="120" height="90" rx="8" fill="#FFFFFF"/>
+          <rect x="290" y="160" width="90" height="120" rx="8" fill="#FFFFFF"/>
+
+          <path d="M 0 120 L 400 120" stroke="#FFFFFF" stroke-width="22"/>
+          <path d="M 130 0 L 130 320" stroke="#FFFFFF" stroke-width="18"/>
+          <path d="M 280 0 L 280 320" stroke="#FFFFFF" stroke-width="20"/>
+          <path d="M 0 250 L 400 250" stroke="#FFFFFF" stroke-width="16"/>
+
+          <text x="40" y="55" font-size="9" font-weight="700" fill="#B0B8C1" letter-spacing="0.5">WEST HILL</text>
+          <text x="310" y="60" font-size="9" font-weight="700" fill="#B0B8C1" letter-spacing="0.5">WOOD</text>
+          <text x="40" y="180" font-size="8" font-weight="600" fill="#9DA7B3">Domino's Pizza</text>
+          <text x="160" y="195" font-size="8" font-weight="600" fill="#9DA7B3">Elliott Street School</text>
+          <text x="160" y="265" font-size="8" font-weight="600" fill="#9DA7B3">Luis Muñoz Marin</text>
+
+          <path d="M 90 220 L 130 190 L 180 230 L 230 140 L 280 160 L 320 60" 
+                fill="none" stroke="#E53935" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="90" cy="220" r="6" fill="#94A3B8"/>
+          <circle cx="320" cy="60" r="7" fill="#E53935"/>
+          <circle cx="320" cy="60" r="14" fill="none" stroke="rgba(229, 57, 53, 0.3)" stroke-width="2"/>
+        </svg>
+
+        <div class="map-tooltip tooltip-target">
+          <span class="pin-pulse"></span>
+          <span>You are here</span>
+        </div>
+
+        <div class="map-tooltip tooltip-responder">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="#E53935"><circle cx="12" cy="12" r="10"/></svg>
+          <span id="targetDistanceBadge">1st Responder (1.6m)</span>
+        </div>
+
+        <div class="radar-sweep-overlay">
+          <div class="radar-sweep-inner"></div>
+          <div class="radar-needle"></div>
+        </div>
+      </div>
+
+      <div class="responder-card">
+        <div class="responder-card-top">
+          <svg class="responder-avatar" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="48" fill="#E3F2FD"/>
+            <circle cx="50" cy="38" r="20" fill="#1E88E5"/>
+            <path d="M22,88 Q50,62 78,88 Z" fill="#1E88E5"/>
+          </svg>
+          <div class="responder-meta">
+            <div class="responder-name">Emily Dayton:</div>
+            <div class="responder-role">1st Responder (<span id="respDistTxt">1.6m</span> away)</div>
           </div>
+          <div class="responder-badge-proximity" id="respZoneBadge">IMMEDIATE</div>
+        </div>
 
-          <div id="victimStatusPill" class="beacon-status-pill">
-            <div class="beacon-dot"></div>
-            <span id="beaconText">STANDBY: Press SOS to broadcast beacon</span>
-          </div>
-
-          <div class="sos-btn-wrapper">
-            <div class="sos-pulse-ring"></div>
-            <button id="btnSosToggle" class="sos-btn" onclick="toggleVictimSos()">
-              <span class="sos-label" id="sosLabel">SOS</span>
-              <span class="sos-sub" id="sosSub">TAP TO BROADCAST</span>
-            </button>
-          </div>
-
-          <div class="call-911-btn" onclick="alert('Cellular Direct Call: Dialing 911 (Works with no internet or data required)')">
-            <div class="call-911-icon">📞</div>
-            <div>
-              <div class="call-911-text">CALL 911 (CELLULAR)</div>
-              <div class="call-911-sub">One-tap direct dial • No data needed</div>
-            </div>
-          </div>
-
-          <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.5px;">YOUR CURRENT CONDITION:</div>
-          <div class="chip-grid">
-            <div class="status-chip selected" onclick="setCondition(this, 'CONSCIOUS')">🗣️ Conscious & Able to Speak</div>
-            <div class="status-chip" onclick="setCondition(this, 'TRAPPED')">🏚️ Trapped Under Debris</div>
-            <div class="status-chip" onclick="setCondition(this, 'CANNOT_MOVE')">🚷 Cannot Move Legs</div>
-            <div class="status-chip" onclick="setCondition(this, 'BLEEDING')">🩸 Severe Bleeding</div>
-            <div class="status-chip" onclick="setCondition(this, 'NEED_INSULIN')">💉 Need Insulin Urgently</div>
-          </div>
-
-          <button id="btnLocalSiren" class="deck-btn" style="padding: 12px; margin-top: auto;" onclick="toggleAudioSiren()">
-            🔊 TEST LOCAL PHONE SIREN (MAX dB)
+        <div class="responder-actions">
+          <button id="btnCallSiren" class="btn-resp-call" onclick="toggleAudioSiren()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H4c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/></svg>
+            <span id="callBtnText">Call / Siren</span>
+          </button>
+          <button class="btn-resp-msg" onclick="switchTab('chat')">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            <span>Message</span>
           </button>
         </div>
-
-        <!-- VIEW 3: RESCUE SEARCH RADAR -->
-        <div id="viewRescue" class="screen-view">
-          <div class="phone-nav">
-            <div class="nav-title">Search Radar</div>
-            <div class="nav-back" onclick="selectAppMode('NONE')">Change Mode</div>
-          </div>
-
-          <div class="radar-canvas-wrap">
-            <canvas id="radarCanvas" width="260" height="260"></canvas>
-          </div>
-
-          <!-- Spotlight Target -->
-          <div class="spotlight-box">
-            <div class="spot-left">
-              <div>
-                <div style="font-size: 10px; font-weight: 800; color: var(--radar-blue);">NEAREST TARGET</div>
-                <div class="spot-dist" id="spotDist">3.2m</div>
-              </div>
-            </div>
-            <div class="spot-trend trend-warmer" id="spotTrend">🔥 GETTING WARMER</div>
-          </div>
-
-          <!-- Victims List -->
-          <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 8px;">DISCOVERED VICTIMS (3)</div>
-          <div id="victimsList" style="flex: 1; overflow-y: auto;">
-            <!-- Dynamically populated -->
-          </div>
-        </div>
-
-        <!-- VIEW 4: P2P CHAT -->
-        <div id="viewChat" class="screen-view">
-          <div class="phone-nav">
-            <div class="nav-title">Offline P2P Chat</div>
-            <div class="nav-back" onclick="openRadar()">← Radar</div>
-          </div>
-          <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 8px;">Direct 200-byte BLE packets • Zero internet</div>
-
-          <div class="chat-stream" id="chatStream">
-            <div class="chat-bubble bubble-them">
-              Can you hear us? We are search team Alpha directly above you.
-              <div class="bubble-receipt">15:42 • DELIVERED</div>
-            </div>
-            <div class="chat-bubble bubble-me">
-              Yes! I am trapped under a concrete beam. I cannot move my legs.
-              <div class="bubble-receipt">15:43 • ✓✓ DELIVERED</div>
-            </div>
-          </div>
-
-          <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); margin-bottom: 4px;">QUICK REPLIES:</div>
-          <div style="display: flex; gap: 4px; overflow-x: auto; margin-bottom: 8px;">
-            <button class="deck-btn" style="white-space: nowrap; font-size: 10px;" onclick="sendQuickReply('Need oxygen urgently')">Need O2</button>
-            <button class="deck-btn" style="white-space: nowrap; font-size: 10px;" onclick="sendQuickReply('Tapping 3 times now')">Tapping pipe</button>
-            <button class="deck-btn" style="white-space: nowrap; font-size: 10px;" onclick="sendQuickReply('Hang tight, cutting rubble')">Hang tight</button>
-          </div>
-
-          <div class="chat-input-row">
-            <input type="text" id="chatInput" class="chat-input" placeholder="Type short message..." onkeydown="if(event.key==='Enter') sendChatMessage()">
-            <button class="chat-send-btn" onclick="sendChatMessage()">SEND</button>
-          </div>
-        </div>
-
       </div>
     </div>
 
-    <!-- Live Simulation Control Deck -->
-    <div class="control-deck">
-      <div class="deck-title">⚡ BLE RF & Distance Deck</div>
-      <div class="deck-sub">Adjust virtual victim distance and RF obstacles in real time to observe the on-device Kalman and Neural Denoising response.</div>
-
-      <!-- Distance Control -->
-      <div class="deck-card">
-        <div class="deck-label">Rescuer Physical Distance: <span id="distDisplay" style="color: #FFF; font-size: 14px;">3.2m</span></div>
-        <div class="btn-row">
-          <button class="deck-btn" onclick="adjustDistance(-0.8)">🚶‍♂️ Walk Closer (-0.8m)</button>
-          <button class="deck-btn" onclick="adjustDistance(+0.8)">🚶‍♂️ Walk Away (+0.8m)</button>
+    <!-- SCREEN 4: OFFLINE P2P CHAT -->
+    <div id="screenChat" class="screen">
+      <div class="chat-header">
+        <button class="radar-back-btn" onclick="switchTab('radar')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <div style="flex: 1;">
+          <div style="font-size: 15px; font-weight: 800; color: var(--text-title);">Emily Dayton</div>
+          <div style="font-size: 11px; color: var(--status-green); font-weight: 700;">● Offline BLE Mesh Connected</div>
         </div>
       </div>
 
-      <!-- Obstacle Shadowing -->
-      <div class="deck-card">
-        <div class="deck-label">RF Multipath & Obstacle</div>
-        <div class="btn-row">
-          <button id="btnWall" class="deck-btn active" onclick="toggleWall()">Wall / Rubble (-10dB) ON</button>
-          <button class="deck-btn" onclick="triggerRandomSpike()">⚡ Simulate RF Spike</button>
+      <div class="chat-stream-box" id="chatStreamBox">
+        <div class="chat-bubble bubble-in">
+          Can you hear us? We are search team Alpha directly above you.
+          <div class="bubble-sub">15:42 • DELIVERED</div>
+        </div>
+        <div class="chat-bubble bubble-out">
+          Yes! I am trapped under a concrete beam. I cannot move my legs.
+          <div class="bubble-sub">15:43 • ✓✓ DELIVERED</div>
+        </div>
+        <div class="chat-bubble bubble-out">
+          Hang tight, cutting rubble
+          <div class="bubble-sub">09:15 AM • ✓✓ DELIVERED</div>
         </div>
       </div>
 
-      <!-- Remote Siren Trigger -->
+      <div style="display: flex; gap: 6px; overflow-x: auto; margin-bottom: 8px;">
+        <button class="triage-chip" onclick="quickSend('Need oxygen urgently')">Need O2</button>
+        <button class="triage-chip" onclick="quickSend('Tapping on pipe')">Tapping pipe</button>
+        <button class="triage-chip" onclick="quickSend('I hear your footsteps')">Hear steps</button>
+      </div>
+
+      <div class="chat-input-bar">
+        <input type="text" id="chatInputField" class="chat-input-field" placeholder="Type offline message..." onkeydown="if(event.key==='Enter') sendChat()">
+        <button class="chat-send-icon-btn" onclick="sendChat()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- BOTTOM NAVIGATION DOCK -->
+    <div class="bottom-dock" id="bottomDock">
+      <div class="dock-tab active" id="tabHome" onclick="switchTab('home')">
+        <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span>Home</span>
+      </div>
+      <div class="dock-tab" id="tabRadar" onclick="switchTab('radar')">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        <span>Radar</span>
+      </div>
+      <div class="dock-tab" id="tabChat" onclick="switchTab('chat')">
+        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+        <span>Chat</span>
+      </div>
+      <div class="dock-tab" id="tabDeck" onclick="toggleDeck()">
+        <svg viewBox="0 0 24 24"><path d="M11 21h-1l1-7H7.5c-.88 0-.33-.75-.31-.78C8.48 10.94 10.42 7.54 13.01 3h1l-1 7h3.51c.4 0 .62.19.4.66C14.7 14.88 12.5 18.66 11 21z"/></svg>
+        <span>RF Deck</span>
+      </div>
+    </div>
+
+    <!-- MODAL DRAWER: BLE RF & EDGE AI SIMULATOR -->
+    <div class="deck-drawer" id="deckDrawer">
+      <div class="deck-handle-bar"></div>
+      <div class="deck-heading">
+        <span>⚡ Edge AI RF Telemetry</span>
+        <button onclick="toggleDeck()" style="border:none; background:#F0F2F5; width:28px; height:28px; border-radius:50%; font-weight:800; cursor:pointer;">✕</button>
+      </div>
+      <p class="deck-sub-text">Observe on-device 1D-CNN and Adaptive Kalman signal cleaning responding to physical rescuer distance & rubble shadowing.</p>
+
       <div class="deck-card">
-        <div class="deck-label">Remote Siren Remote Command</div>
-        <div class="btn-row">
-          <button id="btnRemoteSiren" class="deck-btn" onclick="toggleRemoteSiren()">🔊 Sound Victim Siren</button>
+        <div class="deck-row-label">Rescuer Distance: <strong id="deckDistVal" style="color:var(--text-title); font-size:13px;">1.6m</strong></div>
+        <div class="deck-btn-group">
+          <button class="deck-btn-action" onclick="walkStep(-0.8)">🚶‍♂️ Walk Closer (-0.8m)</button>
+          <button class="deck-btn-action" onclick="walkStep(+0.8)">🚶‍♂️ Walk Away (+0.8m)</button>
         </div>
       </div>
 
-      <!-- Signal Cleaner Metrics -->
-      <div class="deck-card" style="background: #0B111F;">
-        <div class="deck-label">AI Signal Denoising Telemetry</div>
-        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 18px; color: var(--text-sec);">
-          Raw RSSI: <span id="telemetryRaw" style="color: var(--far-red);">-76 dBm</span><br>
-          Kalman Cleaned: <span id="telemetryKalman" style="color: var(--immediate-green);">-71.4 dBm</span><br>
-          Zone: <span id="telemetryZone" style="color: var(--near-amber);">NEAR (&lt; 5m)</span><br>
-          Trend Slope: <span id="telemetrySlope" style="color: var(--immediate-green);">+0.62 dB/s (Warmer)</span>
+      <div class="deck-card">
+        <div class="deck-row-label">RF Obstacle Simulation</div>
+        <div class="deck-btn-group">
+          <button id="btnWallToggle" class="deck-btn-action" onclick="toggleWall()">Wall / Rubble (-10dB) ON</button>
+          <button class="deck-btn-action" onclick="spikeNoise()">⚡ RF Multipath Spike</button>
+        </div>
+      </div>
+
+      <div class="deck-card" style="background:#F1F5F9;">
+        <div class="deck-row-label">Neural Denoising Metrics</div>
+        <div class="telemetry-code">
+          Raw RSSI: <span id="mRaw" style="color:#DC2626; font-weight:700;">-73 dBm</span><br>
+          Kalman Cleaned: <span id="mKalman" style="color:#059669; font-weight:700;">-75.5 dBm</span><br>
+          Proximity: <span id="mZone" style="color:#2563EB; font-weight:700;">IMMEDIATE (&lt; 2m)</span><br>
+          Trend: <span id="mTrend" style="color:#059669; font-weight:700;">+0.62 dB/s (Warmer)</span>
         </div>
       </div>
     </div>
+
   </div>
 
   <script>
-    // --- State Engine ---
-    let appMode = 'NONE';
-    let isSosBroadcasting = false;
-    let distanceMeters = 3.2;
+    let currentScreen = 'home';
+    let distanceMeters = 1.6;
     let hasWall = true;
-    let isSirenOn = false;
+    let isSirenActive = false;
     let audioCtx = null;
     let sirenOsc = null;
-    let rawRssi = -76;
-    let kalmanRssi = -71.4;
+    let rawRssi = -73;
+    let kalmanRssi = -75.5;
 
-    const victims = [
-      { id: 'A1B2C3D40001', name: 'Sarah M.', dist: 3.2, condition: 'TRAPPED', blood: 'O+', allergies: 'Penicillin' },
-      { id: '887766550002', name: 'Alex R.', dist: 1.4, condition: 'CONSCIOUS', blood: 'A+', allergies: 'Latex' },
-      { id: '990011220003', name: 'Search Dog Beacon', dist: 11.2, condition: 'SAFE', blood: 'n/a', allergies: 'none' }
-    ];
+    function switchTab(tabId) {
+      currentScreen = tabId;
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.dock-tab').forEach(t => t.classList.remove('active'));
+      const dock = document.getElementById('bottomDock');
 
-    function selectAppMode(mode) {
-      appMode = mode;
-      document.querySelectorAll('.screen-view').forEach(v => v.classList.remove('active'));
-      if (mode === 'VICTIM') {
-        document.getElementById('viewVictim').classList.add('active');
-      } else if (mode === 'RESCUE') {
-        document.getElementById('viewRescue').classList.add('active');
-        renderVictims();
-      } else {
-        document.getElementById('viewModePicker').classList.add('active');
+      if (tabId === 'home') {
+        document.getElementById('screenHome').classList.add('active');
+        document.getElementById('tabHome').classList.add('active');
+        dock.classList.remove('dock-hidden');
+      } else if (tabId === 'dispatch') {
+        document.getElementById('screenDispatch').classList.add('active');
+        dock.classList.add('dock-hidden');
+      } else if (tabId === 'radar') {
+        document.getElementById('screenRadar').classList.add('active');
+        document.getElementById('tabRadar').classList.add('active');
+        dock.classList.remove('dock-hidden');
+      } else if (tabId === 'chat') {
+        document.getElementById('screenChat').classList.add('active');
+        document.getElementById('tabChat').classList.add('active');
+        dock.classList.remove('dock-hidden');
       }
+      closeDeck();
     }
 
-    function toggleVictimSos() {
-      isSosBroadcasting = !isSosBroadcasting;
-      const btn = document.getElementById('btnSosToggle');
-      const pill = document.getElementById('victimStatusPill');
-      const label = document.getElementById('sosLabel');
-      const sub = document.getElementById('sosSub');
-      const text = document.getElementById('beaconText');
-
-      if (isSosBroadcasting) {
-        btn.classList.add('active');
-        pill.classList.add('active');
-        label.innerText = 'ACTIVE';
-        sub.innerText = 'BEACON BROADCASTING';
-        text.innerText = 'BEACON LIVE: 15-min rotating ID 43453F4C005CC2D5';
-      } else {
-        btn.classList.remove('active');
-        pill.classList.remove('active');
-        label.innerText = 'SOS';
-        sub.innerText = 'TAP TO BROADCAST';
-        text.innerText = 'STANDBY: Press SOS to broadcast beacon';
-        stopSirenSound();
-      }
-    }
-
-    function setCondition(elem, cond) {
-      document.querySelectorAll('.status-chip').forEach(c => c.classList.remove('selected'));
+    function triggerSosEmergency() { switchTab('dispatch'); }
+    function cancelEmergency() { switchTab('home'); stopAudioSiren(); }
+    function selectChip(elem) {
+      document.querySelectorAll('.triage-chip').forEach(c => c.classList.remove('selected'));
       elem.classList.add('selected');
     }
 
-    function openChat(victimId) {
-      document.querySelectorAll('.screen-view').forEach(v => v.classList.remove('active'));
-      document.getElementById('viewChat').classList.add('active');
+    function toggleDeck() { document.getElementById('deckDrawer').classList.toggle('open'); }
+    function closeDeck() { document.getElementById('deckDrawer').classList.remove('open'); }
+
+    function walkStep(delta) {
+      distanceMeters = Math.max(0.4, Math.min(20.0, Math.round((distanceMeters + delta) * 10) / 10));
+      updateTelemetry();
     }
 
-    function openRadar() {
-      selectAppMode('RESCUE');
+    function toggleWall() {
+      hasWall = !hasWall;
+      const btn = document.getElementById('btnWallToggle');
+      btn.innerText = hasWall ? 'Wall / Rubble (-10dB) ON' : 'Direct LOS (No Wall)';
+      updateTelemetry();
     }
 
-    function sendQuickReply(msg) {
-      const stream = document.getElementById('chatStream');
-      const div = document.createElement('div');
-      div.className = 'chat-bubble bubble-me';
-      div.innerHTML = `${msg}<div class="bubble-receipt">${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} • ✓✓ DELIVERED</div>`;
-      stream.appendChild(div);
-      stream.scrollTop = stream.scrollHeight;
+    function spikeNoise() {
+      rawRssi -= 12;
+      updateTelemetry();
     }
 
-    function sendChatMessage() {
-      const input = document.getElementById('chatInput');
-      const text = input.value.trim();
-      if (!text) return;
+    function updateTelemetry() {
+      const wallLoss = hasWall ? 10 : 0;
+      rawRssi = Math.round(-59 - 25 * Math.log10(distanceMeters) - wallLoss + (Math.random() * 4 - 2));
+      kalmanRssi = Math.round((kalmanRssi * 0.4 + rawRssi * 0.6) * 10) / 10;
+
+      let zone = 'FAR (> 5m)';
+      let zoneShort = 'FAR';
+      if (distanceMeters < 2.0) {
+        zone = 'IMMEDIATE (< 2m)';
+        zoneShort = 'IMMEDIATE';
+      } else if (distanceMeters < 5.0) {
+        zone = 'NEAR (< 5m)';
+        zoneShort = 'NEAR';
+      }
+
+      document.getElementById('deckDistVal').innerText = distanceMeters.toFixed(1) + 'm';
+      document.getElementById('respDistTxt').innerText = distanceMeters.toFixed(1) + 'm';
+      document.getElementById('targetDistanceBadge').innerText = `1st Responder (${distanceMeters.toFixed(1)}m)`;
+      document.getElementById('respZoneBadge').innerText = zoneShort;
+
+      document.getElementById('mRaw').innerText = rawRssi + ' dBm';
+      document.getElementById('mKalman').innerText = kalmanRssi + ' dBm';
+      document.getElementById('mZone').innerText = zone;
+    }
+
+    function sendChat() {
+      const input = document.getElementById('chatInputField');
+      const val = input.value.trim();
+      if (!val) return;
       input.value = '';
-      sendQuickReply(text);
+      quickSend(val);
     }
 
-    // --- Web Audio Siren Synthesizer ---
+    function quickSend(text) {
+      const box = document.getElementById('chatStreamBox');
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-bubble bubble-out';
+      bubble.innerHTML = `${text}<div class="bubble-sub">${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} • ✓✓ DELIVERED</div>`;
+      box.appendChild(bubble);
+      box.scrollTop = box.scrollHeight;
+    }
+
     function toggleAudioSiren() {
-      if (isSirenOn) {
-        stopSirenSound();
-      } else {
-        startSirenSound();
-      }
+      if (isSirenActive) stopAudioSiren();
+      else startAudioSiren();
     }
 
-    function toggleRemoteSiren() {
-      toggleAudioSiren();
-      const btn = document.getElementById('btnRemoteSiren');
-      if (isSirenOn) {
-        btn.innerText = '🔕 Silence Victim Siren';
-        btn.style.background = 'var(--sos-red)';
-      } else {
-        btn.innerText = '🔊 Sound Victim Siren';
-        btn.style.background = '';
-      }
-    }
-
-    function startSirenSound() {
-      isSirenOn = true;
+    function startAudioSiren() {
+      isSirenActive = true;
       try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         audioCtx = new AudioContext();
@@ -703,7 +941,6 @@
         sirenOsc.type = 'sawtooth';
         sirenOsc.frequency.setValueAtTime(800, audioCtx.currentTime);
         
-        // Oscillate 800Hz - 1200Hz warble alarm
         let high = false;
         window.sirenInterval = setInterval(() => {
           if (!sirenOsc || !audioCtx) return;
@@ -711,190 +948,29 @@
           sirenOsc.frequency.exponentialRampToValueAtTime(high ? 1300 : 750, audioCtx.currentTime + 0.25);
         }, 300);
 
-        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
         sirenOsc.connect(gain);
         gain.connect(audioCtx.destination);
         sirenOsc.start();
-        document.getElementById('btnLocalSiren').innerText = 'SILENCE ALARM';
-        document.getElementById('btnLocalSiren').style.background = 'var(--sos-red)';
-      } catch(e) {
-        console.log('Audio init prevented:', e);
-      }
+        
+        const btn = document.getElementById('btnCallSiren');
+        btn.classList.add('active');
+        document.getElementById('callBtnText').innerText = 'Silence Siren';
+      } catch(e) {}
     }
 
-    function stopSirenSound() {
-      isSirenOn = false;
+    function stopAudioSiren() {
+      isSirenActive = false;
       if (window.sirenInterval) clearInterval(window.sirenInterval);
       if (sirenOsc) {
         try { sirenOsc.stop(); } catch(e) {}
         sirenOsc = null;
       }
-      document.getElementById('btnLocalSiren').innerText = '🔊 TEST LOCAL PHONE SIREN (MAX dB)';
-      document.getElementById('btnLocalSiren').style.background = '';
+      const btn = document.getElementById('btnCallSiren');
+      if (btn) btn.classList.remove('active');
+      const text = document.getElementById('callBtnText');
+      if (text) text.innerText = 'Call / Siren';
     }
-
-    // --- Distance & Radar Simulation ---
-    function adjustDistance(delta) {
-      distanceMeters = Math.max(0.4, Math.min(20.0, Math.round((distanceMeters + delta) * 10) / 10));
-      victims[0].dist = distanceMeters;
-      updateSimulation();
-    }
-
-    function toggleWall() {
-      hasWall = !hasWall;
-      const btn = document.getElementById('btnWall');
-      btn.innerText = hasWall ? 'Wall / Rubble (-10dB) ON' : 'Direct Line of Sight (LOS)';
-      btn.classList.toggle('active', hasWall);
-      updateSimulation();
-    }
-
-    function triggerRandomSpike() {
-      rawRssi -= 14;
-      updateSimulation();
-    }
-
-    function updateSimulation() {
-      document.getElementById('distDisplay').innerText = distanceMeters.toFixed(1) + 'm';
-      document.getElementById('spotDist').innerText = distanceMeters.toFixed(1) + 'm';
-
-      // Path loss calculation
-      const tx1m = -59.0;
-      const n = 2.8;
-      const pathLoss = 10 * n * Math.log10(Math.max(0.3, distanceMeters));
-      let calcRssi = tx1m - pathLoss;
-      if (hasWall) calcRssi -= 9.5;
-      rawRssi = Math.round(calcRssi + (Math.random() - 0.5) * 5);
-
-      // Adaptive Kalman smoothing simulation
-      kalmanRssi = Math.round((kalmanRssi * 0.7 + rawRssi * 0.3) * 10) / 10;
-
-      // Telemetry readouts
-      document.getElementById('telemetryRaw').innerText = rawRssi + ' dBm';
-      document.getElementById('telemetryKalman').innerText = kalmanRssi + ' dBm';
-
-      const zone = distanceMeters <= 2.2 ? 'IMMEDIATE (< 2m)' : (distanceMeters <= 5.5 ? 'NEAR (< 5m)' : 'FAR (> 5m)');
-      document.getElementById('telemetryZone').innerText = zone;
-
-      const spotTrend = document.getElementById('spotTrend');
-      if (distanceMeters <= 2.2) {
-        spotTrend.className = 'spot-trend trend-warmer';
-        spotTrend.innerText = '🎯 REACHED IMMEDIATE ZONE';
-      } else if (distanceMeters < 4.0) {
-        spotTrend.className = 'spot-trend trend-warmer';
-        spotTrend.innerText = '🔥 GETTING WARMER';
-      } else {
-        spotTrend.className = 'spot-trend trend-colder';
-        spotTrend.innerText = '❄️ GETTING COLDER';
-      }
-
-      renderVictims();
-    }
-
-    function renderVictims() {
-      const list = document.getElementById('victimsList');
-      if (!list) return;
-      list.innerHTML = '';
-
-      victims.forEach((v, i) => {
-        const zoneClass = v.dist <= 2.2 ? 'zone-imm' : (v.dist <= 5.5 ? 'zone-near' : 'zone-far');
-        const zoneLabel = v.dist <= 2.2 ? 'IMMEDIATE' : (v.dist <= 5.5 ? 'NEAR' : 'FAR');
-
-        const card = document.createElement('div');
-        card.className = `victim-card ${i === 0 ? 'selected' : ''}`;
-        card.innerHTML = `
-          <div class="vc-top">
-            <div class="vc-id">#${v.id.slice(-6)} • ${v.name}</div>
-            <span class="vc-zone ${zoneClass}">${v.dist.toFixed(1)}m • ${zoneLabel}</span>
-          </div>
-          <div class="vc-telemetry">
-            <span>Raw: ${rawRssi - i*4}dBm</span>
-            <span style="color:var(--immediate-green)">Cleaned: ${(kalmanRssi - i*3).toFixed(1)}dBm</span>
-            <span style="color:var(--sos-red)">${v.condition}</span>
-          </div>
-          <div class="vc-actions">
-            <button class="btn-siren-trigger ${isSirenOn && i === 0 ? 'active' : ''}" onclick="toggleRemoteSiren()">${isSirenOn && i === 0 ? 'SILENCE' : 'TRIGGER SIREN'}</button>
-            <button class="btn-card-chat" onclick="openChat('${v.id}')">CHAT</button>
-          </div>
-        `;
-        list.appendChild(card);
-      });
-    }
-
-    // --- Radar Sweep Animation on Canvas ---
-    let sweepAngle = 0;
-    function drawRadar() {
-      const canvas = document.getElementById('radarCanvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const w = canvas.width;
-      const h = canvas.height;
-      const center = w / 2;
-
-      ctx.clearRect(0, 0, w, h);
-
-      // Range rings
-      const rings = [0.26, 0.55, 0.88];
-      rings.forEach((r, idx) => {
-        ctx.beginPath();
-        ctx.arc(center, center, center * r, 0, Math.PI * 2);
-        ctx.strokeStyle = idx === 0 ? 'rgba(16, 185, 129, 0.4)' : (idx === 1 ? 'rgba(245, 158, 11, 0.3)' : 'rgba(239, 68, 68, 0.2)');
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4, 4]);
-        ctx.stroke();
-        ctx.setLineDash([]);
-      });
-
-      // Axis lines
-      ctx.strokeStyle = 'rgba(30, 41, 59, 0.7)';
-      ctx.beginPath();
-      ctx.moveTo(center, 0); ctx.lineTo(center, h);
-      ctx.moveTo(0, center); ctx.lineTo(w, center);
-      ctx.stroke();
-
-      // Rotating sweep line
-      sweepAngle += 0.035;
-      ctx.beginPath();
-      ctx.moveTo(center, center);
-      ctx.arc(center, center, center * 0.95, sweepAngle, sweepAngle + 0.35);
-      ctx.closePath();
-      const grad = ctx.createRadialGradient(center, center, 0, center, center, center);
-      grad.addColorStop(0, 'rgba(59, 130, 246, 0)');
-      grad.addColorStop(1, 'rgba(59, 130, 246, 0.25)');
-      ctx.fillStyle = grad;
-      ctx.fill();
-
-      // Draw Center Rescuer
-      ctx.beginPath();
-      ctx.arc(center, center, 6, 0, Math.PI * 2);
-      ctx.fillStyle = '#3B82F6';
-      ctx.fill();
-      ctx.strokeStyle = '#FFF';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      // Draw victim blips
-      victims.forEach((v, idx) => {
-        const maxDist = 18.0;
-        const normDist = Math.max(0.08, Math.min(0.9, v.dist / maxDist));
-        const blipRadius = center * normDist;
-        const blipAngle = (idx * 2.1) + 0.4;
-        const bx = center + blipRadius * Math.cos(blipAngle);
-        const by = center + blipRadius * Math.sin(blipAngle);
-
-        ctx.beginPath();
-        ctx.arc(bx, by, 7, 0, Math.PI * 2);
-        ctx.fillStyle = v.dist <= 2.2 ? '#10B981' : (v.dist <= 5.5 ? '#F59E0B' : '#EF4444');
-        ctx.fill();
-        ctx.strokeStyle = '#FFF';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-      });
-
-      requestAnimationFrame(drawRadar);
-    }
-
-    drawRadar();
-    updateSimulation();
   </script>
 </body>
 </html>
