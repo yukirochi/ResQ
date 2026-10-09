@@ -28,8 +28,7 @@
       --border-light: #F0F2F5;
       --border-card: #EAECEF;
 
-      --status-green: #10B981;
-      --status-amber: #F59E0B;
+      --status-amber: #D97706;
       --status-red: #E53935;
       
       --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.03);
@@ -37,11 +36,12 @@
       --shadow-lg: 0 18px 40px rgba(0, 0, 0, 0.08);
       --shadow-sos: 0 16px 36px rgba(229, 57, 53, 0.38);
 
-      /* Radar Tactical Tokens */
-      --radar-bg: #070D1A;
-      --radar-surface: #0E1729;
-      --radar-green: #10B981;
-      --radar-cyan: #06B6D4;
+      /* Radar Emergency Scope Tokens */
+      --radar-bg: #150508;
+      --radar-surface: #1E070B;
+      --radar-crimson: #E53935;
+      --radar-crimson-bright: #FF1744;
+      --radar-glow: rgba(229, 57, 53, 0.35);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -176,7 +176,7 @@
     .home-user-info .user-greeting { font-size: 13px; color: var(--text-sub); font-weight: 500; }
     .home-user-info .user-name { font-size: 18px; font-weight: 800; color: var(--text-title); letter-spacing: -0.3px; }
     
-    /* Clean Tactical Badge Icon instead of Dude Photo */
+    /* Clean Tactical Badge Icon (No Dude Photo) */
     .home-avatar-wrap { position: relative; cursor: pointer; }
     .badge-shield-icon {
       width: 44px;
@@ -283,16 +283,18 @@
     .address-info { flex: 1; }
     .address-label { font-size: 13px; font-weight: 800; color: var(--text-title); margin-bottom: 2px; }
     .address-text { font-size: 11px; color: var(--text-sub); line-height: 15px; }
-    .mesh-status-row { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 10px; font-weight: 700; color: var(--status-green); }
-    .mesh-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--status-green); box-shadow: 0 0 6px var(--status-green); }
+    .mesh-status-row { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 10px; font-weight: 700; color: var(--primary-red); }
+    .mesh-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary-red); box-shadow: 0 0 6px var(--primary-red); }
 
     .chips-section-title { font-size: 11px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
     .chips-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 8px; }
+    
+    /* Clean Triage Chips (No Emojis) */
     .triage-chip {
       background: var(--bg-card);
       border: 1.5px solid var(--border-light);
       border-radius: 14px;
-      padding: 8px 12px;
+      padding: 8px 14px;
       font-size: 11px;
       font-weight: 700;
       color: var(--text-title);
@@ -300,14 +302,13 @@
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
       box-shadow: var(--shadow-sm);
       transition: all 0.2s ease;
     }
     .triage-chip.selected { border-color: var(--primary-red); background: #FFF5F5; color: var(--primary-red); }
 
     /* ============================================================
-       SCREEN 1: DISPATCH VIEW (AMBULANCE SCREEN)
+       SCREEN 1: DISPATCH VIEW (AMBULANCE)
        ============================================================ */
     #screenDispatch {
       background: var(--dispatch-gradient);
@@ -387,7 +388,7 @@
     .btn-cancel-req { background: transparent; border: none; color: #FFFFFF; font-size: 14px; font-weight: 700; cursor: pointer; opacity: 0.9; padding: 8px 16px; }
 
     /* ============================================================
-       SCREEN 3: RESPONDERS RADAR SCREEN (MAP REMOVED, RADAR KEPT)
+       SCREEN 3: RESPONDERS RADAR SCREEN (ON-THEME EMERGENCY RADAR)
        ============================================================ */
     #screenRadar { background: var(--bg-page); padding: 50px 18px 125px 18px; }
     .radar-nav-bar { display: flex; align-items: center; gap: 12px; margin-top: 4px; margin-bottom: 12px; }
@@ -410,7 +411,7 @@
     .radar-main-sub { font-size: 11px; color: var(--text-sub); line-height: 16px; margin-top: 2px; }
     .link-instruction { color: var(--primary-red); font-size: 11px; font-weight: 700; text-decoration: none; display: inline-block; cursor: pointer; margin-top: 2px; }
 
-    /* Tactical Circular Radar Scope Container (replaces the old map) */
+    /* Tactical Emergency Scope Container (Red/Crimson Theme) */
     .radar-scope-wrapper {
       position: relative;
       width: 100%;
@@ -437,18 +438,18 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
       font-weight: 800;
-      color: var(--status-green);
-      background: rgba(16, 185, 129, 0.1);
+      color: var(--primary-red);
+      background: #FFF0F0;
       padding: 3px 8px;
       border-radius: 6px;
-      border: 1px solid rgba(16, 185, 129, 0.25);
+      border: 1px solid rgba(229, 57, 53, 0.25);
     }
     .radar-live-dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: var(--status-green);
-      box-shadow: 0 0 6px var(--status-green);
+      background: var(--primary-red);
+      box-shadow: 0 0 6px var(--primary-red);
       animation: pulseGlow 1.2s infinite;
     }
 
@@ -484,8 +485,8 @@
       max-width: 340px;
       margin: 0 auto;
       border-radius: 50%;
-      background: radial-gradient(circle at center, #0B162B 0%, #060B15 70%, #03060B 100%);
-      box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.9), 0 4px 16px rgba(0, 0, 0, 0.15), 0 0 0 2px #16243D;
+      background: radial-gradient(circle at center, #1E070B 0%, #150508 70%, #0C0305 100%);
+      box-shadow: inset 0 0 35px rgba(229, 57, 53, 0.25), 0 4px 16px rgba(0, 0, 0, 0.15), 0 0 0 2px rgba(229, 57, 53, 0.3);
       overflow: hidden;
       display: flex;
       align-items: center;
@@ -534,12 +535,12 @@
       font-weight: 800;
       padding: 3px 8px;
       border-radius: 8px;
-      background: #E8F5E9;
-      color: var(--status-green);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      background: #FFF0F0;
+      color: var(--primary-red);
+      border: 1px solid rgba(229, 57, 53, 0.3);
       display: flex;
       align-items: center;
-      gap: 4px;
+      letter-spacing: 0.3px;
     }
 
     .telemetry-metrics-grid {
@@ -566,10 +567,9 @@
       color: var(--text-title);
       margin-top: 1px;
     }
-    .metric-cell-val.green { color: var(--status-green); }
-    .metric-cell-val.red { color: var(--primary-red); }
+    .metric-cell-val.crimson { color: var(--primary-red); }
 
-    /* Tactical Quick Calibration Buttons */
+    /* Tactical Quick Calibration Buttons (No Emojis) */
     .quick-calib-row {
       display: flex;
       gap: 8px;
@@ -577,7 +577,7 @@
     }
     .btn-calib {
       flex: 1;
-      height: 36px;
+      height: 38px;
       background: #FFFFFF;
       border: 1px solid var(--border-light);
       border-radius: 12px;
@@ -588,13 +588,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 6px;
       box-shadow: var(--shadow-sm);
       transition: all 0.15s ease;
     }
+    .btn-calib svg { width: 14px; height: 14px; fill: var(--primary-red); }
     .btn-calib:active { background: #F1F4F8; transform: scale(0.97); }
 
-    /* Tactical Responder Card (No dude faces, pure tactical unit badge) */
+    /* Tactical Responder Card (No Dudes, Emergency Crimson Theme) */
     .responder-card {
       background: var(--bg-card);
       border-radius: 22px;
@@ -609,13 +610,13 @@
       width: 46px;
       height: 46px;
       border-radius: 50%;
-      background: #E8F5E9;
+      background: #FFF0F0;
       border: 2px solid #FFFFFF;
       box-shadow: var(--shadow-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--status-green);
+      color: var(--primary-red);
       flex-shrink: 0;
     }
     .responder-tactical-icon svg { width: 22px; height: 22px; fill: currentColor; }
@@ -623,7 +624,7 @@
     .responder-meta { flex: 1; }
     .responder-name { font-size: 14px; font-weight: 800; color: var(--text-title); }
     .responder-role { font-size: 11px; color: var(--text-sub); font-weight: 600; margin-top: 1px; }
-    .responder-badge-proximity { background: #E8F5E9; color: var(--status-green); font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px; }
+    .responder-badge-proximity { background: #FFF0F0; color: var(--primary-red); font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px; }
     
     .responder-actions { display: flex; gap: 10px; }
     .btn-resp-call {
@@ -702,6 +703,9 @@
     .deck-sub-text { font-size: 11px; color: var(--text-sub); line-height: 16px; margin-bottom: 16px; }
     .deck-card { background: #F8F9FA; border-radius: 16px; padding: 12px 14px; margin-bottom: 12px; border: 1px solid var(--border-light); }
     .deck-row-label { font-size: 11px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin-bottom: 8px; }
+    .deck-btn-group { display: flex; gap: 6px; }
+    .deck-btn-action { flex: 1; padding: 10px; border-radius: 12px; border: 1px solid var(--border-light); background: #FFFFFF; font-size: 12px; font-weight: 700; color: var(--text-title); cursor: pointer; box-shadow: var(--shadow-sm); }
+    .deck-btn-action:active { background: #F0F2F5; }
     .telemetry-code { font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 18px; color: #374151; }
   </style>
 </head>
@@ -718,7 +722,7 @@
           <div class="user-greeting">Welcome back,</div>
           <div class="user-name">Rescue Unit Lead</div>
         </div>
-        <!-- Tactical Badge Icon instead of Dude Face -->
+        <!-- Tactical Badge Icon (No Dude Face) -->
         <div class="home-avatar-wrap" onclick="toggleDeck()">
           <div class="badge-shield-icon">
             <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 6h2v4h4v2h-4v4h-2v-4H7v-2h4V7z"/></svg>
@@ -758,13 +762,13 @@
         </div>
       </div>
 
-      <!-- Condition / Triage Selection -->
+      <!-- Condition / Triage Selection (No Emojis) -->
       <div class="chips-section-title">Emergency Condition (Encoded in BLE Beacon)</div>
       <div class="chips-row">
-        <div class="triage-chip selected" onclick="selectChip(this)">🗣️ Conscious</div>
-        <div class="triage-chip" onclick="selectChip(this)">🏚️ Trapped Under Debris</div>
-        <div class="triage-chip" onclick="selectChip(this)">🩸 Severe Bleeding</div>
-        <div class="triage-chip" onclick="selectChip(this)">🚷 Cannot Move Legs</div>
+        <div class="triage-chip selected" onclick="selectChip(this)">Conscious</div>
+        <div class="triage-chip" onclick="selectChip(this)">Trapped Under Debris</div>
+        <div class="triage-chip" onclick="selectChip(this)">Severe Bleeding</div>
+        <div class="triage-chip" onclick="selectChip(this)">Cannot Move Legs</div>
       </div>
     </div>
 
@@ -818,7 +822,7 @@
     </div>
 
     <!-- ============================================================
-         SCREEN 3: RESPONDERS RADAR SCREEN (MAP REMOVED, RADAR KEPT)
+         SCREEN 3: RESPONDERS RADAR SCREEN (ON-THEME RADAR SCOPE)
          ============================================================ -->
     <div id="screenRadar" class="screen">
       <div class="radar-nav-bar">
@@ -832,7 +836,7 @@
         </div>
       </div>
 
-      <!-- RADAR SCOPE CARD (Replacing the map completely) -->
+      <!-- RADAR SCOPE CARD (Crimson & Coral Emergency Palette) -->
       <div class="radar-scope-wrapper">
         <div class="scope-top-bar">
           <div class="radar-accuracy-badge">
@@ -858,17 +862,17 @@
               <span class="telemetry-unit">METERS</span>
             </div>
             <div id="scopeProximityPill" class="proximity-pill">
-              🎯 IMMEDIATE (&lt; 2M)
+              IMMEDIATE (&lt; 2M)
             </div>
           </div>
           <div class="telemetry-metrics-grid">
             <div>
               <div class="metric-cell-label">Filtered RSSI</div>
-              <div id="scopeFilteredRssi" class="metric-cell-val green">-73.2 dBm</div>
+              <div id="scopeFilteredRssi" class="metric-cell-val crimson">-73.2 dBm</div>
             </div>
             <div>
               <div class="metric-cell-label">Raw RF RSSI</div>
-              <div id="scopeRawRssi" class="metric-cell-val red">-71.7 dBm</div>
+              <div id="scopeRawRssi" class="metric-cell-val">-71.7 dBm</div>
             </div>
             <div>
               <div class="metric-cell-label">Trend Velocity</div>
@@ -878,13 +882,19 @@
         </div>
       </div>
 
-      <!-- Quick Distance Calibration (Interactive fine-tuning) -->
+      <!-- Quick Distance Calibration (No Emojis) -->
       <div class="quick-calib-row">
-        <button class="btn-calib" onclick="adjustDistance(-0.6)">🚶 Approaching (-0.6m)</button>
-        <button class="btn-calib" onclick="adjustDistance(0.6)">🏃 Moving Away (+0.6m)</button>
+        <button class="btn-calib" onclick="adjustDistance(-0.6)">
+          <svg viewBox="0 0 24 24"><path d="M12 4l-8 8h6v8h4v-8h6z"/></svg>
+          <span>Approaching (-0.6m)</span>
+        </button>
+        <button class="btn-calib" onclick="adjustDistance(0.6)">
+          <svg viewBox="0 0 24 24"><path d="M12 20l8-8h-6V4h-4v8H4z"/></svg>
+          <span>Moving Away (+0.6m)</span>
+        </button>
       </div>
 
-      <!-- Responder Tactical Card (Clean tactical icon, no dude face) -->
+      <!-- Responder Tactical Card (Clean tactical icon, no dude face, emergency theme) -->
       <div class="responder-card">
         <div class="responder-card-top">
           <div class="responder-tactical-icon">
@@ -920,7 +930,7 @@
         </button>
         <div style="flex: 1;">
           <div style="font-size: 15px; font-weight: 800; color: var(--text-title);" id="chatTargetName">Sarah M. (Search Target)</div>
-          <div style="font-size: 11px; color: var(--status-green); font-weight: 700;">● Offline BLE Mesh Connected (1.62m)</div>
+          <div style="font-size: 11px; color: var(--primary-red); font-weight: 700;">Offline BLE Mesh Connected (1.62m)</div>
         </div>
       </div>
 
@@ -931,7 +941,7 @@
         </div>
         <div class="chat-bubble bubble-out">
           Yes! I am trapped under a concrete beam. I hear the radar siren!
-          <div class="bubble-sub">15:43 • ✓✓ DELIVERED</div>
+          <div class="bubble-sub">15:43 • DELIVERED</div>
         </div>
       </div>
 
@@ -972,7 +982,7 @@
       <div class="deck-handle-bar" onclick="toggleDeck()"></div>
       <div class="deck-heading">
         <span>High-Precision Radar Telemetry</span>
-        <span style="font-size: 11px; color: var(--status-green); font-family: 'JetBrains Mono', monospace;">100.1% CONFIDENCE</span>
+        <span style="font-size: 11px; color: var(--primary-red); font-family: 'JetBrains Mono', monospace;">100.1% CONFIDENCE</span>
       </div>
       <div class="deck-sub-text">
         Real-time log-distance path loss inversion with adaptive 1D Kalman state smoothing ($TX_{1m} = -59.0\text{ dBm}$, $n = 2.40$).
@@ -980,8 +990,8 @@
 
       <div class="deck-card">
         <div class="deck-row-label">Target Node Selection</div>
-        <div style="display: flex; gap: 6px;">
-          <button class="deck-btn-action" style="background: #E8F5E9; color: var(--status-green); font-weight: 800;" onclick="selectNode(0)">Sarah M. (1.62m)</button>
+        <div class="deck-btn-group">
+          <button class="deck-btn-action" style="background: #FFF0F0; color: var(--primary-red); font-weight: 800;" onclick="selectNode(0)">Sarah M. (1.62m)</button>
           <button class="deck-btn-action" onclick="selectNode(1)">Alex R. (3.45m)</button>
           <button class="deck-btn-action" onclick="selectNode(2)">K9 Beacon (8.90m)</button>
         </div>
@@ -995,7 +1005,7 @@
           <div>&gt; Prior Variance P_k: <span id="deckPk">0.038</span></div>
           <div>&gt; Kalman Gain K: <span id="deckGain">0.021</span></div>
           <div>&gt; Log-Dist Path Loss: d = 10^((-59 - RSSI) / (10 * 2.4))</div>
-          <div>&gt; Sub-Meter Confidence: <span style="color: var(--status-green); font-weight: bold;">100.1%</span></div>
+          <div>&gt; Sub-Meter Confidence: <span style="color: var(--primary-red); font-weight: bold;">100.1%</span></div>
         </div>
       </div>
 
@@ -1021,6 +1031,7 @@
     let sirenGain = null;
     let sirenInterval = null;
 
+    // Node colors aligned with emergency theme (Crimson, Warm Amber, Coral)
     const nodes = [
       {
         id: "NODE-SARAH-01",
@@ -1033,7 +1044,7 @@
         filteredRssi: -73.2,
         kalmanP: 0.04,
         history: [-73.2, -73.3, -73.1, -73.2],
-        color: "#10B981",
+        color: "#FF1744",
         highlight: true
       },
       {
@@ -1047,7 +1058,7 @@
         filteredRssi: -82.1,
         kalmanP: 0.05,
         history: [-82.1, -82.0, -82.3],
-        color: "#F59E0B",
+        color: "#FF9800",
         highlight: false
       },
       {
@@ -1061,7 +1072,7 @@
         filteredRssi: -90.8,
         kalmanP: 0.07,
         history: [-90.8, -90.9, -90.7],
-        color: "#EF4444",
+        color: "#E53935",
         highlight: false
       }
     ];
@@ -1090,7 +1101,7 @@
     }
 
     /* ============================================================
-       CANVAS RADAR RENDERING ENGINE (60 FPS)
+       CANVAS RADAR RENDERING ENGINE (EMERGENCY THEME PALETTE)
        ============================================================ */
     const canvas = document.getElementById('radarCanvas');
     const ctx = canvas.getContext('2d');
@@ -1121,15 +1132,19 @@
 
       ctx.clearRect(0, 0, size, size);
 
-      // Deep dark scope backdrop
-      ctx.fillStyle = '#060B15';
+      // Deep emergency midnight obsidian backdrop with subtle warm center
+      const bgGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxRadius);
+      bgGrad.addColorStop(0, '#1E070B');
+      bgGrad.addColorStop(0.7, '#140407');
+      bgGrad.addColorStop(1, '#090203');
+      ctx.fillStyle = bgGrad;
       ctx.beginPath();
       ctx.arc(cx, cy, maxRadius, 0, Math.PI * 2);
       ctx.fill();
 
-      // Cardinal and 30-degree divider lines
+      // Cardinal and 30-degree divider lines (Emergency Crimson Alpha)
       ctx.save();
-      ctx.strokeStyle = 'rgba(16, 185, 129, 0.16)';
+      ctx.strokeStyle = 'rgba(229, 57, 53, 0.16)';
       ctx.lineWidth = 1;
       for (let deg = 0; deg < 360; deg += 30) {
         const rad = (deg * Math.PI) / 180;
@@ -1140,7 +1155,7 @@
       }
       ctx.restore();
 
-      // Metric Reticle Rings
+      // Metric Reticle Rings (Emergency Crimson)
       let ringSteps = [];
       if (currentScaleMeters === 5.0) {
         ringSteps = [
@@ -1171,15 +1186,15 @@
 
         ctx.save();
         if (ring.immediate) {
-          ctx.strokeStyle = 'rgba(16, 185, 129, 0.55)';
+          ctx.strokeStyle = 'rgba(229, 57, 53, 0.85)';
           ctx.setLineDash([4, 4]);
           ctx.lineWidth = 1.6;
         } else if (ring.dash) {
-          ctx.strokeStyle = 'rgba(16, 185, 129, 0.28)';
+          ctx.strokeStyle = 'rgba(229, 57, 53, 0.35)';
           ctx.setLineDash([3, 5]);
           ctx.lineWidth = 1;
         } else {
-          ctx.strokeStyle = 'rgba(16, 185, 129, 0.22)';
+          ctx.strokeStyle = 'rgba(229, 57, 53, 0.22)';
           ctx.lineWidth = 1;
         }
 
@@ -1188,14 +1203,14 @@
         ctx.stroke();
 
         // Ring distance label
-        ctx.fillStyle = ring.immediate ? '#10B981' : 'rgba(16, 185, 129, 0.65)';
+        ctx.fillStyle = ring.immediate ? '#FF5252' : 'rgba(255, 120, 120, 0.75)';
         ctx.font = '8px "JetBrains Mono", monospace';
         ctx.fillText(ring.label, cx + 3, cy - r + 9);
         ctx.restore();
       });
 
-      // Cardinal Labels (N, E, S, W)
-      ctx.fillStyle = 'rgba(16, 185, 129, 0.8)';
+      // Cardinal Labels (N, E, S, W) in Emergency Red
+      ctx.fillStyle = 'rgba(255, 82, 82, 0.9)';
       ctx.font = 'bold 9px "Plus Jakarta Sans", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -1204,16 +1219,16 @@
       ctx.fillText('E', cx + maxRadius - 10, cy);
       ctx.fillText('W', cx - maxRadius + 10, cy);
 
-      // Rotating Phosphor Sweep Beam
+      // Rotating Crimson Phosphor Sweep Beam
       sweepAngle = (sweepAngle + 1.2) % 360;
       const sweepRad = (sweepAngle * Math.PI) / 180;
       const trailAngle = (35 * Math.PI) / 180;
 
       ctx.save();
       const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxRadius);
-      grad.addColorStop(0, 'rgba(16, 185, 129, 0)');
-      grad.addColorStop(0.7, 'rgba(16, 185, 129, 0.12)');
-      grad.addColorStop(1, 'rgba(16, 185, 129, 0.35)');
+      grad.addColorStop(0, 'rgba(229, 57, 53, 0)');
+      grad.addColorStop(0.7, 'rgba(229, 57, 53, 0.12)');
+      grad.addColorStop(1, 'rgba(229, 57, 53, 0.35)');
 
       ctx.fillStyle = grad;
       ctx.beginPath();
@@ -1222,10 +1237,10 @@
       ctx.closePath();
       ctx.fill();
 
-      // Leading beam vector
-      ctx.strokeStyle = '#10B981';
+      // Leading beam vector (Bright Crimson)
+      ctx.strokeStyle = '#FF1744';
       ctx.lineWidth = 1.8;
-      ctx.shadowColor = '#10B981';
+      ctx.shadowColor = '#FF1744';
       ctx.shadowBlur = 8;
       ctx.beginPath();
       ctx.moveTo(cx, cy);
@@ -1235,8 +1250,8 @@
 
       // Center user anchor dot
       ctx.save();
-      ctx.fillStyle = '#10B981';
-      ctx.shadowColor = '#10B981';
+      ctx.fillStyle = '#FF1744';
+      ctx.shadowColor = '#FF1744';
       ctx.shadowBlur = 10;
       ctx.beginPath();
       ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
@@ -1298,7 +1313,6 @@
         if (idx === selectedNodeIndex) {
           const estDist = calculateDistance(node.filteredRssi);
           const vel = (node.history[node.history.length - 1] - node.history[0]) / Math.max(1, node.history.length - 1);
-          const confidence = (100.1 - Math.min(0.5, node.kalmanP * 0.4)).toFixed(1);
 
           document.getElementById('scopeMainDistance').innerText = estDist.toFixed(2);
           document.getElementById('scopeFilteredRssi').innerText = node.filteredRssi.toFixed(1) + " dBm";
@@ -1313,19 +1327,21 @@
           const zonePill = document.getElementById('scopeProximityPill');
           const zoneBadge = document.getElementById('respZoneBadge');
           if (isImmediate) {
-            zonePill.innerHTML = "🎯 IMMEDIATE (&lt; 2M)";
-            zonePill.style.background = "#E8F5E9";
-            zonePill.style.color = "#10B981";
+            zonePill.innerHTML = "IMMEDIATE (&lt; 2M)";
+            zonePill.style.background = "#FFF0F0";
+            zonePill.style.color = "#E53935";
+            zonePill.style.borderColor = "rgba(229, 57, 53, 0.3)";
             zoneBadge.innerText = "IMMEDIATE";
-            zoneBadge.style.background = "#E8F5E9";
-            zoneBadge.style.color = "#10B981";
+            zoneBadge.style.background = "#FFF0F0";
+            zoneBadge.style.color = "#E53935";
           } else {
-            zonePill.innerHTML = "📡 TRACKING (&gt; 2M)";
+            zonePill.innerHTML = "SEARCHING (&gt; 2M)";
             zonePill.style.background = "#FFF8E1";
-            zonePill.style.color = "#F59E0B";
+            zonePill.style.color = "#D97706";
+            zonePill.style.borderColor = "rgba(217, 119, 6, 0.3)";
             zoneBadge.innerText = "APPROACHING";
             zoneBadge.style.background = "#FFF8E1";
-            zoneBadge.style.color = "#F59E0B";
+            zoneBadge.style.color = "#D97706";
           }
         }
       });
@@ -1457,7 +1473,7 @@
       
       const outBubble = document.createElement('div');
       outBubble.className = 'chat-bubble bubble-out';
-      outBubble.innerHTML = text + '<div class="bubble-sub">' + timeStr + ' • ✓✓ DELIVERED</div>';
+      outBubble.innerHTML = text + '<div class="bubble-sub">' + timeStr + ' • DELIVERED</div>';
       stream.appendChild(outBubble);
       input.value = '';
       stream.scrollTop = stream.scrollHeight;
