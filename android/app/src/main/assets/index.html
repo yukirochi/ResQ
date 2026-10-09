@@ -79,7 +79,7 @@
       flex-direction: column;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 50px 20px 120px 20px;
+      padding: 40px 20px 145px 20px;
       transition: opacity 0.2s ease;
     }
 
@@ -403,24 +403,24 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
     .radar-header-title { font-size: 20px; font-weight: 900; color: var(--text-main); }
 
     .radar-scope-wrapper {
       background: var(--bg-card);
       border-radius: 24px;
-      padding: 16px;
+      padding: 12px 14px;
       box-shadow: var(--shadow-card);
       border: 1px solid var(--border-subtle);
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .radar-scale-bar {
       display: flex;
       justify-content: flex-end;
       gap: 6px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
     .scale-btn {
       padding: 4px 10px;
@@ -441,7 +441,7 @@
       position: relative;
       width: 100%;
       aspect-ratio: 1 / 1;
-      max-width: 320px;
+      max-width: 260px;
       margin: 0 auto;
       border-radius: 50%;
       background: radial-gradient(circle at center, #1E070B 0%, #150508 70%, #0C0305 100%);
@@ -534,7 +534,130 @@
     }
     .target-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
     .target-name { font-size: 15px; font-weight: 900; color: var(--text-main); }
-    .target-desc-row { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 12px; }
+    .target-desc-row { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 10px; }
+
+    /* Alarm Volume Slider & Presets */
+    .alarm-volume-card {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+    .alarm-volume-card.in-profile {
+      margin-top: 10px;
+      margin-bottom: 4px;
+    }
+    .volume-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .volume-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: -0.2px;
+    }
+    .volume-title-wrap svg {
+      color: var(--red-primary);
+      stroke: var(--red-primary);
+    }
+    .volume-percent-badge {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--red-primary);
+      background: #FFF0F0;
+      border: 1px solid rgba(229, 57, 53, 0.2);
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-variant-numeric: tabular-nums;
+    }
+    .volume-slider-wrap {
+      display: flex;
+      align-items: center;
+      padding: 4px 0 6px;
+    }
+    .custom-vol-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 6px;
+      background: linear-gradient(to right, #E53935 0%, #E53935 90%, #E2E8F0 90%, #E2E8F0 100%);
+      outline: none;
+      cursor: pointer;
+    }
+    .custom-vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 3px solid var(--red-primary);
+      box-shadow: 0 2px 6px rgba(229, 57, 53, 0.35);
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+    .custom-vol-slider::-webkit-slider-thumb:active {
+      transform: scale(1.15);
+      box-shadow: 0 3px 10px rgba(229, 57, 53, 0.5);
+    }
+    .custom-vol-slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      border: 3px solid var(--red-primary);
+      box-shadow: 0 2px 6px rgba(229, 57, 53, 0.35);
+      cursor: pointer;
+    }
+    .volume-presets-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .preset-pill {
+      flex: 1;
+      height: 26px;
+      background: #FFFFFF;
+      border: 1px solid #CBD5E1;
+      border-radius: 13px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+    .preset-pill:active {
+      transform: scale(0.96);
+    }
+    .preset-pill.active {
+      background: #FFF0F0;
+      border-color: rgba(229, 57, 53, 0.4);
+      color: var(--red-primary);
+      font-weight: 800;
+    }
+    .preset-pill.preset-max {
+      color: var(--red-primary);
+    }
+    .preset-pill.test-btn {
+      flex: 1.3;
+      background: #F1F5F9;
+      color: var(--text-main);
+    }
+    .preset-pill.test-btn svg {
+      fill: var(--red-primary);
+    }
 
     .target-actions-row { display: flex; gap: 8px; }
     .btn-alert-siren {
@@ -876,6 +999,25 @@
           Listening on 2.4 GHz Emergency Mesh for active victim beacons...
         </div>
 
+        <!-- Volume Control Slider & Presets -->
+        <div class="alarm-volume-card">
+          <div class="volume-header-row">
+            <div class="volume-title-wrap">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+              <span class="volume-label">Siren Volume</span>
+            </div>
+            <span class="volume-percent-badge" id="radarVolumeDisplay">90%</span>
+          </div>
+          <div class="volume-slider-wrap">
+            <input type="range" id="radarVolumeSlider" min="10" max="100" value="90" class="custom-vol-slider" oninput="onVolumeChange(this.value)">
+          </div>
+          <div class="volume-presets-row">
+            <button type="button" class="preset-pill" id="rPreset_50" onclick="setVolumePreset(50)">50%</button>
+            <button type="button" class="preset-pill" id="rPreset_80" onclick="setVolumePreset(80)">80%</button>
+            <button type="button" class="preset-pill preset-max" id="rPreset_100" onclick="setVolumePreset(100)">100% MAX</button>
+          </div>
+        </div>
+
         <div class="target-actions-row">
           <button id="btnCallSiren" class="btn-alert-siren" onclick="toggleAudioSiren()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
@@ -981,6 +1123,33 @@
             <div class="med-checkbox">
               <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Emergency Alarm Loudness (Pre-save & Test) -->
+      <div class="profile-section-card">
+        <div class="section-label">Emergency Alarm Loudness</div>
+        <div style="font-size: 11px; color: var(--text-muted); font-weight: 500; margin-bottom: 8px;">Pre-save the default alarm volume for emergency beaconing and radar sirens.</div>
+        <div class="alarm-volume-card in-profile">
+          <div class="volume-header-row">
+            <div class="volume-title-wrap">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+              <span class="volume-label">Saved Alarm Level</span>
+            </div>
+            <span class="volume-percent-badge" id="profileVolumeDisplay">90%</span>
+          </div>
+          <div class="volume-slider-wrap">
+            <input type="range" id="profileVolumeSlider" min="10" max="100" value="90" class="custom-vol-slider" oninput="onVolumeChange(this.value)">
+          </div>
+          <div class="volume-presets-row">
+            <button type="button" class="preset-pill" id="pPreset_50" onclick="setVolumePreset(50)">50%</button>
+            <button type="button" class="preset-pill" id="pPreset_80" onclick="setVolumePreset(80)">80%</button>
+            <button type="button" class="preset-pill preset-max" id="pPreset_100" onclick="setVolumePreset(100)">100% MAX</button>
+            <button type="button" class="preset-pill test-btn" onclick="testAlarmPulse()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              <span>Test Tone</span>
+            </button>
           </div>
         </div>
       </div>
@@ -1175,12 +1344,13 @@
 
       try {
         localStorage.setItem(STORAGE_KEY_PROFILE, JSON.stringify(userProfile));
+        localStorage.setItem(STORAGE_KEY_ALARM_VOL, currentAlarmVolume.toString());
       } catch (e) {
         console.warn("Storage write error:", e);
       }
 
       renderHomeConditions();
-      showToast("Profile Saved");
+      showToast("Profile & Alarm Volume Saved");
 
       if (window.ResQNative && typeof window.ResQNative.triggerVibrate === 'function') {
         window.ResQNative.triggerVibrate(60);
@@ -1227,8 +1397,135 @@
     let isSirenActive = false;
     let audioCtx = null;
     let sirenOsc = null;
+    let sirenHarmonicOsc = null;
     let sirenGain = null;
+    let sirenCompressor = null;
     let sirenInterval = null;
+
+    let currentAlarmVolume = 90;
+    const STORAGE_KEY_ALARM_VOL = 'resq_alarm_volume';
+
+    function loadSavedVolume() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY_ALARM_VOL);
+        if (saved !== null) {
+          const parsed = parseInt(saved, 10);
+          if (!isNaN(parsed) && parsed >= 10 && parsed <= 100) {
+            currentAlarmVolume = parsed;
+          }
+        }
+      } catch (e) {
+        console.warn("Volume read error:", e);
+      }
+      syncVolumeUI(currentAlarmVolume, false);
+    }
+
+    function onVolumeChange(val) {
+      currentAlarmVolume = parseInt(val, 10);
+      syncVolumeUI(currentAlarmVolume, true);
+    }
+
+    function setVolumePreset(val) {
+      currentAlarmVolume = val;
+      syncVolumeUI(currentAlarmVolume, true);
+      showToast("Alarm Volume: " + val + "%");
+    }
+
+    function syncVolumeUI(vol, saveToStorage) {
+      const radarSlider = document.getElementById('radarVolumeSlider');
+      const profileSlider = document.getElementById('profileVolumeSlider');
+      const radarDisplay = document.getElementById('radarVolumeDisplay');
+      const profileDisplay = document.getElementById('profileVolumeDisplay');
+
+      if (radarSlider) {
+        radarSlider.value = vol;
+        updateSliderTrack(radarSlider, vol);
+      }
+      if (profileSlider) {
+        profileSlider.value = vol;
+        updateSliderTrack(profileSlider, vol);
+      }
+      if (radarDisplay) radarDisplay.innerText = vol + '%';
+      if (profileDisplay) profileDisplay.innerText = vol + '%';
+
+      // Update preset pills active state
+      ['50', '80', '100'].forEach(preset => {
+        const rPill = document.getElementById('rPreset_' + preset);
+        const pPill = document.getElementById('pPreset_' + preset);
+        const isMatch = (parseInt(preset, 10) === vol);
+        if (rPill) rPill.classList.toggle('active', isMatch);
+        if (pPill) pPill.classList.toggle('active', isMatch);
+      });
+
+      // Adjust gain in real-time if siren is active
+      if (isSirenActive && sirenGain && audioCtx) {
+        const targetGain = Math.min(1.0, (vol / 100) * 0.95);
+        sirenGain.gain.setValueAtTime(targetGain, audioCtx.currentTime);
+      }
+
+      if (saveToStorage) {
+        try {
+          localStorage.setItem(STORAGE_KEY_ALARM_VOL, vol.toString());
+        } catch (e) {}
+      }
+
+      // Sync with Android hardware stream volume
+      if (window.ResQNative && typeof window.ResQNative.setSystemVolume === 'function') {
+        window.ResQNative.setSystemVolume(vol);
+      }
+    }
+
+    function updateSliderTrack(sliderEl, vol) {
+      sliderEl.style.background = `linear-gradient(to right, #E53935 0%, #E53935 ${vol}%, #E2E8F0 ${vol}%, #E2E8F0 100%)`;
+    }
+
+    function testAlarmPulse() {
+      if (isSirenActive) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        // Boost native system stream volume
+        if (window.ResQNative && typeof window.ResQNative.setSystemVolume === 'function') {
+          window.ResQNative.setSystemVolume(currentAlarmVolume);
+        }
+
+        const osc = audioCtx.createOscillator();
+        const harmOsc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const harmGain = audioCtx.createGain();
+
+        osc.type = 'sawtooth';
+        harmOsc.type = 'square';
+
+        const targetGain = Math.min(1.0, (currentAlarmVolume / 100) * 0.95);
+        gain.gain.setValueAtTime(targetGain, audioCtx.currentTime);
+        harmGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+
+        osc.frequency.setValueAtTime(950, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1600, audioCtx.currentTime + 0.35);
+
+        harmOsc.frequency.setValueAtTime(1900, audioCtx.currentTime);
+        harmOsc.frequency.exponentialRampToValueAtTime(3200, audioCtx.currentTime + 0.35);
+
+        osc.connect(gain);
+        harmOsc.connect(harmGain);
+        harmGain.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        harmOsc.start();
+        osc.stop(audioCtx.currentTime + 0.38);
+        harmOsc.stop(audioCtx.currentTime + 0.38);
+
+        if (window.ResQNative && typeof window.ResQNative.triggerVibrate === 'function') {
+          window.ResQNative.triggerVibrate(150);
+        }
+        showToast("Alarm Test: " + currentAlarmVolume + "%");
+      } catch (e) {
+        console.warn("Test audio error:", e);
+      }
+    }
 
     // Active target node is NULL by default
     let activeTargetNode = null;
@@ -1591,23 +1888,56 @@
           if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
           if (audioCtx.state === 'suspended') audioCtx.resume();
 
+          // Boost native system stream volume
+          if (window.ResQNative && typeof window.ResQNative.setSystemVolume === 'function') {
+            window.ResQNative.setSystemVolume(currentAlarmVolume);
+          }
+
+          if (!sirenCompressor) {
+            sirenCompressor = audioCtx.createDynamicsCompressor();
+            sirenCompressor.threshold.setValueAtTime(-18, audioCtx.currentTime);
+            sirenCompressor.knee.setValueAtTime(24, audioCtx.currentTime);
+            sirenCompressor.ratio.setValueAtTime(12, audioCtx.currentTime);
+            sirenCompressor.attack.setValueAtTime(0.003, audioCtx.currentTime);
+            sirenCompressor.release.setValueAtTime(0.2, audioCtx.currentTime);
+            sirenCompressor.connect(audioCtx.destination);
+          }
+
           sirenOsc = audioCtx.createOscillator();
+          sirenHarmonicOsc = audioCtx.createOscillator();
           sirenGain = audioCtx.createGain();
+
           sirenOsc.type = 'sawtooth';
-          sirenGain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+          sirenHarmonicOsc.type = 'square';
+
+          const targetGain = Math.min(1.0, (currentAlarmVolume / 100) * 0.95);
+          sirenGain.gain.setValueAtTime(targetGain, audioCtx.currentTime);
+
+          const harmGain = audioCtx.createGain();
+          harmGain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+
+          sirenOsc.connect(sirenGain);
+          sirenHarmonicOsc.connect(harmGain);
+          harmGain.connect(sirenGain);
+          sirenGain.connect(sirenCompressor);
 
           let freqHigh = true;
           sirenInterval = setInterval(() => {
-            if (sirenOsc && audioCtx) {
-              const targetFreq = freqHigh ? 1200 : 750;
-              sirenOsc.frequency.exponentialRampToValueAtTime(targetFreq, audioCtx.currentTime + 0.25);
+            if (sirenOsc && sirenHarmonicOsc && audioCtx) {
+              const pFreq = freqHigh ? 1400 : 800;
+              const hFreq = freqHigh ? 2800 : 1600;
+              sirenOsc.frequency.exponentialRampToValueAtTime(pFreq, audioCtx.currentTime + 0.22);
+              sirenHarmonicOsc.frequency.exponentialRampToValueAtTime(hFreq, audioCtx.currentTime + 0.22);
               freqHigh = !freqHigh;
-            }
-          }, 300);
 
-          sirenOsc.connect(sirenGain);
-          sirenGain.connect(audioCtx.destination);
+              if (window.ResQNative && typeof window.ResQNative.triggerVibrate === 'function') {
+                window.ResQNative.triggerVibrate(80);
+              }
+            }
+          }, 260);
+
           sirenOsc.start();
+          sirenHarmonicOsc.start();
 
           isSirenActive = true;
           btn.classList.add('active');
@@ -1619,6 +1949,10 @@
         if (sirenOsc) {
           try { sirenOsc.stop(); sirenOsc.disconnect(); } catch (e) {}
           sirenOsc = null;
+        }
+        if (sirenHarmonicOsc) {
+          try { sirenHarmonicOsc.stop(); sirenHarmonicOsc.disconnect(); } catch (e) {}
+          sirenHarmonicOsc = null;
         }
         if (sirenInterval) {
           clearInterval(sirenInterval);
@@ -1695,6 +2029,7 @@
     // App Initialization
     window.addEventListener('DOMContentLoaded', () => {
       loadProfile();
+      loadSavedVolume();
       loadChatHistory();
       initGeolocation();
     });

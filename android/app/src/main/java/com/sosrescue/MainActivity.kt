@@ -152,6 +152,20 @@ class MainActivity : AppCompatActivity() {
                 android.util.Log.e("ResQNativeBridge", "Vibrate error", e)
             }
         }
+
+        @android.webkit.JavascriptInterface
+        fun setSystemVolume(volumePercent: Int) {
+            try {
+                val audioManager = activity.getSystemService(android.content.Context.AUDIO_SERVICE) as? android.media.AudioManager
+                audioManager?.let { am ->
+                    val maxVol = am.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC)
+                    val targetVol = ((maxVol * volumePercent.coerceIn(0, 100)) / 100.0).toInt().coerceIn(0, maxVol)
+                    am.setStreamVolume(android.media.AudioManager.STREAM_MUSIC, targetVol, 0)
+                }
+            } catch (e: Exception) {
+                android.util.Log.e("ResQNativeBridge", "Volume set error", e)
+            }
+        }
     }
 
     override fun onBackPressed() {
