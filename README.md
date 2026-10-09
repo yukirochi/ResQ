@@ -1,10 +1,10 @@
-# 🚨 ResQ - Autonomous Offline SOS Emergency & Rescue Mesh
+# ResQ - Autonomous Offline SOS Emergency & Rescue Mesh
 
 <div align="center">
   <img src="preview/resq_logo.png" width="96" height="96" alt="ResQ Logo" style="border-radius: 24px; box-shadow: 0 8px 24px rgba(229,57,53,0.3);" />
   <h3>Zero-Internet Disaster Response, AirTag Precision Radar & On-Device AI</h3>
   <p>
-    <b>100% Offline • Bluetooth Low Energy (BLE) Mesh • Neural Network Denoising • On-Device LLM & NLP</b>
+    <b>100% Offline | Bluetooth Low Energy (BLE) Mesh | Neural Network Denoising | On-Device LLM & NLP</b>
   </p>
 
   [![Version](https://img.shields.io/badge/Release-v1.1.0-E53935.svg?style=for-the-badge)](android/app/build/outputs/apk/release/app-release.apk)
@@ -14,16 +14,16 @@
 
 ---
 
-## 📥 Direct APK Downloads
+## Direct APK Downloads
 
 You can download and install the latest built APK binaries directly onto your Android device or emulator:
 
 | Package Variant | Direct File Link | Path in Repository | Recommended Use |
 |---|---|---|---|
-| **🚀 Release APK (Signed)** | [**Download app-release.apk**](android/app/build/outputs/apk/release/app-release.apk) | `android/app/build/outputs/apk/release/app-release.apk` | **Production / Real Devices** (Optimized, 5.79 MB) |
-| **🛠️ Debug APK** | [**Download app-debug.apk**](android/app/build/outputs/apk/debug/app-debug.apk) | `android/app/build/outputs/apk/debug/app-debug.apk` | **Development & Emulators** (Logs enabled, 6.77 MB) |
+| **Release APK (Signed)** | [**Download app-release.apk**](android/app/build/outputs/apk/release/app-release.apk) | `android/app/build/outputs/apk/release/app-release.apk` | **Production / Real Devices** (Optimized, 5.79 MB) |
+| **Debug APK** | [**Download app-debug.apk**](android/app/build/outputs/apk/debug/app-debug.apk) | `android/app/build/outputs/apk/debug/app-debug.apk` | **Development & Emulators** (Logs enabled, 6.77 MB) |
 
-### ⚡ Quick Install via ADB
+### Quick Install via ADB
 ```bash
 # Install directly to connected phone or emulator:
 adb install -r android/app/build/outputs/apk/release/app-release.apk
@@ -31,7 +31,7 @@ adb install -r android/app/build/outputs/apk/release/app-release.apk
 
 ---
 
-## 🎯 Primary Goal & Vision
+## Primary Goal and Vision
 
 During severe earthquakes, typhoons, building collapses, and remote wilderness emergencies, **cellular towers and internet infrastructures fail first**. Victims trapped beneath rubble are unable to place 911 calls or share GPS coordinates.
 
@@ -41,7 +41,7 @@ Victims' phones continuously broadcast encrypted emergency beacons over Bluetoot
 
 ---
 
-## 🧠 Deep AI & Machine Learning Integration
+## Deep AI & Machine Learning Integration
 
 ResQ embeds state-of-the-art **Edge Artificial Intelligence** that operates **100% on-device** with zero cloud reliance.
 
@@ -57,17 +57,17 @@ graph TD
   H --> I[Otto AI Interactive Companion]
 ```
 
-### 1. ⚡ Neural Network Signal Denoising (TFLite 1D-CNN)
-- **The Challenge**: Radio signal strength (RSSI) in collapsed structures suffers from extreme multi-path fading, bouncing off pulverized concrete, steel rebar, and debris, causing severe signal spikes (±18 dBm fluctuations).
+### 1. Neural Network Signal Denoising (TFLite 1D-CNN)
+- **The Challenge**: Radio signal strength (RSSI) in collapsed structures suffers from extreme multi-path fading, bouncing off pulverized concrete, steel rebar, and debris, causing severe signal spikes (+-18 dBm fluctuations).
 - **The Neural Solution**: ResQ feeds sequential RSSI time-series windows into a lightweight **1D Temporal Convolutional Neural Network (CNN)** running on TensorFlow Lite on-device. The neural network filters out multi-path scatter reflections and feeds an **Adaptive 1D Kalman Filter** to estimate real-world distance and trend gradients with centimeter-level stability.
 
-### 2. 🤖 On-Device Small Language Models (SLMs) & Local LLM Bridge
-- **The Challenge**: Trapped survivors experience severe panic and require instant, conversational medical guidance (e.g. treating arterial bleeding, 15-minute crush injury protocols) when cell towers are down.
+### 2. On-Device Small Language Models (SLMs) & Local LLM Bridge
+- **The Challenge**: Trapped survivors experience severe panic and require instant, conversational medical guidance (such as treating arterial bleeding or 15-minute crush injury protocols) when cell towers are down.
 - **The AI Solution**: 
-  - Integrates an on-device **Local LLM inference pipeline** (optimized for quantized Edge models such as Qwen 2.5 0.5B / MobileLLM / Gemma Edge) communicating via the native Android hardware bridge.
+  - Integrates an on-device **Local LLM inference pipeline** (optimized for quantized Edge models such as Qwen 2.5 0.5B, MobileLLM, or Gemma Edge) communicating via the native Android hardware bridge.
   - **Deterministic Emergency Guardrails**: Evaluates critical life-saving queries against verified medical triage protocols (CPR, tourniquet timing, crush syndrome decompressive shock prevention) to guarantee 100% factual first-aid answers with zero hallucinations.
 
-### 3. 🦦 "Otto" - Multi-Persona AI Rescue Companion
+### 3. "Otto" - Multi-Persona AI Rescue Companion
 Accessible anytime via the floating on-screen chat head:
 - **resQ Medic**: Rapid triage, burn treatment, and tourniquet tracking.
 - **Radar Scout**: Explains signal vectoring and AirTag precision navigation.
@@ -76,33 +76,33 @@ Accessible anytime via the floating on-screen chat head:
 
 ---
 
-## 🌟 Key Application Features
+## Key Application Features
 
-### 📡 1. AirTag-Style Precision Finding Radar
+### 1. AirTag-Style Precision Finding Radar
 - **Directional 3D Compass Arrow**: Dynamically points toward the bearing of the victim's beacon.
 - **Live Distance HUD**: Real-time metric readout (`1.8 m`) with signal confidence indicators.
-- **Immediate Proximity State**: When within `< 2.0 meters`, the interface transitions into an emerald glowing bullseye (**"HERE • REACH OUT"**) with haptic confirmation.
+- **Immediate Proximity State**: When within `< 2.0 meters`, the interface transitions into an emerald glowing bullseye (**"HERE - REACH OUT"**) with haptic confirmation.
 - **Multi-Victim Selector**: Seamlessly switch tracking between multiple detected victims (*Alex Rivera*, *Maria Santos*, *Liam Chen*) from a horizontal carousel.
 
-### 🔊 2. Remote Victim Siren Activation
+### 2. Remote Victim Siren Activation
 - When a rescuer identifies a target on the radar, tapping **"Ring Victim Phone"** broadcasts an authenticated BLE GATT command.
 - **Only the victim's phone sounds the high-decibel alarm** under the rubble, keeping the rescuer's ears clear to home in on the acoustic sound.
 - Victims can test their own device speaker volume in the **Medical Profile** screen using the local **Test Tone** generator.
 
-### 💬 3. Offline P2P Mesh Chat (Channel #911)
+### 3. Offline P2P Mesh Chat (Channel #911)
 - Two-way peer-to-peer radio messaging over Bluetooth ATT MTU characteristics.
 - **Zero cell tower or Wi-Fi footprint.**
 - One-tap emergency dispatch presets:
-  - `🚨 Trapped under debris, send help!`
-  - `🔊 I can hear the rescue siren!`
-  - `🩹 Injured: Need stretcher and first aid kit.`
-  - `📍 Holding position.`
-  - `✅ All clear and safe.`
-- Message delivery receipts (`✓✓ MESH DELIVERED`) and automated responder acknowledgments.
+  - `[Trapped under debris, send help]`
+  - `[I can hear the rescue siren]`
+  - `[Injured: Need stretcher and first aid kit]`
+  - `[Holding position]`
+  - `[All clear and safe]`
+- Message delivery receipts (`DELIVERED`) and automated responder acknowledgments.
 
-### 🩸 4. Encrypted Medical Triage & Blood Group Profiles
+### 4. Encrypted Medical Triage & Blood Group Profiles
 Victims pre-declare critical extraction hazards that broadcast upon emergency activation:
-- **Blood Type Selection**: $O^+$, $A^+$, $B^+$, $AB^+$, $O^-$, $A^-$, $B^-$, $AB^-$ with field transfusion compatibility tables.
+- **Blood Type Selection**: O+, A+, B+, AB+, O-, A-, B-, AB- with field transfusion compatibility tables.
 - **Chronic Condition Flags**:
   - *Diabetic (Insulin Dependent)*
   - *Mobility Impaired / Physical Disability (Requires Stretcher)*
@@ -111,13 +111,13 @@ Victims pre-declare critical extraction hazards that broadcast upon emergency ac
   - *Hearing / Speech Impaired (Tactile/Strobe Protocol)*
   - *Severe Drug Allergies (Penicillin/Antibiotic Warning)*
 
-### 💥 5. Automatic SOS (Crash & Shake Detection)
+### 5. Automatic SOS (Crash & Shake Detection)
 - Background accelerometer monitoring detects violent impacts or earthquake tremors.
 - **10-second countdown with loud haptic cues** prevents false alarms before automatically triggering victim mode broadcasting.
 
 ---
 
-## 🛠️ Tech Stack & Architecture
+## Tech Stack & Architecture
 
 | Layer | Technologies | Purpose |
 |---|---|---|
@@ -130,7 +130,7 @@ Victims pre-declare critical extraction hazards that broadcast upon emergency ac
 
 ---
 
-## 🚀 Building & Running from Source
+## Building & Running from Source
 
 ### Option A: Open with Android Studio (Recommended)
 1. Open **Android Studio**.
@@ -139,7 +139,7 @@ Victims pre-declare critical extraction hazards that broadcast upon emergency ac
    F:\codes\resq\android
    ```
 3. Ensure Gradle JDK is set to **Embedded JDK** or **JDK 17** (`Settings > Build Tools > Gradle`).
-4. Click **Run (▶)** (`Shift + F10`) on your connected device or emulator.
+4. Click **Run** (`Shift + F10`) on your connected device or emulator.
 
 ### Option B: Build via Command Line (Gradle)
 ```bash
@@ -155,7 +155,7 @@ cd android
 
 ---
 
-## 🔒 Permissions & Security Architecture
+## Permissions & Security Architecture
 
 ResQ strictly respects user privacy:
 - **Zero Cloud Tracking**: No servers, no telemetry, no analytics.
@@ -169,5 +169,5 @@ ResQ strictly respects user privacy:
 ---
 
 <div align="center">
-  <sub>ResQ Emergency Response System • Developed for Offline Disaster Resilience</sub>
+  <sub>ResQ Emergency Response System | Developed for Offline Disaster Resilience</sub>
 </div>
