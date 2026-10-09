@@ -73,10 +73,10 @@ export const SurvivalGuideScreen: React.FC<SurvivalGuideScreenProps> = ({ onBack
         <Card style={styles.aiCard}>
           <View style={styles.aiHeaderRow}>
             <Text style={styles.aiTitle}>⚡ Talk to resQ</Text>
-            <Text style={styles.aiModelBadge}>ON-DEVICE SLM</Text>
+            <Text style={styles.aiModelBadge}>QWEN2.5-1.5B</Text>
           </View>
           <Text style={styles.aiSubText}>
-            Ask situational triage questions or how to operate this app. Grounded in emergency protocols.
+            Conversational emergency assistant powered by Qwen2.5-1.5B on-device. Higher reasoning triage & app guidance.
           </Text>
 
           <View style={styles.inputRow}>

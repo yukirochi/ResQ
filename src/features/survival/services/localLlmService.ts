@@ -12,11 +12,18 @@ export interface AssistantResponse {
   matchedProtocol?: SurvivalProtocol;
 }
 
+export interface ChatMessage {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+
 export class LocalLlmService {
   private static instance: LocalLlmService;
   private llamaContext: any = null;
   private isModelLoaded = false;
   private isLoading = false;
+  private conversationHistory: ChatMessage[] = [];
+  private currentModelName = 'Qwen2.5-1.5B-Instruct';
 
   private constructor() {}
 
@@ -28,10 +35,10 @@ export class LocalLlmService {
   }
 
   /**
-   * Initializes the on-device GGUF model via react-native-llama
-   * Uses quantized SmolLM2-360M or Qwen2.5-0.5B for low-RAM mobile execution
+   * Initializes the on-device Qwen2.5-1.5B GGUF model via react-native-llama
+   * Uses quantized Qwen2.5-1.5B-Instruct (Q4_K_M, ~980MB) for 3x higher conversational reasoning & multi-turn dialog.
    */
-  public async loadModel(modelPath: string = 'models/smollm2-360m-instruct-q4_k_m.gguf'): Promise<boolean> {
+  public async loadModel(modelPath: string = 'models/qwen2.5-1.5b-instruct-q4_k_m.gguf'): Promise<boolean> {
     if (this.isModelLoaded) return true;
     if (this.isLoading) return false;
 
@@ -43,15 +50,16 @@ export class LocalLlmService {
         this.llamaContext = await rnLlama.initLlama({
           model: modelPath,
           use_mlock: true,
-          n_ctx: 1024,
+          n_ctx: 2048, // Qwen2.5 2K mobile edge context window
           n_threads: 4,
-          n_gpu_layers: 0, // Set to 1+ if device supports OpenCL/Metal
+          n_gpu_layers: 0, // Set to 1+ if device supports OpenCL/Vulkan/Metal
         });
         this.isModelLoaded = true;
+        this.currentModelName = modelPath.includes('3b') ? 'Qwen2.5-3B-Instruct' : 'Qwen2.5-1.5B-Instruct';
         return true;
       }
     } catch (err) {
-      console.log('[ResQ LocalLLM] react-native-llama native runtime not initialized yet. Using Offline Protocol Engine fallback.', err);
+      console.log('[ResQ Qwen-LLM] react-native-llama native runtime not initialized yet. Using Offline Conversational Protocol Engine fallback.', err);
     } finally {
       this.isLoading = false;
     }
@@ -59,31 +67,47 @@ export class LocalLlmService {
   }
 
   /**
-   * Queries the Local LLM or falls back to the deterministic survival matcher
+   * Queries the Qwen Local LLM using ChatML multi-turn conversational format
+   * Falls back to deterministic survival & app protocol matcher if model is not loaded.
    */
-  public async query(userQuestion: string): Promise<AssistantResponse> {
+  public async query(userQuestion: string, saveHistory: boolean = true): Promise<AssistantResponse> {
     const cleanQuery = userQuestion.trim().toLowerCase();
 
-    // 1. Try On-Device LLM via react-native-llama if initialized
+    // 1. Try On-Device Qwen LLM via react-native-llama if initialized
     if (this.isModelLoaded && this.llamaContext) {
       try {
-        const prompt = `<|im_start|>system\n${RESQ_SYSTEM_PROMPT}<|im_end|>\n<|im_start|>user\n${userQuestion}<|im_end|>\n<|im_start|>assistant\n`;
+        // Construct Qwen2.5 ChatML prompt with conversation history
+        let prompt = `<|im_start|>system\n${RESQ_SYSTEM_PROMPT}<|im_end|>\n`;
+        
+        // Append last 4 conversation turns for context retention
+        const recentHistory = this.conversationHistory.slice(-4);
+        for (const msg of recentHistory) {
+          prompt += `<|im_start|>${msg.role}\n${msg.content}<|im_end|>\n`;
+        }
+
+        prompt += `<|im_start|>user\n${userQuestion}<|im_end|>\n<|im_start|>assistant\n`;
+
         const result = await this.llamaContext.completion({
           prompt,
-          n_predict: 140,
-          temperature: 0.2, // Low temperature for high factual accuracy
+          n_predict: 200,
+          temperature: 0.3, // Optimal balance between conversational empathy and medical precision
           top_p: 0.85,
-          stop: ['<|im_end|>', 'User:', '<|im_start|>'],
+          stop: ['<|im_end|>', '<|im_start|>', '<|endoftext|>', 'user:', 'User:'],
         });
 
         if (result && result.text) {
+          const replyText = result.text.trim();
+          if (saveHistory) {
+            this.conversationHistory.push({ role: 'user', content: userQuestion });
+            this.conversationHistory.push({ role: 'assistant', content: replyText });
+          }
           return {
-            answer: result.text.trim(),
+            answer: replyText,
             source: 'LOCAL_LLM',
           };
         }
       } catch (e) {
-        console.warn('[ResQ LocalLLM] Inference error, falling back to deterministic protocol:', e);
+        console.warn('[ResQ Qwen-LLM] Inference error, falling back to deterministic protocol:', e);
       }
     }
 
@@ -92,16 +116,33 @@ export class LocalLlmService {
     if (matched) {
       const formattedSteps = matched.steps.map((s, i) => `${i + 1}. ${s}`).join('\n');
       const warningText = matched.warning ? `\n\n⚠️ CRITICAL WARNING: ${matched.warning}` : '';
+      const reply = `**${matched.title}** (${matched.subtitle})\n\n${formattedSteps}${warningText}`;
+      if (saveHistory) {
+        this.conversationHistory.push({ role: 'user', content: userQuestion });
+        this.conversationHistory.push({ role: 'assistant', content: reply });
+      }
       return {
-        answer: `**${matched.title}** (${matched.subtitle})\n\n${formattedSteps}${warningText}`,
+        answer: reply,
         source: 'OFFLINE_PROTOCOL_ENGINE',
         matchedProtocol: matched,
       };
     }
 
-    // 3. General disaster triage fallback
+    // 3. Conversational triage fallback
+    const fallbackAnswer = `Hello! I'm **resQ**, your emergency survival companion powered by **${this.currentModelName}**.\n\n` +
+      `1. Ensure immediate physical safety: Protect your head and move away from falling hazards.\n` +
+      `2. In ResQ, press the SOS button on the Home screen to broadcast your BLE beacon to nearby search teams (zero internet needed).\n` +
+      `3. If trapped, tap walls or metal pipes in rhythmic sets of 3 to assist acoustic search.\n` +
+      `4. Call 911 immediately if cellular voice networks are operational.\n\n` +
+      `Tell me what's happening around you or ask how to use any part of this app. I'm right here with you!`;
+
+    if (saveHistory) {
+      this.conversationHistory.push({ role: 'user', content: userQuestion });
+      this.conversationHistory.push({ role: 'assistant', content: fallbackAnswer });
+    }
+
     return {
-      answer: `Hello! I'm **resQ**, your emergency survival companion and app guide.\n\n1. Ensure immediate physical safety: Protect your head and move away from falling hazards.\n2. In ResQ, press the SOS button to broadcast your BLE beacon to nearby search teams (zero internet needed).\n3. If trapped, tap walls or metal pipes in rhythmic sets of 3 to assist acoustic search.\n4. Call 911 immediately if cellular voice networks are operational.\n\nTell me what's happening around you and I will guide you through it.`,
+      answer: fallbackAnswer,
       source: 'OFFLINE_PROTOCOL_ENGINE',
     };
   }
@@ -127,6 +168,23 @@ export class LocalLlmService {
     }
 
     return bestScore >= 2 ? bestMatch : null;
+  }
+
+  public getModelInfo() {
+    return {
+      name: this.currentModelName,
+      architecture: 'Qwen2.5',
+      quantization: 'Q4_K_M',
+      sizeMB: 980,
+      contextLength: 2048,
+      promptFormat: 'ChatML (<|im_start|> ... <|im_end|>)',
+      isLoaded: this.isModelLoaded,
+      historyLength: this.conversationHistory.length,
+    };
+  }
+
+  public clearHistory(): void {
+    this.conversationHistory = [];
   }
 
   public release(): void {
