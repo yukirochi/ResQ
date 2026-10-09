@@ -1993,11 +1993,11 @@
 
       <!-- Quick Radio Dispatch Presets -->
       <div class="chat-radio-chips-row">
-        <button class="chat-radio-chip" onclick="sendRadioPreset('SOS: Trapped under debris, send help!')">🚨 Trapped in rubble</button>
-        <button class="chat-radio-chip" onclick="sendRadioPreset('I can hear the rescue siren!')">🔊 Can hear siren</button>
-        <button class="chat-radio-chip" onclick="sendRadioPreset('Injured: Need stretcher and first aid kit.')">🩹 Need medical aid</button>
-        <button class="chat-radio-chip" onclick="sendRadioPreset('Still breathing, holding position.')">📍 Holding position</button>
-        <button class="chat-radio-chip" onclick="sendRadioPreset('All clear and safe.')">✅ All clear</button>
+        <button class="chat-radio-chip" onclick="sendRadioPreset('SOS: Trapped under debris, send help!')">Trapped in rubble</button>
+        <button class="chat-radio-chip" onclick="sendRadioPreset('I can hear the rescue siren!')">Can hear siren</button>
+        <button class="chat-radio-chip" onclick="sendRadioPreset('Injured: Need stretcher and first aid kit.')">Need medical aid</button>
+        <button class="chat-radio-chip" onclick="sendRadioPreset('Still breathing, holding position.')">Holding position</button>
+        <button class="chat-radio-chip" onclick="sendRadioPreset('All clear and safe.')">All clear</button>
       </div>
 
       <div class="chat-stream-box" id="chatStreamBox">
@@ -2917,7 +2917,7 @@
           </div>
           <div class="survival-card-body">
             ${stepsHtml}
-            ${item.warning ? `<div class="survival-warning-box">⚠️ ${item.warning}</div>` : ''}
+            ${item.warning ? `<div class="survival-warning-box">WARNING: ${item.warning}</div>` : ''}
           </div>
         `;
         container.appendChild(card);

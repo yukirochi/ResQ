@@ -20,8 +20,7 @@ You can download and install the latest built APK binaries directly onto your An
 
 | Package Variant | Direct File Link | Path in Repository | Recommended Use |
 |---|---|---|---|
-| **Release APK (Signed)** | [**Download app-release.apk**](android/app/build/outputs/apk/release/app-release.apk) | `android/app/build/outputs/apk/release/app-release.apk` | **Production / Real Devices** (Optimized, 5.79 MB) |
-| **Debug APK** | [**Download app-debug.apk**](android/app/build/outputs/apk/debug/app-debug.apk) | `android/app/build/outputs/apk/debug/app-debug.apk` | **Development & Emulators** (Logs enabled, 6.77 MB) |
+| **Release APK (Signed)** | [**Download app-release.apk**](app-release.apk) | `app-release.apk` | **Production / Real Devices** (Optimized, 5.79 MB) |
 
 ### Quick Install via ADB
 ```bash
