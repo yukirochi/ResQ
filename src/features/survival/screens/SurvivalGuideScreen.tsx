@@ -21,6 +21,8 @@ import { THEME } from '../../../ui/theme';
 const AVATAR_1 = require('../../../assets/persona1.jpg');
 const AVATAR_2 = require('../../../assets/persona2.jpg');
 const AVATAR_3 = require('../../../assets/persona3.jpg');
+const SAFETY_MASCOT = require('../../../assets/7.jpg');
+const RADIO_MASCOT = require('../../../assets/6.jpg');
 
 const PERSONAS = [
   {
@@ -43,12 +45,21 @@ const PERSONAS = [
   },
   {
     id: '3',
-    name: 'resQ Survival',
-    role: 'Field Expert',
-    img: AVATAR_3,
+    name: 'resQ Safety',
+    role: 'Safety 101',
+    img: SAFETY_MASCOT,
     badge: 'SURVIVAL',
     color: '#F59E0B',
     chips: ['Find clean water', 'Wildfire escape', 'Enable Auto SOS', 'Night shelter'],
+  },
+  {
+    id: '4',
+    name: 'resQ Comms',
+    role: 'Mesh Radio',
+    img: RADIO_MASCOT,
+    badge: 'COMMS',
+    color: '#8B5CF6',
+    chips: ['BLE Mesh signal', 'Off-grid broadcast', 'Siren relay', 'Battery saver'],
   },
 ];
 
@@ -109,6 +120,20 @@ export const SurvivalGuideScreen: React.FC<SurvivalGuideScreenProps> = ({ onBack
         </View>
 
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+
+          {/* === SAFETY 101 FIELD GUIDE HERO BANNER === */}
+          <View style={styles.safetyHeroBanner}>
+            <Image source={SAFETY_MASCOT} style={styles.safetyHeroImg} />
+            <View style={styles.safetyHeroContent}>
+              <View style={styles.safetyTag}>
+                <Text style={styles.safetyTagText}>SAFETY 101 FIELD GUIDE</Text>
+              </View>
+              <Text style={styles.safetyHeroTitle}>Stay Calm. Be Prepared.</Text>
+              <Text style={styles.safetyHeroSub}>
+                Verified offline emergency triage protocols, crush injury warnings & safety tips.
+              </Text>
+            </View>
+          </View>
 
           {/* === AI SPECIALIST PERSONA PICKER === */}
           <Text style={styles.sectionTitle}>AI SPECIALISTS</Text>
@@ -379,4 +404,50 @@ const styles = StyleSheet.create({
   },
   warningText: { fontSize: 12, color: '#DC2626', fontWeight: '600' },
   expandHint: { fontSize: 11, color: THEME.colors.primaryRed, fontWeight: '700', marginTop: 10, textAlign: 'center' },
+  safetyHeroBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: '#F0FDF4',
+    borderWidth: 1.5,
+    borderColor: '#86EFAC',
+    borderRadius: 16,
+    padding: 12,
+    marginBottom: 14,
+  },
+  safetyHeroImg: {
+    width: 64,
+    height: 64,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: '#10B981',
+  },
+  safetyHeroContent: {
+    flex: 1,
+  },
+  safetyTag: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#DCFCE7',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    marginBottom: 3,
+  },
+  safetyTagText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#15803D',
+    letterSpacing: 0.5,
+  },
+  safetyHeroTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#166534',
+    marginBottom: 2,
+  },
+  safetyHeroSub: {
+    fontSize: 11,
+    color: '#15803D',
+    lineHeight: 15,
+  },
 });

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Linking, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, Vibration, View } from 'react-native';
+import { Alert, Image, Linking, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, Vibration, View } from 'react-native';
 import { accelerometer, setUpdateIntervalForType, SensorTypes } from 'react-native-sensors';
 import { SirenManager } from '../../../core/audio/siren';
 import { BleAdvertiserManager } from '../../../core/ble/advertiser';
@@ -188,19 +188,19 @@ export const SosHomeScreen: React.FC<SosHomeScreenProps> = ({ onOpenProfile, onO
         {/* Quick Navigation Cards */}
         <View style={styles.navRow}>
           <TouchableOpacity onPress={onOpenProfile} style={styles.navCard}>
-            <Text style={styles.navCardIcon}>🛡️</Text>
+            <Image source={require('../../../assets/5.jpg')} style={styles.navCardImg} />
             <Text style={styles.navCardTitle}>Medical Profile</Text>
             <Text style={styles.navCardSub}>Encrypted on phone</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={onOpenChat} style={styles.navCard}>
-            <Text style={styles.navCardIcon}>💬</Text>
+            <Image source={require('../../../assets/6.jpg')} style={styles.navCardImg} />
             <Text style={styles.navCardTitle}>Offline Chat</Text>
             <Text style={styles.navCardSub}>P2P BLE link</Text>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={onOpenSurvival} style={styles.navCard}>
-            <Text style={styles.navCardIcon}>⚡</Text>
+            <Image source={require('../../../assets/7.jpg')} style={styles.navCardImg} />
             <Text style={styles.navCardTitle}>Survival & AI</Text>
             <Text style={styles.navCardSub}>Offline Guide</Text>
           </TouchableOpacity>
@@ -349,6 +349,12 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: THEME.colors.textMuted,
     marginTop: 2,
+  },
+  navCardImg: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    marginBottom: 6,
   },
   shakeBanner: {
     flexDirection: 'row',

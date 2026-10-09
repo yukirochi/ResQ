@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Image, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { BleGattClient } from '../../../core/ble/gattClient';
 import { BleScannerManager } from '../../../core/ble/scanner';
 import { useVictimsStore } from '../../../store/victimsStore';
@@ -79,6 +79,8 @@ export const RadarScreen: React.FC<RadarScreenProps> = ({ onInspectVictim, onOpe
               </View>
             ) : (
               <View style={styles.emptyContainer}>
+                <Image source={require('../../../assets/3.jpg')} style={styles.emptyMascot} />
+                <Text style={styles.emptyTitle}>Radar Scout Active</Text>
                 <Text style={styles.emptyText}>Scanning BLE 2.4GHz for ResQ Emergency Beacons...</Text>
               </View>
             )}
@@ -173,8 +175,23 @@ const styles = StyleSheet.create({
     padding: THEME.spacing.lg,
     alignItems: 'center',
   },
+  emptyMascot: {
+    width: 68,
+    height: 68,
+    borderRadius: 18,
+    marginBottom: 10,
+    borderWidth: 2,
+    borderColor: 'rgba(59, 130, 246, 0.5)',
+  },
+  emptyTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: THEME.colors.textPrimary,
+    marginBottom: 4,
+  },
   emptyText: {
+    fontSize: 12,
     color: THEME.colors.textMuted,
-    fontSize: 13,
+    textAlign: 'center',
   },
 });

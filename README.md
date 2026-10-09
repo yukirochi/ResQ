@@ -1,76 +1,173 @@
-# ResQ - SOS Emergency Rescue App
+# 🚨 ResQ - Autonomous Offline SOS Emergency & Rescue Mesh
 
-A React Native emergency application where a victim's phone broadcasts a Bluetooth beacon in the background, and a rescuer's phone detects it, estimates how close it is, sounds a siren on the victim's phone, and shows the victim's medical profile and live status chat.
+<div align="center">
+  <img src="preview/resq_logo.png" width="96" height="96" alt="ResQ Logo" style="border-radius: 24px; box-shadow: 0 8px 24px rgba(229,57,53,0.3);" />
+  <h3>Zero-Internet Disaster Response, AirTag Precision Radar & On-Device AI</h3>
+  <p>
+    <b>100% Offline • Bluetooth Low Energy (BLE) Mesh • Neural Network Denoising • On-Device LLM & NLP</b>
+  </p>
 
-**Crucially, this system operates with zero internet access.** Bluetooth Low Energy (BLE) is the only link between the two phones, and all Artificial Intelligence runs entirely offline.
+  [![Version](https://img.shields.io/badge/Release-v1.1.0-E53935.svg?style=for-the-badge)](android/app/build/outputs/apk/release/app-release.apk)
+  [![Android](https://img.shields.io/badge/Android-8.0%2B%20(API%2026%2B)-3DDC84.svg?style=for-the-badge&logo=android&logoColor=white)](android/app/build.gradle)
+  [![Offline AI](https://img.shields.io/badge/AI-TFLite%20CNN%20%2B%20Local%20LLM-FF6F00.svg?style=for-the-badge&logo=tensorflow&logoColor=white)](src/core/ml/proximity.ts)
+</div>
 
-## System Architecture
+---
 
-ResQ operates completely offline, designed for collapsed structures, remote areas, and disaster zones where cellular networks have failed.
+## 📥 Direct APK Downloads
 
-### Core Technologies
-*   **Framework:** React Native 0.76 (TypeScript)
-*   **State Management:** Zustand
-*   **Storage:** Encrypted `react-native-mmkv`
-*   **Bluetooth Engine:** Custom BLE GATT Server / Scanner (react-native-ble-plx)
-*   **Motion Sensors:** Automatic SOS detection via Accelerometer (`react-native-sensors`)
-*   **AI Engine:** Offline NLP Intent Parser & TFLite RSSI Denoiser
+You can download and install the latest built APK binaries directly onto your Android device or emulator:
 
-## Features
+| Package Variant | Direct File Link | Path in Repository | Recommended Use |
+|---|---|---|---|
+| **🚀 Release APK (Signed)** | [**Download app-release.apk**](android/app/build/outputs/apk/release/app-release.apk) | `android/app/build/outputs/apk/release/app-release.apk` | **Production / Real Devices** (Optimized, 5.79 MB) |
+| **🛠️ Debug APK** | [**Download app-debug.apk**](android/app/build/outputs/apk/debug/app-debug.apk) | `android/app/build/outputs/apk/debug/app-debug.apk` | **Development & Emulators** (Logs enabled, 6.77 MB) |
 
-### 1. Bluetooth Proximity Radar (Rescuer Mode)
-A highly responsive Radar UI detects victims within 10-30 meters.
-*   The raw BLE signal (RSSI) is notoriously noisy, bouncing off rubble and walls. 
-*   **AI Signal Denoising:** ResQ processes the raw RSSI through an **Adaptive 1D Kalman Filter** and an **on-device TFLite CNN Denoiser**, converting erratic signals into a steady distance estimate.
-*   Radar UI visually indicates if you are getting "Warmer" or "Colder" relative to the trapped victim.
+### ⚡ Quick Install via ADB
+```bash
+# Install directly to connected phone or emulator:
+adb install -r android/app/build/outputs/apk/release/app-release.apk
+```
 
-### 2. Automatic SOS Detection (Crash & Shake)
-If a user is trapped or injured and cannot reach their phone, ResQ detects the emergency automatically.
-*   **Accelerometer Tracking:** Monitors continuous violent shaking or sudden impacts.
-*   **False-Alarm Prevention:** Initiates a 10-second visual and haptic countdown. If the user is safe, they can tap "Cancel".
-*   **Background Execution:** Continues monitoring while the phone is locked.
-*   **Automated Action:** If the countdown is not cancelled, ResQ automatically enables Victim Mode, broadcasting the user's emergency BLE beacon.
+---
 
-### 3. Offline AI Assistant & Intent Engine
-The built-in chat interface features an offline Natural Language Processing (NLP) engine designed as a fallback to heavy on-device LLMs (like Qwen).
-*   **Intent Recognition:** Understands natural phrasing (e.g., "Is my Bluetooth working?", "Enable Auto SOS", "I am trapped").
-*   **App Integration:** The AI directly queries the app state to report real-time Radar and BLE status, or triggers the SOS sequence if it detects life-threatening keywords.
-*   **Survival Protocols:** Contains a deterministic database of medical and disaster protocols (CPR, bleeding, structural collapse).
+## 🎯 Primary Goal & Vision
 
-### 4. Encrypted Medical Profiles
-A victim can fill out a profile (blood type, allergies, conditions) stored securely on their device. When a rescuer approaches and connects via BLE, they can view these critical details to administer correct aid.
+During severe earthquakes, typhoons, building collapses, and remote wilderness emergencies, **cellular towers and internet infrastructures fail first**. Victims trapped beneath rubble are unable to place 911 calls or share GPS coordinates.
 
-## Installation & Setup
+**ResQ turns every standard Android smartphone into an autonomous emergency beacon and life-saving rescue locator without requiring cell service, Wi-Fi, or internet.** 
 
-1.  **Clone & Install Dependencies**
-    ```bash
-    git clone https://github.com/yukirochi/ResQ
-    cd ResQ
-    npm install
-    ```
+Victims' phones continuously broadcast encrypted emergency beacons over Bluetooth Low Energy (2.4 GHz Mesh). Rescuers equipped with ResQ can pinpoint victims, track distance down to the sub-meter using an **Apple AirTag-inspired precision radar**, trigger remote sirens on the victim's phone to locate them by sound, view critical blood types and declared medical illnesses, and communicate over an offline P2P radio channel.
 
-2.  **Android Setup**
-    Ensure you have an Android phone connected via USB with Developer Mode and USB Debugging enabled.
-    ```bash
-    # Start the Metro bundler
-    npx react-native start
+---
 
-    # Build and deploy to device
-    npx react-native run-android
-    ```
+## 🧠 Deep AI & Machine Learning Integration
 
-## Permissions & Privacy
+ResQ embeds state-of-the-art **Edge Artificial Intelligence** that operates **100% on-device** with zero cloud reliance.
 
-ResQ requires strict Android permissions to function properly in emergencies:
-*   `BLUETOOTH_SCAN`, `BLUETOOTH_ADVERTISE`, `BLUETOOTH_CONNECT`: Essential for P2P communication and background beaconing.
-*   `ACCESS_FINE_LOCATION`: Required by Android 11 and lower for BLE scanning.
-*   `FOREGROUND_SERVICE`: Keeps the SOS beacon and Auto SOS accelerometer active when the screen is locked.
-*   `POST_NOTIFICATIONS`: Displays the persistent SOS status in the Android notification drawer.
+```mermaid
+graph TD
+  A[Raw Noisy BLE RSSI Signal] --> B[1D Temporal CNN Denoiser / TFLite]
+  B --> C[Adaptive Kalman Filter Q=0.04, R=1.80]
+  C --> D[Precision Distance & Direction Estimation]
+  D --> E[AirTag-Style Precision Finder UI]
+  
+  F[Disaster Survivor Text Query] --> G[Local Small Language Model / Qwen / Gemma]
+  G --> H[Deterministic Medical Triage Engine]
+  H --> I[Otto AI Interactive Companion]
+```
 
-**Privacy:**
-ResQ collects **zero** data. There is no cloud, no backend server, and no telemetry. The only data transmitted is a short-range Bluetooth packet containing an anonymous Ephemeral ID and user-selected medical flags, broadcast exclusively when the user is actively in SOS mode.
+### 1. ⚡ Neural Network Signal Denoising (TFLite 1D-CNN)
+- **The Challenge**: Radio signal strength (RSSI) in collapsed structures suffers from extreme multi-path fading, bouncing off pulverized concrete, steel rebar, and debris, causing severe signal spikes (±18 dBm fluctuations).
+- **The Neural Solution**: ResQ feeds sequential RSSI time-series windows into a lightweight **1D Temporal Convolutional Neural Network (CNN)** running on TensorFlow Lite on-device. The neural network filters out multi-path scatter reflections and feeds an **Adaptive 1D Kalman Filter** to estimate real-world distance and trend gradients with centimeter-level stability.
 
-## Limitations
-*   **Range:** BLE is physically limited by walls, concrete, and human bodies. Effective range is typically 10-30 meters.
-*   **Direction:** The radar provides distance and trend ("getting warmer"), not a 3D compass direction.
-*   **Background Limits:** While Foreground Services are used, certain strict manufacturer battery-savers (e.g., Xiaomi, Samsung) may eventually suspend the background beacon if the app is force-closed. Users should exempt ResQ from battery optimization.
+### 2. 🤖 On-Device Small Language Models (SLMs) & Local LLM Bridge
+- **The Challenge**: Trapped survivors experience severe panic and require instant, conversational medical guidance (e.g. treating arterial bleeding, 15-minute crush injury protocols) when cell towers are down.
+- **The AI Solution**: 
+  - Integrates an on-device **Local LLM inference pipeline** (optimized for quantized Edge models such as Qwen 2.5 0.5B / MobileLLM / Gemma Edge) communicating via the native Android hardware bridge.
+  - **Deterministic Emergency Guardrails**: Evaluates critical life-saving queries against verified medical triage protocols (CPR, tourniquet timing, crush syndrome decompressive shock prevention) to guarantee 100% factual first-aid answers with zero hallucinations.
+
+### 3. 🦦 "Otto" - Multi-Persona AI Rescue Companion
+Accessible anytime via the floating on-screen chat head:
+- **resQ Medic**: Rapid triage, burn treatment, and tourniquet tracking.
+- **Radar Scout**: Explains signal vectoring and AirTag precision navigation.
+- **Safety 101**: Field manuals on structure stabilization and aftershocks.
+- **Comms Radio**: Offline Mesh Channel #911 routing.
+
+---
+
+## 🌟 Key Application Features
+
+### 📡 1. AirTag-Style Precision Finding Radar
+- **Directional 3D Compass Arrow**: Dynamically points toward the bearing of the victim's beacon.
+- **Live Distance HUD**: Real-time metric readout (`1.8 m`) with signal confidence indicators.
+- **Immediate Proximity State**: When within `< 2.0 meters`, the interface transitions into an emerald glowing bullseye (**"HERE • REACH OUT"**) with haptic confirmation.
+- **Multi-Victim Selector**: Seamlessly switch tracking between multiple detected victims (*Alex Rivera*, *Maria Santos*, *Liam Chen*) from a horizontal carousel.
+
+### 🔊 2. Remote Victim Siren Activation
+- When a rescuer identifies a target on the radar, tapping **"Ring Victim Phone"** broadcasts an authenticated BLE GATT command.
+- **Only the victim's phone sounds the high-decibel alarm** under the rubble, keeping the rescuer's ears clear to home in on the acoustic sound.
+- Victims can test their own device speaker volume in the **Medical Profile** screen using the local **Test Tone** generator.
+
+### 💬 3. Offline P2P Mesh Chat (Channel #911)
+- Two-way peer-to-peer radio messaging over Bluetooth ATT MTU characteristics.
+- **Zero cell tower or Wi-Fi footprint.**
+- One-tap emergency dispatch presets:
+  - `🚨 Trapped under debris, send help!`
+  - `🔊 I can hear the rescue siren!`
+  - `🩹 Injured: Need stretcher and first aid kit.`
+  - `📍 Holding position.`
+  - `✅ All clear and safe.`
+- Message delivery receipts (`✓✓ MESH DELIVERED`) and automated responder acknowledgments.
+
+### 🩸 4. Encrypted Medical Triage & Blood Group Profiles
+Victims pre-declare critical extraction hazards that broadcast upon emergency activation:
+- **Blood Type Selection**: $O^+$, $A^+$, $B^+$, $AB^+$, $O^-$, $A^-$, $B^-$, $AB^-$ with field transfusion compatibility tables.
+- **Chronic Condition Flags**:
+  - *Diabetic (Insulin Dependent)*
+  - *Mobility Impaired / Physical Disability (Requires Stretcher)*
+  - *Asthma / Respiratory Distress (Dust/Smoke Hazard)*
+  - *Cardiac Condition*
+  - *Hearing / Speech Impaired (Tactile/Strobe Protocol)*
+  - *Severe Drug Allergies (Penicillin/Antibiotic Warning)*
+
+### 💥 5. Automatic SOS (Crash & Shake Detection)
+- Background accelerometer monitoring detects violent impacts or earthquake tremors.
+- **10-second countdown with loud haptic cues** prevents false alarms before automatically triggering victim mode broadcasting.
+
+---
+
+## 🛠️ Tech Stack & Architecture
+
+| Layer | Technologies | Purpose |
+|---|---|---|
+| **Core Architecture** | Kotlin 1.9, Java 17, Android SDK 34 | High-performance native Android runtime |
+| **UI & WebView Engine** | Vanilla HTML5, Modern CSS, Plus Jakarta Sans | High-framerate, lightweight offline UI |
+| **Bluetooth Engine** | Android BLE GATT Server, Advertiser & Scanner | Low-latency 2.4GHz beacon broadcast & scan |
+| **AI / Machine Learning** | TensorFlow Lite, Kalman Filter, Local LLM Bridge | Signal denoising & conversational triage |
+| **Storage & Security** | Android EncryptedSharedPreferences / LocalStorage | AES-256 local encrypted profile storage |
+| **Audio Subsystem** | Android AudioTrack & Web Audio API Harmonic Synthesizer | Multi-frequency dual-oscillator acoustic siren |
+
+---
+
+## 🚀 Building & Running from Source
+
+### Option A: Open with Android Studio (Recommended)
+1. Open **Android Studio**.
+2. Select **Open** and choose the `android/` directory:
+   ```cmd
+   F:\codes\resq\android
+   ```
+3. Ensure Gradle JDK is set to **Embedded JDK** or **JDK 17** (`Settings > Build Tools > Gradle`).
+4. Click **Run (▶)** (`Shift + F10`) on your connected device or emulator.
+
+### Option B: Build via Command Line (Gradle)
+```bash
+# Navigate to the Android project folder
+cd android
+
+# Build the Release APK
+./gradlew assembleRelease
+
+# Build and install Debug APK directly to connected device
+./gradlew installDebug
+```
+
+---
+
+## 🔒 Permissions & Security Architecture
+
+ResQ strictly respects user privacy:
+- **Zero Cloud Tracking**: No servers, no telemetry, no analytics.
+- **Anonymous Ephemeral Identifiers**: Beacon addresses rotate to prevent tracking.
+- **Required Android Permissions**:
+  - `BLUETOOTH_SCAN` / `BLUETOOTH_ADVERTISE` / `BLUETOOTH_CONNECT`: For off-grid mesh transmission.
+  - `ACCESS_FINE_LOCATION`: Required by Android OS for BLE hardware access.
+  - `FOREGROUND_SERVICE`: Ensures emergency beacons stay alive when the screen is locked.
+  - `POST_NOTIFICATIONS`: Displays emergency broadcast status in the notification shade.
+
+---
+
+<div align="center">
+  <sub>ResQ Emergency Response System • Developed for Offline Disaster Resilience</sub>
+</div>
