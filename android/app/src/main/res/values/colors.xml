@@ -1,0 +1,6 @@
+<resources>
+    <color name="resq_bg">#070A11</color>
+    <color name="sos_red">#EF4444</color>
+    <color name="radar_blue">#3B82F6</color>
+    <color name="immediate_green">#10B981</color>
+</resources>

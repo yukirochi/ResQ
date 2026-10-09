@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResQ - Offline BLE Emergency Rescue Interactive Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070A11;
+      --surface: #0E1524;
+      --surface-card: #141E34;
+      --surface-hover: #1B2947;
+      --border: #213052;
+      --border-subtle: #18233C;
+      --sos-red: #EF4444;
+      --sos-red-dark: #DC2626;
+      --radar-blue: #3B82F6;
+      --radar-blue-dark: #2563EB;
+      --immediate-green: #10B981;
+      --near-amber: #F59E0B;
+      --far-red: #EF4444;
+      --text-main: #F8FAFC;
+      --text-muted: #64748B;
+      --text-sec: #94A3B8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Top Global Header */
+    header {
+      background: rgba(14, 21, 36, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand-wrap { display: flex; align-items: center; gap: 12px; }
+    .brand-logo { font-size: 24px; font-weight: 900; color: var(--sos-red); letter-spacing: -0.5px; }
+    .pill-offline {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--immediate-green);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pill-offline::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--immediate-green); box-shadow: 0 0 8px var(--immediate-green); }
+
+    /* Layout Container */
+    .app-layout {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      padding: 30px 20px;
+    }
+
+    /* Phone Mockup */
+    .phone-frame {
+      width: 380px;
+      height: 760px;
+      background: #090D16;
+      border-radius: 46px;
+      border: 10px solid #1E293B;
+      box-shadow: 0 25px 60px -15px rgba(0,0,0,0.8), 0 0 40px rgba(59, 130, 246, 0.1);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (max-width: 600px) {
+      body { overflow: hidden; height: 100vh; }
+      header { display: none !important; }
+      .app-layout { padding: 0 !important; margin: 0 !important; width: 100vw !important; height: 100vh !important; }
+      .phone-frame { width: 100vw !important; height: 100vh !important; border: none !important; border-radius: 0 !important; box-shadow: none !important; }
+      .phone-notch { display: none !important; }
+      .phone-screen { padding-top: 10px !important; }
+      .control-deck {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100% !important;
+        max-height: 75vh;
+        overflow-y: auto;
+        z-index: 999;
+        border-radius: 20px 20px 0 0 !important;
+        border-bottom: none !important;
+      }
+      .control-deck.open { display: block !important; }
+      .mobile-deck-toggle { display: flex !important; }
+    }
+
+    .mobile-deck-toggle {
+      display: none;
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      background: var(--radar-blue);
+      color: #FFF;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 10px 16px;
+      border-radius: 999px;
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.5);
+      border: 1px solid #93C5FD;
+      cursor: pointer;
+      z-index: 1000;
+    }
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140px;
+      height: 24px;
+      background: #1E293B;
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .notch-speaker { width: 44px; height: 4px; border-radius: 2px; background: #0F172A; }
+
+    .phone-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding-top: 26px;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    /* Control Panel on the Side */
+    .control-deck {
+      width: 360px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    .deck-title { font-size: 16px; font-weight: 800; color: var(--text-main); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .deck-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; }
+    .deck-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .deck-label { font-size: 11px; font-weight: 800; color: var(--text-muted); letter-spacing: 0.5px; margin-bottom: 8px; text-transform: uppercase; }
+    .btn-row { display: flex; gap: 8px; }
+    .deck-btn {
+      flex: 1;
+      background: var(--surface-hover);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: center;
+    }
+    .deck-btn:hover { background: #223458; border-color: var(--radar-blue); }
+    .deck-btn.active { background: rgba(59, 130, 246, 0.2); border-color: var(--radar-blue); color: var(--radar-blue); }
+
+    /* In-Phone Screen Views */
+    .screen-view { display: none; flex-direction: column; flex: 1; padding: 16px; }
+    .screen-view.active { display: flex; }
+
+    /* Mode Picker View */
+    .mode-header { text-align: center; margin-top: 20px; margin-bottom: 24px; }
+    .mode-app-title { font-size: 38px; font-weight: 900; color: var(--sos-red); letter-spacing: -1px; }
+    .mode-tagline { font-size: 13px; font-weight: 700; color: var(--text-sec); margin-top: 2px; }
+    .mode-card-select {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .mode-card-select:hover { transform: translateY(-2px); }
+    .mode-card-victim { border-color: rgba(239, 68, 68, 0.4); }
+    .mode-card-victim:hover { border-color: var(--sos-red); box-shadow: 0 8px 24px rgba(239, 68, 68, 0.2); }
+    .mode-card-rescue { border-color: rgba(59, 130, 246, 0.4); }
+    .mode-card-rescue:hover { border-color: var(--radar-blue); box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2); }
+    .mode-card-title { font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+    .mode-card-desc { font-size: 12px; color: var(--text-sec); margin: 6px 0 12px 0; line-height: 16px; }
+    .mode-cta { font-size: 12px; font-weight: 800; padding: 10px; border-radius: 8px; text-align: center; }
+    .cta-victim { background: var(--sos-red); color: #FFF; }
+    .cta-rescue { background: var(--radar-blue); color: #FFF; }
+
+    /* Top In-App Phone Nav */
+    .phone-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 12px;
+    }
+    .nav-title { font-size: 18px; font-weight: 900; }
+    .nav-back { font-size: 12px; font-weight: 700; color: var(--radar-blue); cursor: pointer; }
+
+    /* Victim Mode Screen */
+    .beacon-status-pill {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-sec);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .beacon-status-pill.active {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: var(--sos-red);
+      color: #FFF;
+    }
+    .beacon-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); }
+    .beacon-status-pill.active .beacon-dot { background: var(--sos-red); box-shadow: 0 0 10px var(--sos-red); animation: pulse 1.2s infinite; }
+
+    /* SOS Button */
+    .sos-btn-wrapper {
+      position: relative;
+      width: 170px;
+      height: 170px;
+      margin: 10px auto 20px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .sos-pulse-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.35);
+      transform: scale(1);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .sos-btn {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: var(--surface-card);
+      border: 4px solid var(--border);
+      color: #FFF;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      transition: all 0.2s ease;
+      z-index: 2;
+    }
+    .sos-btn.active {
+      background: var(--sos-red);
+      border-color: #FCA5A5;
+      box-shadow: 0 0 35px rgba(239, 68, 68, 0.7);
+    }
+    .sos-btn.active ~ .sos-pulse-ring { animation: ripple 1.6s infinite ease-out; }
+    .sos-label { font-size: 22px; font-weight: 900; letter-spacing: 0.5px; }
+    .sos-sub { font-size: 9px; font-weight: 800; opacity: 0.85; margin-top: 4px; letter-spacing: 0.5px; }
+
+    @keyframes ripple {
+      0% { transform: scale(0.9); opacity: 0.8; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+    @keyframes pulse {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
+
+    /* Direct 911 Call Button */
+    .call-911-btn {
+      background: #7F1D1D;
+      border: 1px solid var(--sos-red);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+    .call-911-icon { font-size: 20px; }
+    .call-911-text { font-size: 12px; font-weight: 900; color: #FFF; }
+    .call-911-sub { font-size: 10px; color: #FCA5A5; }
+
+    /* Chips */
+    .chip-grid { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .status-chip {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .status-chip.selected {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: var(--sos-red);
+      color: #FFF;
+    }
+
+    /* Radar View */
+    .radar-canvas-wrap {
+      width: 260px;
+      height: 260px;
+      margin: 0 auto 12px auto;
+      position: relative;
+    }
+    canvas#radarCanvas {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #060910;
+      box-shadow: 0 0 30px rgba(59, 130, 246, 0.15);
+    }
+    .spotlight-box {
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .spot-left { display: flex; align-items: center; gap: 10px; }
+    .spot-dist { font-size: 22px; font-weight: 900; color: #FFF; }
+    .spot-trend { font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 999px; }
+    .trend-warmer { background: rgba(16, 185, 129, 0.2); color: var(--immediate-green); }
+    .trend-colder { background: rgba(239, 68, 68, 0.2); color: var(--sos-red); }
+
+    /* Victim Cards in Rescue List */
+    .victim-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+    .victim-card.selected { border-color: var(--radar-blue); box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
+    .vc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+    .vc-id { font-size: 13px; font-weight: 800; color: #FFF; }
+    .vc-zone { font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 999px; }
+    .zone-imm { background: rgba(16, 185, 129, 0.2); color: var(--immediate-green); }
+    .zone-near { background: rgba(245, 158, 11, 0.2); color: var(--near-amber); }
+    .zone-far { background: rgba(239, 68, 68, 0.2); color: var(--sos-red); }
+    .vc-telemetry { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); display: flex; gap: 10px; }
+    .vc-actions { display: flex; gap: 6px; margin-top: 8px; }
+    .btn-siren-trigger {
+      flex: 1;
+      background: var(--surface-hover);
+      border: 1px solid var(--border);
+      color: var(--sos-red);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .btn-siren-trigger.active { background: var(--sos-red); color: #FFF; }
+    .btn-card-chat {
+      background: var(--surface-hover);
+      border: 1px solid var(--border);
+      color: var(--radar-blue);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* P2P Chat View */
+    .chat-stream { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+    .chat-bubble { max-width: 80%; padding: 8px 12px; border-radius: 12px; font-size: 12px; line-height: 16px; }
+    .bubble-me { align-self: flex-end; background: var(--radar-blue); color: #FFF; border-bottom-right-radius: 2px; }
+    .bubble-them { align-self: flex-start; background: var(--surface-card); border: 1px solid var(--border); color: #FFF; border-bottom-left-radius: 2px; }
+    .bubble-receipt { font-size: 8px; opacity: 0.8; text-align: right; margin-top: 2px; }
+    .chat-input-row { display: flex; gap: 6px; }
+    .chat-input {
+      flex: 1;
+      background: var(--surface-hover);
+      border: 1px solid var(--border);
+      color: #FFF;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 12px;
+      outline: none;
+    }
+    .chat-send-btn { background: var(--radar-blue); border: none; color: #FFF; font-size: 11px; font-weight: 800; padding: 8px 14px; border-radius: 999px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand-wrap">
+      <div class="brand-logo">ResQ</div>
+      <div class="pill-offline">OFFLINE P2P BLE ACTIVE</div>
+    </div>
+    <div style="font-size: 12px; color: var(--text-sec); font-weight: 600;">
+      Interactive Mobile & AI Signal Simulator
+    </div>
+  </header>
+
+  <div class="app-layout">
+    <!-- Phone Device Shell -->
+    <div class="phone-frame">
+      <div class="phone-notch"><div class="notch-speaker"></div></div>
+      <div class="phone-screen">
+
+        <!-- VIEW 1: MODE PICKER -->
+        <div id="viewModePicker" class="screen-view active">
+          <div class="mode-header">
+            <div class="mode-app-title">ResQ</div>
+            <div class="mode-tagline">Zero-Internet Emergency Rescue</div>
+          </div>
+
+          <div class="mode-card-select mode-card-victim" onclick="selectAppMode('VICTIM')">
+            <div class="mode-card-title"><span>🆘</span> VICTIM MODE</div>
+            <div class="mode-card-desc">I am hurt or trapped. Broadcasts background BLE rotating beacon, shares encrypted medical data, and allows rescuers to trigger locating siren.</div>
+            <div class="mode-cta cta-victim">ACTIVATE SOS BROADCAST →</div>
+          </div>
+
+          <div class="mode-card-select mode-card-rescue" onclick="selectAppMode('RESCUE')">
+            <div class="mode-card-title"><span>🧭</span> RESCUE SEARCH RADAR</div>
+            <div class="mode-card-desc">Search team mode. Proximity radar with on-device AI noise denoiser, "Warmer/Colder" trend tracking, remote siren, and offline P2P chat.</div>
+            <div class="mode-cta cta-rescue">OPEN SEARCH RADAR →</div>
+          </div>
+        </div>
+
+        <!-- VIEW 2: VICTIM SOS SCREEN -->
+        <div id="viewVictim" class="screen-view">
+          <div class="phone-nav">
+            <div class="nav-title">Emergency Beacon</div>
+            <div class="nav-back" onclick="selectAppMode('NONE')">Change Mode</div>
+          </div>
+
+          <div id="victimStatusPill" class="beacon-status-pill">
+            <div class="beacon-dot"></div>
+            <span id="beaconText">STANDBY: Press SOS to broadcast beacon</span>
+          </div>
+
+          <div class="sos-btn-wrapper">
+            <div class="sos-pulse-ring"></div>
+            <button id="btnSosToggle" class="sos-btn" onclick="toggleVictimSos()">
+              <span class="sos-label" id="sosLabel">SOS</span>
+              <span class="sos-sub" id="sosSub">TAP TO BROADCAST</span>
+            </button>
+          </div>
+
+          <div class="call-911-btn" onclick="alert('Cellular Direct Call: Dialing 911 (Works with no internet or data required)')">
+            <div class="call-911-icon">📞</div>
+            <div>
+              <div class="call-911-text">CALL 911 (CELLULAR)</div>
+              <div class="call-911-sub">One-tap direct dial • No data needed</div>
+            </div>
+          </div>
+
+          <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.5px;">YOUR CURRENT CONDITION:</div>
+          <div class="chip-grid">
+            <div class="status-chip selected" onclick="setCondition(this, 'CONSCIOUS')">🗣️ Conscious & Able to Speak</div>
+            <div class="status-chip" onclick="setCondition(this, 'TRAPPED')">🏚️ Trapped Under Debris</div>
+            <div class="status-chip" onclick="setCondition(this, 'CANNOT_MOVE')">🚷 Cannot Move Legs</div>
+            <div class="status-chip" onclick="setCondition(this, 'BLEEDING')">🩸 Severe Bleeding</div>
+            <div class="status-chip" onclick="setCondition(this, 'NEED_INSULIN')">💉 Need Insulin Urgently</div>
+          </div>
+
+          <button id="btnLocalSiren" class="deck-btn" style="padding: 12px; margin-top: auto;" onclick="toggleAudioSiren()">
+            🔊 TEST LOCAL PHONE SIREN (MAX dB)
+          </button>
+        </div>
+
+        <!-- VIEW 3: RESCUE SEARCH RADAR -->
+        <div id="viewRescue" class="screen-view">
+          <div class="phone-nav">
+            <div class="nav-title">Search Radar</div>
+            <div class="nav-back" onclick="selectAppMode('NONE')">Change Mode</div>
+          </div>
+
+          <div class="radar-canvas-wrap">
+            <canvas id="radarCanvas" width="260" height="260"></canvas>
+          </div>
+
+          <!-- Spotlight Target -->
+          <div class="spotlight-box">
+            <div class="spot-left">
+              <div>
+                <div style="font-size: 10px; font-weight: 800; color: var(--radar-blue);">NEAREST TARGET</div>
+                <div class="spot-dist" id="spotDist">3.2m</div>
+              </div>
+            </div>
+            <div class="spot-trend trend-warmer" id="spotTrend">🔥 GETTING WARMER</div>
+          </div>
+
+          <!-- Victims List -->
+          <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 8px;">DISCOVERED VICTIMS (3)</div>
+          <div id="victimsList" style="flex: 1; overflow-y: auto;">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- VIEW 4: P2P CHAT -->
+        <div id="viewChat" class="screen-view">
+          <div class="phone-nav">
+            <div class="nav-title">Offline P2P Chat</div>
+            <div class="nav-back" onclick="openRadar()">← Radar</div>
+          </div>
+          <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 8px;">Direct 200-byte BLE packets • Zero internet</div>
+
+          <div class="chat-stream" id="chatStream">
+            <div class="chat-bubble bubble-them">
+              Can you hear us? We are search team Alpha directly above you.
+              <div class="bubble-receipt">15:42 • DELIVERED</div>
+            </div>
+            <div class="chat-bubble bubble-me">
+              Yes! I am trapped under a concrete beam. I cannot move my legs.
+              <div class="bubble-receipt">15:43 • ✓✓ DELIVERED</div>
+            </div>
+          </div>
+
+          <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); margin-bottom: 4px;">QUICK REPLIES:</div>
+          <div style="display: flex; gap: 4px; overflow-x: auto; margin-bottom: 8px;">
+            <button class="deck-btn" style="white-space: nowrap; font-size: 10px;" onclick="sendQuickReply('Need oxygen urgently')">Need O2</button>
+            <button class="deck-btn" style="white-space: nowrap; font-size: 10px;" onclick="sendQuickReply('Tapping 3 times now')">Tapping pipe</button>
+            <button class="deck-btn" style="white-space: nowrap; font-size: 10px;" onclick="sendQuickReply('Hang tight, cutting rubble')">Hang tight</button>
+          </div>
+
+          <div class="chat-input-row">
+            <input type="text" id="chatInput" class="chat-input" placeholder="Type short message..." onkeydown="if(event.key==='Enter') sendChatMessage()">
+            <button class="chat-send-btn" onclick="sendChatMessage()">SEND</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Live Simulation Control Deck -->
+    <div class="control-deck">
+      <div class="deck-title">⚡ BLE RF & Distance Deck</div>
+      <div class="deck-sub">Adjust virtual victim distance and RF obstacles in real time to observe the on-device Kalman and Neural Denoising response.</div>
+
+      <!-- Distance Control -->
+      <div class="deck-card">
+        <div class="deck-label">Rescuer Physical Distance: <span id="distDisplay" style="color: #FFF; font-size: 14px;">3.2m</span></div>
+        <div class="btn-row">
+          <button class="deck-btn" onclick="adjustDistance(-0.8)">🚶‍♂️ Walk Closer (-0.8m)</button>
+          <button class="deck-btn" onclick="adjustDistance(+0.8)">🚶‍♂️ Walk Away (+0.8m)</button>
+        </div>
+      </div>
+
+      <!-- Obstacle Shadowing -->
+      <div class="deck-card">
+        <div class="deck-label">RF Multipath & Obstacle</div>
+        <div class="btn-row">
+          <button id="btnWall" class="deck-btn active" onclick="toggleWall()">Wall / Rubble (-10dB) ON</button>
+          <button class="deck-btn" onclick="triggerRandomSpike()">⚡ Simulate RF Spike</button>
+        </div>
+      </div>
+
+      <!-- Remote Siren Trigger -->
+      <div class="deck-card">
+        <div class="deck-label">Remote Siren Remote Command</div>
+        <div class="btn-row">
+          <button id="btnRemoteSiren" class="deck-btn" onclick="toggleRemoteSiren()">🔊 Sound Victim Siren</button>
+        </div>
+      </div>
+
+      <!-- Signal Cleaner Metrics -->
+      <div class="deck-card" style="background: #0B111F;">
+        <div class="deck-label">AI Signal Denoising Telemetry</div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 18px; color: var(--text-sec);">
+          Raw RSSI: <span id="telemetryRaw" style="color: var(--far-red);">-76 dBm</span><br>
+          Kalman Cleaned: <span id="telemetryKalman" style="color: var(--immediate-green);">-71.4 dBm</span><br>
+          Zone: <span id="telemetryZone" style="color: var(--near-amber);">NEAR (&lt; 5m)</span><br>
+          Trend Slope: <span id="telemetrySlope" style="color: var(--immediate-green);">+0.62 dB/s (Warmer)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- State Engine ---
+    let appMode = 'NONE';
+    let isSosBroadcasting = false;
+    let distanceMeters = 3.2;
+    let hasWall = true;
+    let isSirenOn = false;
+    let audioCtx = null;
+    let sirenOsc = null;
+    let rawRssi = -76;
+    let kalmanRssi = -71.4;
+
+    const victims = [
+      { id: 'A1B2C3D40001', name: 'Sarah M.', dist: 3.2, condition: 'TRAPPED', blood: 'O+', allergies: 'Penicillin' },
+      { id: '887766550002', name: 'Alex R.', dist: 1.4, condition: 'CONSCIOUS', blood: 'A+', allergies: 'Latex' },
+      { id: '990011220003', name: 'Search Dog Beacon', dist: 11.2, condition: 'SAFE', blood: 'n/a', allergies: 'none' }
+    ];
+
+    function selectAppMode(mode) {
+      appMode = mode;
+      document.querySelectorAll('.screen-view').forEach(v => v.classList.remove('active'));
+      if (mode === 'VICTIM') {
+        document.getElementById('viewVictim').classList.add('active');
+      } else if (mode === 'RESCUE') {
+        document.getElementById('viewRescue').classList.add('active');
+        renderVictims();
+      } else {
+        document.getElementById('viewModePicker').classList.add('active');
+      }
+    }
+
+    function toggleVictimSos() {
+      isSosBroadcasting = !isSosBroadcasting;
+      const btn = document.getElementById('btnSosToggle');
+      const pill = document.getElementById('victimStatusPill');
+      const label = document.getElementById('sosLabel');
+      const sub = document.getElementById('sosSub');
+      const text = document.getElementById('beaconText');
+
+      if (isSosBroadcasting) {
+        btn.classList.add('active');
+        pill.classList.add('active');
+        label.innerText = 'ACTIVE';
+        sub.innerText = 'BEACON BROADCASTING';
+        text.innerText = 'BEACON LIVE: 15-min rotating ID 43453F4C005CC2D5';
+      } else {
+        btn.classList.remove('active');
+        pill.classList.remove('active');
+        label.innerText = 'SOS';
+        sub.innerText = 'TAP TO BROADCAST';
+        text.innerText = 'STANDBY: Press SOS to broadcast beacon';
+        stopSirenSound();
+      }
+    }
+
+    function setCondition(elem, cond) {
+      document.querySelectorAll('.status-chip').forEach(c => c.classList.remove('selected'));
+      elem.classList.add('selected');
+    }
+
+    function openChat(victimId) {
+      document.querySelectorAll('.screen-view').forEach(v => v.classList.remove('active'));
+      document.getElementById('viewChat').classList.add('active');
+    }
+
+    function openRadar() {
+      selectAppMode('RESCUE');
+    }
+
+    function sendQuickReply(msg) {
+      const stream = document.getElementById('chatStream');
+      const div = document.createElement('div');
+      div.className = 'chat-bubble bubble-me';
+      div.innerHTML = `${msg}<div class="bubble-receipt">${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} • ✓✓ DELIVERED</div>`;
+      stream.appendChild(div);
+      stream.scrollTop = stream.scrollHeight;
+    }
+
+    function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      sendQuickReply(text);
+    }
+
+    // --- Web Audio Siren Synthesizer ---
+    function toggleAudioSiren() {
+      if (isSirenOn) {
+        stopSirenSound();
+      } else {
+        startSirenSound();
+      }
+    }
+
+    function toggleRemoteSiren() {
+      toggleAudioSiren();
+      const btn = document.getElementById('btnRemoteSiren');
+      if (isSirenOn) {
+        btn.innerText = '🔕 Silence Victim Siren';
+        btn.style.background = 'var(--sos-red)';
+      } else {
+        btn.innerText = '🔊 Sound Victim Siren';
+        btn.style.background = '';
+      }
+    }
+
+    function startSirenSound() {
+      isSirenOn = true;
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+        sirenOsc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        sirenOsc.type = 'sawtooth';
+        sirenOsc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        
+        // Oscillate 800Hz - 1200Hz warble alarm
+        let high = false;
+        window.sirenInterval = setInterval(() => {
+          if (!sirenOsc || !audioCtx) return;
+          high = !high;
+          sirenOsc.frequency.exponentialRampToValueAtTime(high ? 1300 : 750, audioCtx.currentTime + 0.25);
+        }, 300);
+
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        sirenOsc.connect(gain);
+        gain.connect(audioCtx.destination);
+        sirenOsc.start();
+        document.getElementById('btnLocalSiren').innerText = 'SILENCE ALARM';
+        document.getElementById('btnLocalSiren').style.background = 'var(--sos-red)';
+      } catch(e) {
+        console.log('Audio init prevented:', e);
+      }
+    }
+
+    function stopSirenSound() {
+      isSirenOn = false;
+      if (window.sirenInterval) clearInterval(window.sirenInterval);
+      if (sirenOsc) {
+        try { sirenOsc.stop(); } catch(e) {}
+        sirenOsc = null;
+      }
+      document.getElementById('btnLocalSiren').innerText = '🔊 TEST LOCAL PHONE SIREN (MAX dB)';
+      document.getElementById('btnLocalSiren').style.background = '';
+    }
+
+    // --- Distance & Radar Simulation ---
+    function adjustDistance(delta) {
+      distanceMeters = Math.max(0.4, Math.min(20.0, Math.round((distanceMeters + delta) * 10) / 10));
+      victims[0].dist = distanceMeters;
+      updateSimulation();
+    }
+
+    function toggleWall() {
+      hasWall = !hasWall;
+      const btn = document.getElementById('btnWall');
+      btn.innerText = hasWall ? 'Wall / Rubble (-10dB) ON' : 'Direct Line of Sight (LOS)';
+      btn.classList.toggle('active', hasWall);
+      updateSimulation();
+    }
+
+    function triggerRandomSpike() {
+      rawRssi -= 14;
+      updateSimulation();
+    }
+
+    function updateSimulation() {
+      document.getElementById('distDisplay').innerText = distanceMeters.toFixed(1) + 'm';
+      document.getElementById('spotDist').innerText = distanceMeters.toFixed(1) + 'm';
+
+      // Path loss calculation
+      const tx1m = -59.0;
+      const n = 2.8;
+      const pathLoss = 10 * n * Math.log10(Math.max(0.3, distanceMeters));
+      let calcRssi = tx1m - pathLoss;
+      if (hasWall) calcRssi -= 9.5;
+      rawRssi = Math.round(calcRssi + (Math.random() - 0.5) * 5);
+
+      // Adaptive Kalman smoothing simulation
+      kalmanRssi = Math.round((kalmanRssi * 0.7 + rawRssi * 0.3) * 10) / 10;
+
+      // Telemetry readouts
+      document.getElementById('telemetryRaw').innerText = rawRssi + ' dBm';
+      document.getElementById('telemetryKalman').innerText = kalmanRssi + ' dBm';
+
+      const zone = distanceMeters <= 2.2 ? 'IMMEDIATE (< 2m)' : (distanceMeters <= 5.5 ? 'NEAR (< 5m)' : 'FAR (> 5m)');
+      document.getElementById('telemetryZone').innerText = zone;
+
+      const spotTrend = document.getElementById('spotTrend');
+      if (distanceMeters <= 2.2) {
+        spotTrend.className = 'spot-trend trend-warmer';
+        spotTrend.innerText = '🎯 REACHED IMMEDIATE ZONE';
+      } else if (distanceMeters < 4.0) {
+        spotTrend.className = 'spot-trend trend-warmer';
+        spotTrend.innerText = '🔥 GETTING WARMER';
+      } else {
+        spotTrend.className = 'spot-trend trend-colder';
+        spotTrend.innerText = '❄️ GETTING COLDER';
+      }
+
+      renderVictims();
+    }
+
+    function renderVictims() {
+      const list = document.getElementById('victimsList');
+      if (!list) return;
+      list.innerHTML = '';
+
+      victims.forEach((v, i) => {
+        const zoneClass = v.dist <= 2.2 ? 'zone-imm' : (v.dist <= 5.5 ? 'zone-near' : 'zone-far');
+        const zoneLabel = v.dist <= 2.2 ? 'IMMEDIATE' : (v.dist <= 5.5 ? 'NEAR' : 'FAR');
+
+        const card = document.createElement('div');
+        card.className = `victim-card ${i === 0 ? 'selected' : ''}`;
+        card.innerHTML = `
+          <div class="vc-top">
+            <div class="vc-id">#${v.id.slice(-6)} • ${v.name}</div>
+            <span class="vc-zone ${zoneClass}">${v.dist.toFixed(1)}m • ${zoneLabel}</span>
+          </div>
+          <div class="vc-telemetry">
+            <span>Raw: ${rawRssi - i*4}dBm</span>
+            <span style="color:var(--immediate-green)">Cleaned: ${(kalmanRssi - i*3).toFixed(1)}dBm</span>
+            <span style="color:var(--sos-red)">${v.condition}</span>
+          </div>
+          <div class="vc-actions">
+            <button class="btn-siren-trigger ${isSirenOn && i === 0 ? 'active' : ''}" onclick="toggleRemoteSiren()">${isSirenOn && i === 0 ? 'SILENCE' : 'TRIGGER SIREN'}</button>
+            <button class="btn-card-chat" onclick="openChat('${v.id}')">CHAT</button>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    // --- Radar Sweep Animation on Canvas ---
+    let sweepAngle = 0;
+    function drawRadar() {
+      const canvas = document.getElementById('radarCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      const center = w / 2;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Range rings
+      const rings = [0.26, 0.55, 0.88];
+      rings.forEach((r, idx) => {
+        ctx.beginPath();
+        ctx.arc(center, center, center * r, 0, Math.PI * 2);
+        ctx.strokeStyle = idx === 0 ? 'rgba(16, 185, 129, 0.4)' : (idx === 1 ? 'rgba(245, 158, 11, 0.3)' : 'rgba(239, 68, 68, 0.2)');
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      });
+
+      // Axis lines
+      ctx.strokeStyle = 'rgba(30, 41, 59, 0.7)';
+      ctx.beginPath();
+      ctx.moveTo(center, 0); ctx.lineTo(center, h);
+      ctx.moveTo(0, center); ctx.lineTo(w, center);
+      ctx.stroke();
+
+      // Rotating sweep line
+      sweepAngle += 0.035;
+      ctx.beginPath();
+      ctx.moveTo(center, center);
+      ctx.arc(center, center, center * 0.95, sweepAngle, sweepAngle + 0.35);
+      ctx.closePath();
+      const grad = ctx.createRadialGradient(center, center, 0, center, center, center);
+      grad.addColorStop(0, 'rgba(59, 130, 246, 0)');
+      grad.addColorStop(1, 'rgba(59, 130, 246, 0.25)');
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Draw Center Rescuer
+      ctx.beginPath();
+      ctx.arc(center, center, 6, 0, Math.PI * 2);
+      ctx.fillStyle = '#3B82F6';
+      ctx.fill();
+      ctx.strokeStyle = '#FFF';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Draw victim blips
+      victims.forEach((v, idx) => {
+        const maxDist = 18.0;
+        const normDist = Math.max(0.08, Math.min(0.9, v.dist / maxDist));
+        const blipRadius = center * normDist;
+        const blipAngle = (idx * 2.1) + 0.4;
+        const bx = center + blipRadius * Math.cos(blipAngle);
+        const by = center + blipRadius * Math.sin(blipAngle);
+
+        ctx.beginPath();
+        ctx.arc(bx, by, 7, 0, Math.PI * 2);
+        ctx.fillStyle = v.dist <= 2.2 ? '#10B981' : (v.dist <= 5.5 ? '#F59E0B' : '#EF4444');
+        ctx.fill();
+        ctx.strokeStyle = '#FFF';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      });
+
+      requestAnimationFrame(drawRadar);
+    }
+
+    function toggleMobileDeck() {
+      const deck = document.querySelector('.control-deck');
+      deck.classList.toggle('open');
+      const btn = document.querySelector('.mobile-deck-toggle');
+      btn.innerText = deck.classList.contains('open') ? '✕ CLOSE' : '⚡ RF DECK';
+    }
+
+    drawRadar();
+    updateSimulation();
+  </script>
+  <button class="mobile-deck-toggle" onclick="toggleMobileDeck()">⚡ RF DECK</button>
+</body>
+</html>

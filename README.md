@@ -285,25 +285,29 @@ Follow this order. The riskiest part (BLE in the background) comes first.
 ## Getting started
 
 ```bash
-# 1. Create the project
-npx @react-native-community/cli init SosRescue --template react-native-template-typescript
-cd SosRescue
+# 1. Install dependencies
+npm install
 
-# 2. Install core dependencies
-npm install react-native-ble-plx react-native-fast-tflite zustand \
-  react-native-mmkv react-native-keychain react-native-sound \
-  @react-navigation/native @react-navigation/bottom-tabs \
-  react-native-screens react-native-safe-area-context
+# 2. Run core test suite (Validates BLE packets, Ephemeral ID rotation, Kalman filter, and Proximity Engine)
+npx -y tsx test_core.js
 
-# 3. iOS pods
+# 3. Train Edge AI Denoiser & run signal benchmark
+cd ml-training
+python generate_synthetic_data.py
+python train.py
+python export_tflite.py
+cd ..
+
+# 4. iOS pods (if building for iOS)
 cd ios && pod install && cd ..
 
-# 4. Run on a real device (Bluetooth does not work in simulators)
+# 5. Run the App
+# Toggle the built-in BLE RF Environment Simulator inside the app to test Radar and SOS states immediately,
+# or test directly on real Bluetooth hardware on devices:
 npx react-native run-android
 npx react-native run-ios --device
 ```
 
-Then create the folders from the structure above and start at build step 1.
 
 ## Limitations to plan for
 
